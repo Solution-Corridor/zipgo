@@ -1,13 +1,25 @@
-<div class="col-lg-4 col-md-6 mb-4">
-        <div class="product-card">
-            <a href="/product/{{ $p->slug }}" class="product-image-link">
-                <img src="/{{ $p->pic }}" alt="{{ $p->name }}" title="{{ $p->name }}" class="product-image" onerror="this.src='/assets/images/favicon.png';">
-            </a>
-            <div class="product-content">
-                <h3 class="product-title">
-                    <a href="/product/{{ $p->slug }}">{{ Str::limit($p->name, 30) }}</a>
-                </h3>
-                <a href="https://wa.me/+923467454565?text=Can%20I%20get%20more%20details%20on%20this%20*{{ urlencode($p->name) }}*%0A%0AClick%20the%20link%20to%20view%3A%20{{ urlencode(url('/product/' . $p->slug)) }}" class="btn-buy-now">Buy Now</a>                
-            </div>
-        </div>
+<div class="product-card">
+  <div class="product-image">
+    <a href="/product/{{ $p->slug }}">
+      <img src="/uploads/market/products/{{ $p->pic }}" 
+           onerror="this.onerror=null; this.src='/assets/images/main.jpg';" 
+           alt="{{ $p->name }}" 
+           title="{{ $p->name }}">
+    </a>
+  </div>
+
+  <div class="product-content">
+    <div class="badges">
+      @if ($p->category_name)
+        <span class="badge badge-category">{{ $p->category_name }}</span>
+      @endif
+      @if ($p->sub_category_name)
+        <span class="badge badge-subcategory">{{ $p->sub_category_name }}</span>
+      @endif
     </div>
+    <h3><a href="/product/{{ $p->slug }}" class="product-title">{{ $p->name }}</a></h3>
+    <p class="product-price">Rs. {{ number_format($p->price) }}</p>
+    <a href="{{ route('market.buynow', $p->product_id) }}" class="btn-buy">Buy Now</a>
+    <a href="{{ route('market.addtocart', $p->product_id) }}" class="btn-cart">Add to Cart</a>
+  </div>
+</div>

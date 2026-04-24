@@ -57,28 +57,9 @@
                     {{ auth()->user()->username ?? 'User' }}
                 </h2>
 
-                <!-- Reference -->
-                @if(auth()->user()?->referrer?->id)
-                <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                    <span class="text-purple-400">Ref By:</span> 
-                    FI26{{ auth()->user()->referrer->id }}
-                </p>
-                @endif
+                
 
-                <!-- KYC Status -->
-                <a href="{{ route('kyc.index') }}" class="inline-block mt-3">
-                    <div class="text-xs px-4 py-1.5 rounded-2xl font-semibold text-white w-max
-                        {{ auth()->user()->kyc_status === 'approved' ? 'bg-emerald-600' : 
-                           (auth()->user()->kyc_status === 'submitted' ? 'bg-blue-600' : 'bg-red-600') }} 
-                        hover:scale-105 transition-all duration-200">
-                        KYC • 
-                        {{
-                            auth()->user()->kyc_status === 'submitted' 
-                                ? 'Under Process' 
-                                : ucfirst(str_replace('_', ' ', auth()->user()->kyc_status ?? 'Not Submitted'))
-                        }}
-                    </div>
-                </a>
+                
 
                 <!-- Member Since -->
                 <p class="text-xs text-gray-400 mt-4">

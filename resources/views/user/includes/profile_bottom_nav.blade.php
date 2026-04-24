@@ -10,18 +10,7 @@
         <i data-lucide="chevron-right" class="w-4 h-4 opacity-70"></i>
       </a>
 
-      <a href="{{ route('kyc.index') }}"
-        class="flex items-center justify-between w-full mt-3 px-4 py-3.5 
-    bg-gray-900/60 border border-gray-700/60 rounded-xl 
-    text-sm text-gray-200 hover:text-white 
-    hover:border-purple-500/70 transition">
-        <div class="flex items-center gap-3">
-          <i data-lucide="shield-check" class="w-4 h-4"></i>
-          <span>KYC Verification</span>
-        </div>
-        <i data-lucide="chevron-right" class="w-4 h-4 opacity-70"></i>
-      </a>
-
+     
 
       <!-- Delete Account Button -->
 <button type="button"
@@ -45,7 +34,7 @@
 
 
       <!-- Logout -->
-      <div class="mt-3 px-1">
+      <div class="mt-3">
         <a href="{{ route('logout') }}"
           class="flex items-center justify-between px-4 py-3.5 bg-gradient-to-r from-red-950/50 to-red-900/40 border border-red-800/50 rounded-xl text-red-200 text-sm hover:text-red-100 hover:border-red-700/60 transition">
           <div class="flex items-center gap-3">

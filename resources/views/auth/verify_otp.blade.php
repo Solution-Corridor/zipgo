@@ -2,13 +2,13 @@
 	<html lang="zxx">
 	<head>
 
-		@include('includes.header_links')
+		@include('includes.mob_header_links')
 
 		<title>Verify Otp</title>
 	</head>
 	<body>
 		<!-- Navbar Start -->
-		@include('includes.navbar')
+		@include('includes.mob_navbar')
 		<!-- Navbar End -->
 
 
@@ -54,7 +54,7 @@
 
         @include('includes.footer')
 
-        @include('includes.footer_links')
+        @include('includes.mob_footer_links')
 
 			</body>
 	</html>

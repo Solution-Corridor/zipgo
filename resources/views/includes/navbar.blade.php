@@ -1,116 +1,398 @@
-<header class="sticky top-0 z-50 bg-[#0A0A0F]/80 backdrop-blur-lg border-b border-white/10">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center h-20">
-            <!-- Logo -->
-            <a href="/" class="flex items-center gap-2">
-                <img class="h-45" src="/assets/images/logo.png" alt="Investment Plan" style="height: 40px;">
-            </a>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-            <!-- Desktop Nav -->
-            <nav class="hidden md:flex items-center gap-6">
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f5f5;
+    }
 
-                @guest
-                <a href="/feature-desk" class="text-white/80 hover:text-primary transition-colors">Home</a>
-                <a href="/plan" class="text-white/80 hover:text-primary transition-colors">Plans</a>
-                <a href="/login" class="text-white/80 hover:text-primary transition-colors">Login</a>
-                <a href="/register" class="bg-primary text-white font-semibold py-2 px-4 rounded-full hover:bg-primary/90 transition-all">Sign Up</a>
-                @endguest
+    .feature-desk-navbar {
+        background: linear-gradient(135deg, #1f2937, #111827);
+        height: 60px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        transition: height 0.3s ease;
+    }
 
-                @auth
-                <!-- <a href="/user-dashboard" class="text-white/80 hover:text-primary transition-colors">Dashboard</a>
-                <a href="/plans" class="text-white/80 hover:text-primary transition-colors">Plans</a>
-                <a href="/my-investments" class="text-white/80 hover:text-primary transition-colors">My Investments</a>
-                <a href="/deposit-history" class="text-white/80 hover:text-primary transition-colors">Deposit History</a>
-                <a href="/all-transactions" class="text-white/80 hover:text-primary transition-colors">All Transactions</a>
-                <a href="/withdraw" class="text-white/80 hover:text-primary transition-colors">Withdraw</a>
-                <a href="/withdraw-history" class="text-white/80 hover:text-primary transition-colors">Withdraw History</a>
-                <a href="/referrals" class="text-white/80 hover:text-primary transition-colors">Referrals</a>
-                <a href="/settings" class="text-white/80 hover:text-primary transition-colors">Settings</a>
-                <a href="{{ route('logout') }}" style="color: #f70212;"
-                    class="w-full text-left flex items-center gap-4 text-[#ef4444] hover:text-[#f87171] transition-colors p-3 rounded-lg hover:bg-white/5">
-                    Logout
-                </a> -->
-                @endauth
+    .feature-desk-logo {
+        width: 60px;
+        margin: 0 10px;
+        height: 32px;
+        background: transparent;
+        /* background: #8A2BE2; */
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
 
-            </nav>
+    .nav-links {
+        display: flex;
+        gap: 20px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+    }
 
-            <!-- Mobile Menu Button -->
-            <div class="md:hidden">
-                <button id="menu-btn" class="text-white focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
-                        <line x1="4" x2="20" y1="12" y2="12" />
-                        <line x1="4" x2="20" y1="6" y2="6" />
-                        <line x1="4" x2="20" y1="18" y2="18" />
-                    </svg>
-                </button>
-            </div>
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        position: relative;
+        padding: 8px 0;
+        transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover {
+        opacity: 0.85;
+    }
+
+    .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: white;
+        transition: width 0.25s ease-out;
+        transform: translateX(-50%);
+    }
+
+    .nav-links a:hover::after {
+        width: 100%;
+    }
+
+    .categories-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 0;
+        position: relative;
+    }
+
+    .categories-btn::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: white;
+        transition: width 0.25s ease-out;
+        transform: translateX(-50%);
+    }
+
+    .categories-btn:hover::after {
+        width: 100%;
+    }
+
+    /* Search */
+    .search-container {
+        flex: 1;
+        max-width: 680px;
+        margin: 0 20px;
+        position: relative;
+    }
+
+    .search-bar {
+        width: 100%;
+        height: 40px;
+        background: white;
+        border-radius: 5px;
+        padding: 0 45px 0 20px;
+        border: none;
+        font-size: 15px;
+        outline: none;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        background: #333;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") center/20px no-repeat;
+        cursor: pointer;
+    }
+
+    .navbar-right {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        color: white;
+        font-size: 14px;
+    }
+
+    .navbar-right a {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Hamburger Menu (Mobile) */
+    .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 4px;
+        cursor: pointer;
+    }
+
+    .hamburger span {
+        width: 25px;
+        height: 3px;
+        background: white;
+        border-radius: 2px;
+        transition: 0.3s;
+    }
+
+    /* Mobile Menu Overlay */
+    .mobile-menu {
+        position: fixed;
+        top: 40px;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #1f2937 0%, #1a2433 25%, #141c2b 50%, #0f172a 75%, #020617 100%);
+        padding: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-100%);
+        transition: transform 0.35s ease;
+        z-index: 999;
+    }
+
+    .mobile-menu.active {
+        transform: translateY(0);
+    }
+
+    .mobile-menu a {
+        display: block;
+        padding: 14px 0;
+        color: #fff;
+        font-size: 16px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Dropdown (Desktop + Mobile) */
+    .categories-dropdown {
+        position: relative;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 220px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 12px 0;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.22s ease-out;
+        z-index: 999;
+        color: #333;
+    }
+
+    .dropdown-menu a {
+        padding: 10px 20px;
+        display: block;
+        color: inherit;
+    }
+
+    .dropdown-menu a:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dropdown-menu:hover {
+        background: #000 !important;
+        color: white !important;
+    }
+
+    .categories-dropdown.active .dropdown-menu,
+    .categories-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 1024px) {
+        .nav-links {
+            gap: 16px;
+            font-size: 13.5px;
+        }
+
+        .search-container {
+            margin: 0 16px;
+        }
+    }
+
+    @media (max-width: 900px) {
+
+        .nav-links,
+        .navbar-right>a:not(:last-child) {
+            display: none;
+        }
+
+        .hamburger {
+            display: flex;
+        }
+
+        .search-container {
+            margin: 0 12px;
+            max-width: none;
+        }
+
+        .feature-desk-navbar {
+            justify-content: space-between;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .feature-desk-navbar {
+            height: 56px;
+            padding: 0 12px;
+        }
+
+        .feature-desk-logo {
+            width: 80px;
+            font-size: 13px;
+        }
+
+        .search-bar {
+            height: 38px;
+            font-size: 14px;
+        }
+    }
+</style>
+
+<nav class="feature-desk-navbar">
+    <div class="navbar-right">
+        <div class="hamburger">
+            <span></span><span></span><span></span>
         </div>
     </div>
-</header>
+    
+    <div class="nav-links">
+        <a href="/quick-selling">Quick Selling</a>
+        <a href="/high-rated">High Rated</a>
+        <a href="/new-products">New Arrival</a>
+        <a href="/categories">Categories</a>
+        @guest
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        @endguest
+        @auth
+        @if(auth()->user()->type == 0)
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        @else
+        <a href="{{ route('user_dashboard') }}">Dashboard</a>
+        @endif
+            <a href="/logout" class="text-danger">Logout</a>
+        @endauth
+    </div>
+
+    <div class="search-container">
+        <form action="/search" method="GET" class="search-form position-relative">
+            <input type="text" name="query" class="search-bar" placeholder="Search Feature Desk" required>
+        </form>
+        <div class="search-icon"></div>
+    </div>
+
+    <a href="/">
+        <div class="feature-desk-logo">
+            <img src="/assets/images/logo.png" alt="feature-desk-logo" title="Feature Desk Logo">
+        </div>
+    </a>
+
+    
+</nav>
 
 <!-- Mobile Menu -->
-<div id="mobile-menu" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden md:hidden">
-    <div id="mobile-menu-content" class="fixed top-0 right-0 h-full w-72 bg-[#0A0A0F] border-l border-white/10 shadow-2xl p-6 transform translate-x-full transition-transform duration-300 ease-in-out">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-white text-xl font-bold">Menu</h2>
-            <button id="close-menu-btn" class="text-white/50 hover:text-white text-3xl leading-none">&times;</button>
-        </div>
-        <nav class="flex flex-col space-y-2">
+<div class="mobile-menu">
+    
+    @guest
+    <a href="/login"><i class="fa fa-sign-in-alt"></i> Login</a>
+    <a href="/register"><i class="fa fa-user-plus"></i> Register</a>
+    @endguest
 
-            @guest
-            <a href="/" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Home</a>
-            <a href="/plan" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Plans</a>
-            <a href="/login" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Login</a>
-            <div class="pt-4">
-                <a href="/register" class="block text-center bg-primary text-white font-semibold py-3 px-4 rounded-full hover:bg-primary/90 transition-all w-full">Sign Up</a>
-            </div>
-            @endguest
+    @auth
+        @if(auth()->user()->type == 0)
+            <a href="{{ route('dashboard') }}" style="color: #fc0;">
+                <i class="fa fa-tachometer-alt"></i> Dashboard
+            </a>
+        @else
+            <a href="{{ route('user_dashboard') }}" style="color: #fc0;">
+                <i class="fa fa-user-circle"></i> Dashboard
+            </a>
+        @endif
+    @endauth
 
-            @auth
+    <a href="/quick-selling">
+        <i class="fa fa-bolt"></i> Quick Selling
+    </a>
 
-    {{-- If Admin --}}
-    @if(auth()->user()->type == 0)
+    <a href="/high-rated">
+        <i class="fa fa-star"></i> High Rated
+    </a>
 
-    <a href="{{ route('dashboard') }}"
-           class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">
-            Admin Dashboard
-        </a>
-            
-    <a href="{{ route('user_dashboard') }}"
-           class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">
-            User Dashboard
-        </a>
+    <a href="/new-products">
+        <i class="fa fa-box-open"></i> New Arrival
+    </a>
 
-        
+    <a href="/categories">
+        <i class="fa fa-th-large"></i> Categories
+    </a>
 
-    {{-- If Normal User --}}
-    @else
+    @auth
+    <a href="/logout" style="color: #f00;">
+        <i class="fa fa-sign-out-alt"></i> Logout
+    </a>
+    @endauth
 
-        <a href="{{ route('user_dashboard') }}"
-           class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">
-            Dashboard
-        </a>
-
-    @endif
-
-
-
-            <a href="/plan" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Plans</a>
-            <a href="/my-plans" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">My Investments</a>
-            <a href="/my-plans" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Deposit History</a>
-            <a href="/all-transactions" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">All Transactions</a>
-            <a href="/withdraw" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Withdraw</a>
-            <a href="/withdraw-history" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Withdraw History</a>
-            <a href="{{ route('invite') }}" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Referrals</a>
-            <a href="{{ route('user_profile') }}" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Settings</a>
-            <div class="pt-4">
-                <a href="{{ route('logout') }}" style="color: #f70212;"
-                    class="w-full text-left flex items-center gap-4 text-[#ef4444] hover:text-[#f87171] transition-colors p-3 rounded-lg hover:bg-white/5">
-                    Logout
-                </a>
-            </div>
-            @endauth
-
-        </nav>
-    </div>
 </div>
+
+<script>
+    // Mobile menu toggle
+    document.querySelector('.hamburger').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.querySelector('.mobile-menu').classList.toggle('active');
+    });
+
+    // Categories dropdown (desktop + mobile click)
+    document.querySelector('.categories-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.querySelector('.categories-dropdown').classList.toggle('active');
+    });
+
+    // Close everything on outside click
+    document.addEventListener('click', function() {
+        document.querySelector('.categories-dropdown').classList.remove('active');
+        document.querySelector('.mobile-menu').classList.remove('active');
+    });
+</script>

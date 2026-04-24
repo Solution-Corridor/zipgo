@@ -10,14 +10,14 @@
         </a>
 
         <!-- Membership / Plans -->
-        <a href="{{ route('plan') }}" 
+        <a href="" 
            class="flex flex-col items-center text-slate-400 hover:text-cyan-400 transition-all flex-1">
             <i data-lucide="award" class="w-6 h-6"></i>
             <span class="text-[10px] mt-1 font-medium">Membership</span>
         </a>
 
         <!-- Tasks (Center Highlighted Button) -->
-        <a href="{{ route('my_tasks') }}" 
+        <a href="" 
            class="flex flex-col items-center group -mt-8 flex-1">
             <div class="w-14 h-14 rounded-2xl 
                         bg-gradient-to-br from-violet-500 to-indigo-600 

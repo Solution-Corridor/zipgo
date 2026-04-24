@@ -2,15 +2,92 @@
 <html class="no-js" lang="en">
 
 <head>
-    @include('includes.header_links')
+    @include('includes.mob_header_links')
     <title>Register</title>
+
+    <style>
+        /* Custom dropdown styles for dark theme */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+.custom-dropdown-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+  padding-left: 1rem;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.custom-dropdown-input:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: #1e1e2a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+.custom-dropdown-menu.show {
+  display: block;
+}
+.custom-dropdown-search {
+  padding: 0.75rem;
+  position: sticky;
+  top: 0;
+  background: #1e1e2a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.custom-dropdown-search input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 14px;
+}
+.custom-dropdown-search input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+}
+.custom-dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.custom-dropdown-item:hover {
+  background: rgba(139, 92, 246, 0.3);
+}
+.custom-dropdown-item.selected {
+  background: rgba(139, 92, 246, 0.5);
+  font-weight: 500;
+}
+    </style>
 </head>
 
 <body class="body body5 bg-[#0A0A0F] text-white">
     <main class="mx-auto max-w-md p-4 min-h-screen">
         <!--=====progress END=======-->
         <div class="paginacontainer"></div>
-        @include('includes.navbar')
+        @include('includes.mob_navbar')
+
 
         <div class="min-h-screen bg-[#0A0A0F] flex flex-col">
 
@@ -112,7 +189,7 @@
                                 <button
                                     type="button"
                                     id="togglePassword"
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-white/40 hover:text-white/70 transition-colors">
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-orange-600 hover:text-orange-800 transition-colors">
                                     <!-- We'll change this icon with JS -->
                                     <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye">
                                         <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
@@ -121,6 +198,52 @@
                                 </button>
                             </div>
                         </div>
+
+                        <div class="space-y-2">
+    <div class="flex justify-between items-center px-1">
+        <label class="text-xs font-medium text-white/60">City</label>
+    </div>
+    <div class="custom-dropdown" id="cityDropdown">
+        <div class="custom-dropdown-input" id="cityDropdownInput">
+            <span id="citySelectedText">Select a city</span>
+            <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </div>
+        <div class="custom-dropdown-menu" id="cityDropdownMenu">
+            <div class="custom-dropdown-search">
+                <input type="text" id="citySearch" placeholder="Search city..." autocomplete="off">
+            </div>
+            <div id="cityOptionsList">
+                @foreach($cities as $city)
+                    <div class="custom-dropdown-item" data-value="{{ $city->id }}">
+                        {{ $city->name }}
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="city_id" id="city_id" value="{{ old('city_id') }}">
+</div>
+                        
+                        <div class="space-y-2">
+    <div class="flex justify-between items-center px-1">
+        <label class="text-xs font-medium text-white/60">Register As</label>
+    </div>
+    <div class="custom-dropdown" id="userTypeDropdown">
+        <div class="custom-dropdown-input" id="userTypeDropdownInput">
+            <span id="userTypeSelectedText">Select user type</span>
+            <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </div>
+        <div class="custom-dropdown-menu" id="userTypeDropdownMenu">
+            <div class="custom-dropdown-item" data-value="customer">Customer</div>
+            <div class="custom-dropdown-item" data-value="expert">Expert</div>
+        </div>
+    </div>
+    <input type="hidden" name="user_type" id="user_type" value="{{ old('user_type') }}">
+</div>
 
                         <button
                             type="submit"
@@ -256,8 +379,82 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Generic dropdown controller
+    function initDropdown(dropdownId, hiddenInputId, searchable = false) {
+        const dropdown = document.getElementById(dropdownId);
+        const inputDiv = dropdown.querySelector('.custom-dropdown-input');
+        const menu = dropdown.querySelector('.custom-dropdown-menu');
+        const selectedSpan = inputDiv.querySelector('span:first-child');
+        const hiddenInput = document.getElementById(hiddenInputId);
+        let items = dropdown.querySelectorAll('.custom-dropdown-item');
+
+        // Toggle menu
+        inputDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('show');
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+        });
+
+        // Handle item selection
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const value = item.getAttribute('data-value');
+                const text = item.innerText;
+                selectedSpan.innerText = text;
+                hiddenInput.value = value;
+                menu.classList.remove('show');
+                // Remove selected class from all items
+                items.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+            });
+        });
+
+        // Search functionality (if searchable)
+        if (searchable) {
+            const searchInput = dropdown.querySelector('.custom-dropdown-search input');
+            const optionsContainer = dropdown.querySelector('#cityOptionsList');
+            const originalItems = Array.from(optionsContainer.querySelectorAll('.custom-dropdown-item'));
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                originalItems.forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    if (text.includes(query)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Pre-select from old value
+        if (hiddenInput.value) {
+            const selectedItem = Array.from(items).find(item => item.getAttribute('data-value') === hiddenInput.value);
+            if (selectedItem) {
+                selectedSpan.innerText = selectedItem.innerText;
+                selectedItem.classList.add('selected');
+            }
+        }
+    }
+
+    // Initialize city dropdown (searchable)
+    initDropdown('cityDropdown', 'city_id', true);
+    // Initialize user type dropdown (not searchable)
+    initDropdown('userTypeDropdown', 'user_type', false);
+});
+</script>
+
         
-        @include('includes.footer_links')
+        @include('includes.mob_footer_links')
 
     </main>
 </body>

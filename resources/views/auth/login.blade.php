@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-    @include('includes.header_links')
+    @include('includes.mob_header_links')
     <title>Login</title>
 </head>
 
@@ -10,7 +10,7 @@
     <main class="mx-auto max-w-md p-4 min-h-screen">
         <!--=====progress END=======-->
         <div class="paginacontainer"></div>
-        @include('includes.navbar')
+        @include('includes.mob_navbar')
 
 <div class="min-h-screen bg-[#0A0A0F] flex flex-col">
             
@@ -73,7 +73,7 @@
                                 <button
                                     type="button"
                                     id="togglePassword"
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-white/40 hover:text-white/70 transition-colors">
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-orange-600 hover:text-orange-800 transition-colors">
                                     <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye">
                                         <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
                                         <circle cx="12" cy="12" r="3"></circle>
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-        @include('includes.footer_links')
+        @include('includes.mob_footer_links')
     </main>
 </body>
 

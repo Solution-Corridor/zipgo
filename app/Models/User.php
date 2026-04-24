@@ -25,18 +25,9 @@ class User extends Authenticatable
         'username',
         'password',
         'type',
-        'status',
-        'is_fd',
-        'is_sensitive',
-        'is_tasks_allowed',
-        'is_balance_sharing_allowed',
-        'is_withdraw_allowed',
-        'is_complaint_allowed',
-        'withdraw_timer',
-        'withdraw_without_package',
+        'status',        
         'balance',
-        'address',
-        'referred_by',
+        'address',        
         'otp_code',
         'otp_expires_at',
     ];
@@ -47,61 +38,13 @@ class User extends Authenticatable
 
     protected $casts = [
         'status'      => 'integer',
-        'is_fd'       => 'boolean',
-        'is_sensitive' => 'boolean',
-        'is_tasks_allowed' => 'boolean',
-        'is_balance_sharing_allowed' => 'boolean',
-        'is_withdraw_allowed' => 'boolean',
-        'is_complaint_allowed' => 'boolean',
-        'withdraw_timer' => 'boolean',
-        'withdraw_without_package' => 'boolean',
         'created_at'  => 'datetime',
         'updated_at'  => 'datetime',
     ];
 
     protected $dates = ['last_activity'];
 
-    /**
-     * Get the user who referred this user (the referrer)
-     */
-    public function referrer()
-    {
-        return $this->belongsTo(User::class, 'referred_by', 'id');
-    }
-
-
-    public function referrals()
-    {
-        return $this->hasMany(User::class, 'referred_by', 'id');
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class, 'user_id', 'id');
-    }
-
-
-    public function kycVerification()
-    {
-        return $this->hasOne(KycVerification::class);
-    }
-
-    public function getKycStatusAttribute()
-    {
-        return $this->kycVerification?->status ?? 'not_submitted';
-    }
-
-
-    public function transactions()
-    {
-        return $this->hasMany(Transaction::class, 'user_id', 'id');
-    }
-
-    public function withdraws()
-    {
-        return $this->hasMany(Withdrawal::class, 'user_id', 'id');
-    }
-
+   
     public function complaints()
     {
         return $this->hasMany(Complaint::class, 'user_id', 'id');

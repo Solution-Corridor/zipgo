@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html class="no-js" lang="en">
 <head>
-    @include('includes.header_links')
+    @include('includes.mob_header_links')
     <title>Forgot Password</title>
 </head>
 
 <body class="body body5 bg-[#0A0A0F] text-white">
 <main class="mx-auto max-w-md p-4 min-h-screen">
 
-    @include('includes.navbar')
+    @include('includes.mob_navbar')
 
 
             <!-- Logo -->
@@ -82,7 +82,7 @@
 
 
 
-    @include('includes.footer_links')
+    @include('includes.mob_footer_links')
 
 </main>
 </body>
