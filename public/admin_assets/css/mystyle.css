@@ -1,0 +1,33 @@
+
+.myactive{
+	background-color: #fff;
+	color: #000;
+}
+
+.myactive i{
+	color: #483d8b;
+}
+
+.myactive p{
+	color: #483d8b;
+}
+
+
+.img_user{
+  width: 68px;
+  height: 80px;
+}
+
+.dangr{
+  color: red;
+}
+
+.bd{
+ border-bottom: 1px solid silver;
+  padding: 5px;
+}
+
+.bds{
+ border-bottom: 1px solid silver;
+  padding: 3px;
+}
