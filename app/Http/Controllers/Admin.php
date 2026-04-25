@@ -193,6 +193,55 @@ class Admin extends Controller
     return ($sum % 10) == 0;
   }
 
+
+  public function experts(Request $request)
+  {
+    // Pending experts (profile_status = 0)
+    $pendingExperts = DB::table('expert_details')
+      ->join('users', 'expert_details.user_id', '=', 'users.id')
+      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id') // left join in case service is null
+      ->select(
+        'expert_details.*',
+        'users.username',
+        'users.email',
+        'users.phone',
+        'services.name as service_name'
+      )
+      ->where('expert_details.profile_status', 0)
+      ->orderBy('expert_details.created_at', 'desc')
+      ->get();
+
+    // Verified experts (profile_status = 1)
+    $verifiedExperts = DB::table('expert_details')
+      ->join('users', 'expert_details.user_id', '=', 'users.id')
+      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id')
+      ->select(
+        'expert_details.*',
+        'users.username',
+        'users.email',
+        'users.phone',
+        'services.name as service_name'
+      )
+      ->where('expert_details.profile_status', 1)
+      ->orderBy('expert_details.created_at', 'desc')
+      ->get();
+
+    return view('expert.experts', compact('pendingExperts', 'verifiedExperts'));
+  }
+
+  // Handle expert verification
+  public function verifyExpert($id)
+  {
+    $updated = DB::table('expert_details')
+      ->where('id', $id)
+      ->update(['profile_status' => 1]);
+
+    if ($updated) {
+      return redirect()->back()->with('success', 'Expert verified successfully.');
+    }
+    return redirect()->back()->with('error', 'Verification failed.');
+  }
+
   public function sendEmail(Request $request)
   {
     $recipients = $request->input('recipients');

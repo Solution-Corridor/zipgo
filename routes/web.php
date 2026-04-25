@@ -254,6 +254,9 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
 
   Route::get('/expert-payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page');
   Route::post('/expert-payment/process', [Admin::class, 'processPayment'])->name('expert.payment.process');
+
+  Route::get('/experts', [Admin::class, 'experts'])->name('experts');
+  Route::post('/admin/experts/verify/{id}', [Admin::class, 'verifyExpert'])->name('admin.experts.verify');
 });
 
 
