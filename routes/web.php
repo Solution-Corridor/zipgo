@@ -240,15 +240,10 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
   Route::put('/update_blog/{blog}', [BlogController::class, 'update'])->name('blogs.update');
   Route::delete('/delete_blog/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
   Route::post('/toggle_commentable/{blog}', [BlogController::class, 'toggleCommentable'])->name('blogs.toggle');
-});
 
 
-Route::group(['middleware' => 'checkAdminRole'], function () {
-  Route::get('/expert-dashboard', [Welcome::class, 'expert_dashboard'])->name('expert_dashboard');
-  Route::post('/expert/store-pending', [Admin::class, 'storePending'])->name('expert.store.pending')->middleware('auth');
-  Route::get('/expert/payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page')->middleware('auth');
-  Route::post('/expert/payment/process', [Admin::class, 'processPayment'])->name('expert.payment.process')->middleware('auth');
-});
+
+
 
     Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])
         ->name('important_note');
@@ -275,11 +270,14 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
 });
 
 // expert routes 
-
 Route::group(['middleware' => 'checkExpertRole'], function () {
     Route::get('/expert-dashboard', [Welcome::class, 'expert_dashboard'])->name('expert_dashboard');
     Route::post('/update-expert-profile', [Admin::class, 'updateExpert'])->name('expert.update');
     Route::get('/expert-profile',   [Welcome::class, 'expert_profile'])->name('expert_profile');
+
+    Route::get('/expert/payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page')->middleware('auth');
+  Route::post('/expert/payment/process', [Admin::class, 'processPayment'])->name('expert.payment.process')->middleware('auth');
+
 });
 
 
