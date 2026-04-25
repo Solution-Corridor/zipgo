@@ -72,7 +72,7 @@ Edit Service
 
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label>Service Detail <code>*</code></label>
+                                                <label>Service Detail</label>
                                                 <textarea name="detail" id="myTextarea" class="form-control">{{ old('detail', $service->detail) }}</textarea>
                                             </div>
                                             @error('detail')<p class="text-danger">{{ $message }}</p>@enderror

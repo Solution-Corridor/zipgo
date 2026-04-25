@@ -51,7 +51,14 @@ Add New Service
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Price (Rs.) <code>*</code></label>
-                                                <input type="number" step="0.01" name="price" class="form-control" required value="{{ old('price') }}">
+                                                <input 
+    type="number" 
+    step="0.01" 
+    name="price" 
+    class="form-control" 
+    required 
+    value="{{ old('price', 1000) }}"
+>
                                             </div>
                                             @error('price')<p class="text-danger">{{ $message }}</p>@enderror
                                         </div>
@@ -66,7 +73,7 @@ Add New Service
 
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label>Service Detail <code>*</code></label>
+                                                <label>Service Detail</label>
                                                 <textarea name="detail" id="myTextarea" class="form-control" placeholder="Full description...">{{ old('detail') }}</textarea>
                                             </div>
                                             @error('detail')<p class="text-danger">{{ $message }}</p>@enderror

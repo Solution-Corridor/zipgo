@@ -30,7 +30,7 @@ class ServiceController extends Controller
             'name'      => 'required|string|max:255',
             'slug'      => 'required|string|unique:services,slug',
             'price'     => 'required|numeric|min:0',
-            'detail'    => 'required|string',
+            'detail'    => 'nullable|string',
             'picture'   => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
         ]);
 
@@ -71,7 +71,7 @@ class ServiceController extends Controller
             'name'      => 'required|string|max:255',
             'slug'      => 'required|string|unique:services,slug,' . $service->id,
             'price'     => 'required|numeric|min:0',
-            'detail'    => 'required|string',
+            'detail'    => 'nullable|string',
             'picture'   => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
         ]);
 
