@@ -228,42 +228,19 @@ $username = auth()->user()?->username ?? 'Guest';
   }
 </script>
 
-@if(auth()->user() 
-    && auth()->user()->type == 2 
-    && !DB::table('expert_details')->where('user_id', auth()->id())->exists())
+@if(auth()->user() && auth()->user()->type == 2 && !DB::table('expert_details')->where('user_id', auth()->id())->exists())
 @php
-    // Fetch existing data (if any) for this expert
-    $expertData = DB::table('expert_details')->where('user_id', auth()->id())->first();
-@endphp
-
-<div
-    x-data="{ open: true }"
-    x-init="open = true"
-    x-show="open"
-    x-cloak
-    class="fixed inset-0 z-[10001] flex items-center justify-center px-4"
-    style="display: none;"
->
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-
-    <div class="relative w-full max-w-[calc(100%-2rem)] sm:max-w-md bg-gradient-to-b from-slate-900 to-slate-950 rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden max-h-[90vh] overflow-y-auto" @click.stop>
-        <div class="sticky top-0 px-6 py-4 border-b border-slate-800 bg-slate-900/90 backdrop-blur-sm z-10">
-            <h3 class="text-xl font-semibold text-slate-100 text-center">Expert Dashboard</h3>
-        </div>
-
-        <form action="{{ route('expert.update') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
-            @csrf
- <input type="text" name="user_id" value="{{ auth()->id() }}">
-@php
-    // Get services with id and name
+    // Get services with id, name, price
     $services = DB::table('services')
         ->whereNotNull('name')
         ->where('name', '!=', '')
-        ->select('id', 'name')
+        ->where('is_active', 1)
+        ->select('id', 'name', 'price')
         ->get()
         ->map(fn($item) => [
-            'id' => $item->id,
-            'name' => trim($item->name)
+            'id'    => $item->id,
+            'name'  => trim($item->name),
+            'price' => (float) $item->price
         ])
         ->filter(fn($item) => !empty($item['name']))
         ->unique(fn($item) => strtolower($item['name']))
@@ -271,122 +248,111 @@ $username = auth()->user()?->username ?? 'Guest';
         ->toArray();
 @endphp
 
-<div class="bg-slate-800/50 rounded-xl p-4" x-data="{
-    open: false,
-    search: '',
-    selectedId: {{ old('service_id', $expertData->service_id ?? 'null') }},
-    selectedName: '',
-    allServices: {{ json_encode($services) }},
-    init() {
-        // Pre-fill selectedName if there is a selectedId
-        let found = this.allServices.find(s => s.id == this.selectedId);
-        if (found) this.selectedName = found.name;
-        this.search = this.selectedName;
-    },
-    get filteredServices() {
-        if (!this.search.trim()) return this.allServices;
-        const term = this.search.toLowerCase();
-        return this.allServices.filter(s => s.name.toLowerCase().includes(term));
-    },
-    selectService(service) {
-        this.selectedId = service.id;
-        this.selectedName = service.name;
-        this.search = service.name;
-        this.open = false;
-    },
-    clearSelection() {
-        this.selectedId = null;
-        this.selectedName = '';
-        this.search = '';
-        this.open = true;
-    }
-}">
-    <h4 class="text-md font-semibold text-indigo-300 mb-3">SDDL (Services)</h4>
-    <div class="relative">
-        <input type="text"
-               x-model="search"
-               @focus="open = true"
-               @click.away="open = false"
-               @keydown.escape="open = false"
-               placeholder="Select a service..."
-               class="w-full px-4 py-2 pr-8 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-        <button @click="clearSelection" x-show="selectedId" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-
-        <div x-show="open && filteredServices.length > 0"
-             x-cloak
-             x-transition
-             class="absolute z-20 left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto">
-            <template x-for="service in filteredServices" :key="service.id">
-                <div @click="selectService(service)"
-                     class="px-4 py-2 text-slate-200 hover:bg-indigo-600/50 cursor-pointer transition"
-                     x-text="service.name"></div>
-            </template>
+<div x-data="{ open: true }" x-init="open = true" x-show="open" x-cloak
+     class="fixed inset-0 z-[10001] flex items-center justify-center px-4" style="display: none;">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-[calc(100%-2rem)] sm:max-w-md bg-gradient-to-b from-slate-900 to-slate-950 rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden max-h-[90vh] overflow-y-auto" @click.stop>
+        <div class="sticky top-0 px-6 py-4 border-b border-slate-800 bg-slate-900/90 backdrop-blur-sm z-10">
+            <h3 class="text-xl font-semibold text-slate-100 text-center">Expert Dashboard</h3>
         </div>
-        <div x-show="open && filteredServices.length === 0 && search !== ''"
-             x-cloak
-             class="absolute z-20 left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl p-3 text-center text-slate-400 text-sm">
-            No matching service
-        </div>
-    </div>
-    <!-- Hidden field: service_id (named 'service_id') -->
-    <input type="hidden" name="service_id" :value="selectedId">
-    <!-- Hidden field: user_id -->
-    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
-</div>
 
-            <!-- NIC Details -->
+        <form action="{{ route('expert.store.pending') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
+            @csrf
+            <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+
+            <!-- SDDL Services with price display -->
+            <div class="bg-slate-800/50 rounded-xl p-4" x-data="{
+                open: false,
+                search: '',
+                selectedId: null,
+                selectedName: '',
+                selectedPrice: 0,
+                allServices: {{ json_encode($services) }},
+                get filteredServices() {
+                    if (!this.search.trim()) return this.allServices;
+                    const term = this.search.toLowerCase();
+                    return this.allServices.filter(s => s.name.toLowerCase().includes(term));
+                },
+                selectService(service) {
+                    this.selectedId = service.id;
+                    this.selectedName = service.name;
+                    this.selectedPrice = service.price;
+                    this.search = service.name;
+                    this.open = false;
+                },
+                clearSelection() {
+                    this.selectedId = null;
+                    this.selectedName = '';
+                    this.selectedPrice = 0;
+                    this.search = '';
+                    this.open = true;
+                }
+            }">
+                <h4 class="text-md font-semibold text-indigo-300 mb-3">SDDL (Services)</h4>
+                <div class="relative">
+                    <input type="text"
+                           x-model="search"
+                           @focus="open = true"
+                           @click.away="open = false"
+                           @keydown.escape="open = false"
+                           placeholder="Select a service..."
+                           class="w-full px-4 py-2 pr-8 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                    <button @click="clearSelection" x-show="selectedId" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <div x-show="open && filteredServices.length > 0" x-cloak x-transition
+                         class="absolute z-20 left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                        <template x-for="service in filteredServices" :key="service.id">
+                            <div @click="selectService(service)"
+                                 class="px-4 py-2 text-slate-200 hover:bg-indigo-600/50 cursor-pointer transition"
+                                 x-text="service.name"></div>
+                        </template>
+                    </div>
+                    <div x-show="open && filteredServices.length === 0 && search !== ''" x-cloak
+                         class="absolute z-20 left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl p-3 text-center text-slate-400 text-sm">
+                        No matching service
+                    </div>
+                </div>
+                <!-- Display price -->
+                <div class="mt-3 text-right" x-show="selectedId" x-cloak>
+                    <span class="text-sm text-slate-400">Service price:</span>
+                    <span class="text-xl font-bold text-indigo-300" x-text="'$' + selectedPrice.toFixed(2)"></span>
+                </div>
+                <input type="hidden" name="service_id" :value="selectedId">
+            </div>
+
+            <!-- NIC Details (unchanged) -->
             <div class="bg-slate-800/50 rounded-xl p-4">
                 <h4 class="text-md font-semibold text-indigo-300 mb-3">NIC Details</h4>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm text-slate-400">NIC Number</label>
-                        <input type="text" name="nic_number" value="{{ old('nic_number', $expertData->nic_number ?? '') }}" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200" placeholder="NIC number">
+                        <input type="text" name="nic_number" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200" placeholder="NIC number">
                     </div>
                     <div>
                         <label class="block text-sm text-slate-400">Expiry Date</label>
-                        <input type="date" name="nic_expiry" value="{{ old('nic_expiry', $expertData->nic_expiry ?? '') }}" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200">
+                        <input type="date" name="nic_expiry" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200">
                     </div>
                     <div>
                         <label class="block text-sm text-slate-400">NIC Front Image</label>
                         <input type="file" name="nic_front" class="w-full text-slate-400">
-                        @if(!empty($expertData->nic_front_image))
-                            <p class="text-xs text-slate-500 mt-1">Current: {{ basename($expertData->nic_front_image) }}</p>
-                        @endif
                     </div>
                     <div>
                         <label class="block text-sm text-slate-400">NIC Back Image</label>
                         <input type="file" name="nic_back" class="w-full text-slate-400">
-                        @if(!empty($expertData->nic_back_image))
-                            <p class="text-xs text-slate-500 mt-1">Current: {{ basename($expertData->nic_back_image) }}</p>
-                        @endif
                     </div>
                     <div>
                         <label class="block text-sm text-slate-400">Selfie with NIC</label>
                         <input type="file" name="selfie" class="w-full text-slate-400">
-                        @if(!empty($expertData->selfie_image))
-                            <p class="text-xs text-slate-500 mt-1">Current: {{ basename($expertData->selfie_image) }}</p>
-                        @endif
                     </div>
                 </div>
             </div>
 
-            <!-- Payment Status -->
-            <div class="bg-slate-800/50 rounded-xl p-4">
-                <h4 class="text-md font-semibold text-indigo-300 mb-3">Payment Status</h4>
-                <select name="payment_status" class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200">
-                    <option value="Pending" {{ old('payment_status', $expertData->payment_status ?? 'Pending') == 'Pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="Paid" {{ old('payment_status', $expertData->payment_status ?? '') == 'Paid' ? 'selected' : '' }}>Paid</option>
-                    <option value="Failed" {{ old('payment_status', $expertData->payment_status ?? '') == 'Failed' ? 'selected' : '' }}>Failed</option>
-                    <option value="Refunded" {{ old('payment_status', $expertData->payment_status ?? '') == 'Refunded' ? 'selected' : '' }}>Refunded</option>
-                </select>
-            </div>
-
+            <!-- Payment button (no dropdown) -->
             <div class="flex justify-end mt-4">
                 <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition w-full">
-                    Update Information
+                    Proceed to Payment
                 </button>
             </div>
         </form>

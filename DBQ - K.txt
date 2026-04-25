@@ -7,8 +7,10 @@ CREATE TABLE `expert_details` (
   `nic_front_image` varchar(255) DEFAULT NULL,
   `nic_back_image` varchar(255) DEFAULT NULL,
   `selfie_image` varchar(255) DEFAULT NULL,
-  `payment_status` enum('Pending','Paid','Failed','Refunded') DEFAULT 'Pending',
+  `payment_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=pending, 1=paid',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `expert_details_user_id_foreign` (`user_id`),
+  KEY `expert_details_service_id_foreign` (`service_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
