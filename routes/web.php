@@ -252,10 +252,10 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
   Route::post('/update-expert-profile', [Admin::class, 'updateExpert'])->name('expert_profile.update');
   Route::get('/expert-profile',   [Welcome::class, 'expert_profile'])->name('expert_profile');
 
-  // Route::get('/expert-payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page');
+  Route::get('/expert-payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page');
   Route::post('/expert-payment/process', [Admin::class, 'processPayment'])->name('expert.payment.process');
 });
-Route::get('/expert-payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page');
+
 
 
 
