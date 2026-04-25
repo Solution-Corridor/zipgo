@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     @include('user.includes.general_style')
-    <title>Expert Profile | ProHub</title>
+    <title>Expert Profile</title>
 
     <style>
         * {
@@ -217,7 +217,7 @@
                     <div class="flex-1 h-px bg-gradient-to-r from-indigo-500/40 to-transparent"></div>
                 </div>
 
-                <form action="{{ route('expert.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('expert_profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <!-- hidden user id -->
                     <input type="hidden" name="user_id" value="{{ auth()->id() }}">

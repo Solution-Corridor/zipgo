@@ -58,13 +58,7 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL'),
-
-
-    'withdraw_cool_down_days' => env('WTHDRAW_COOL_DOWN_DAYS', 7),
-    'withdraw_service_fee' => env('WITHDRAW_SERVICE_FEE', 100),
-    'balance_transfer_cool_down_days' => env('BALANCE_TRANSFER_COOL_DOWN_DAYS', 7),
-    'balance_transfer_service_fee' => env('BALANCE_TRANSFER_SERVICE_FEE', 100),
-    
+   
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

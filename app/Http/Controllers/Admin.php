@@ -18,65 +18,17 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\Complaint;
 use App\Models\ImportantNote;
-use App\Models\MobApp;
+
 use function Symfony\Component\Clock\now;
+
+use App\Models\ExpertDetail;
+
+use Illuminate\Validation\ValidationException;
 
 class Admin extends Controller
 {
 
-  public function deleteInactiveUsers()
-  {
-    $cutoffDate = Carbon::now()->subDays(15);
-    $registrationCutoff = Carbon::now()->subDays(15);
 
-    $users = User::where('type', 1) // 👈 only normal users
-      ->whereDoesntHave('payments', function ($q) {
-        $q->where('status', 'approved')
-          ->where('approved_at', '<=', now())
-          ->where('expires_at', '>', now());
-      })
-      ->where(function ($q) use ($cutoffDate, $registrationCutoff) {
-        $q->whereHas('payments', function ($q2) use ($cutoffDate) {
-          $q2->where('expires_at', '<', $cutoffDate);
-        })
-          ->orWhere(function ($q3) use ($registrationCutoff) {
-            $q3->doesntHave('payments')
-              ->where('created_at', '<', $registrationCutoff);
-          });
-      })
-      ->get();
-
-    DB::transaction(function () use ($users) {
-      foreach ($users as $user) {
-        $userId = $user->id;
-
-        // Delete from all related tables manually
-        DB::table('payments')->where('user_id', $userId)->delete();
-        DB::table('complaints')->where('user_id', $userId)->delete();
-        DB::table('kyc_verifications')->where('user_id', $userId)->delete();
-        DB::table('transactions')->where('user_id', $userId)->delete();
-        DB::table('withdrawals')->where('user_id', $userId)->delete();
-        DB::table('user_task_logs')->where('user_id', $userId)->delete();
-        DB::table('spin_histories')->where('user_id', $userId)->delete();
-        DB::table('mk_orders')->where('user_id', $userId)->delete();
-        DB::table('mk_product_reviews')->where('user_id', $userId)->delete();
-
-        // Notifications (polymorphic)
-        DB::table('notifications')
-          ->where('notifiable_type', 'App\Models\User')
-          ->where('notifiable_id', $userId)
-          ->delete();
-
-        // Delete the user
-        $user->delete();
-        Auth::logout($user);
-
-        echo "Deleted User ID: {$user->id}, Username: {$user->username}<br>";
-      }
-    });
-
-    return "Deleted " . $users->count() . " inactive users.";
-  }
 
   public function importantNote(Request $request)
   {
@@ -100,64 +52,6 @@ class Admin extends Controller
   }
 
 
-  public function mobileAppVersion(Request $request)
-  {
-    // Get the first (and usually only) record — or create new empty one
-    $version = MobApp::firstOrNew(['id' => 1]); // You can also use first() + create if null
-
-    if ($request->isMethod('post')) {
-      $request->validate([
-        'version' => 'required|string|max:255', // text field limit
-      ]);
-
-      $version->version = $request->input('version');
-      $version->save();
-
-      return redirect()
-        ->route('mobile_app_version')
-        ->with('success', 'Mobile app version has been updated.');
-    }
-
-    return view('admin.mobile_app_version', compact('version'));
-  }
-
-  public function dollarPrice(Request $request)
-  {
-    // Get the first (and usually only) record — or create new empty one
-    $price = DollarPrice::firstOrNew(['id' => 1]); // You can also use first() + create if null
-
-    if ($request->isMethod('post')) {
-      $request->validate([
-        'price' => 'required|string|max:255', // text field limit
-      ]);
-
-      $price->price = $request->input('price');
-      $price->save();
-
-      return redirect()
-        ->route('dollar_price')
-        ->with('success', 'Dollar price has been updated.');
-    }
-
-    return view('admin.dollar_price', compact('price'));
-  }
-
-  public function runningPackages()
-  {
-    $runningPackages = Payment::with(['user', 'package'])
-      ->where('status', 'approved')
-      ->where('expires_at', '>', now())
-      ->orderBy('expires_at', 'asc')
-      ->get();
-
-    $expiredPackages = Payment::with(['user', 'package'])
-      ->where('status', 'approved')
-      ->where('expires_at', '<=', now())
-      ->orderBy('expires_at', 'asc')
-      ->get();
-
-    return view('admin.running_packages', compact('runningPackages', 'expiredPackages'));
-  }
   public function complaints()
   {
     // Pending complaints 
@@ -175,780 +69,26 @@ class Admin extends Controller
     return view('admin.complaints', compact('pending', 'others'));
   }
 
-  public function transactions()
+
+  public function updateExpert(Request $request)
   {
-    $transactions = Transaction::with('user')
-      ->get();
 
-    return view('admin.transactions', compact('transactions'));
-  }
-
-
-  public function grantWeeklyReward()
-  {
-    $today = Carbon::today();
-
-    // Skip entire process if not Sunday (assuming rewards are only for Sunday)
-    if (!$today->isSunday()) {
-      //return "Today is not Sunday → weekly rewards are only given on Sunday.";
-      return;    // silent skip
-      // or: Log::info("Not Sunday → weekly rewards skipped");
-    }
-
-    // Get all active (approved & not expired) payments
-    $activePayments = Payment::with([
-      'user',
-      'package' => function ($query) {
-        $query->where('weekend_reward', '>', 0);
-      }
-    ])
-      ->where('status', 'approved')
-      ->whereHas('package', function ($query) {
-        $query->where('weekend_reward', '>', 0);
-      })
-      ->where('approved_at', '<=', now())
-      ->where('expires_at', '>', now())
-      ->get();
-
-    $grantedCount = 0;
-    $totalReward  = 0;
-
-    foreach ($activePayments as $payment) {
-      $user = $payment->user;
-      $package = $payment->package;
-
-      // Skip if user is inactive or package not found
-      if (!$user || $user->status != 1 || !$package) {
-        continue;
-      }
-
-      // === Prevent duplicate reward today for this specific payment ===
-      $alreadyRewardedToday = Transaction::where('user_id', $user->id)
-        ->where('trx_type', 'weekly_reward')
-        ->whereDate('created_at', $today)
-        ->where('detail', 'LIKE', '%Payment ID: ' . $payment->id . '%')
-        ->exists();
-
-      if ($alreadyRewardedToday) {
-        continue;
-      }
-
-
-      $reward = $package->weekend_reward ?? 0; // Default to 0 if not set
-      $totalReward += $reward;
-
-
-      // === Update user balance ===
-      $user->increment('balance', $reward);
-
-      // === Create transaction record ===
-      Transaction::create([
-        'user_id'    => $user->id,
-        'amount'     => $reward,
-        'trx_type'   => 'weekly_reward',
-        'detail'     => "Weekly reward from package: {$package->name} (ID: {$package->id}), Payment ID: {$payment->id}, Amount: {$reward}",
-      ]);
-
-      // === Create notification ===
-      DB::table('notifications')->insert([
-        'id' => Str::uuid(),
-        'type' => 'WeeklyReward',
-        'notifiable_type' => 'App\\Models\\User',
-        'notifiable_id' => $user->id,
-        'data' => json_encode([
-          'message' => "You received weekly reward of {$reward} from package {$package->name}.",
-          'amount' => $reward,
-          'package_id' => $package->id,
-          'package_name' => $package->name,
-          'payment_id' => $payment->id,
-          'type' => 'weekly_reward'
-        ]),
-        'created_at' => now(),
-        'updated_at' => now(),
-      ]);
-
-
-      //Log::info("Weekly reward granted to User ID: {$user->id} | Amount: {$reward} | Package: {$package->name} | Payment ID: {$payment->id}");
-
-      $grantedCount++;
-    }
-
-    //Log::info("Weekly rewards process completed. Total rewards granted: {$grantedCount}");
-
-    return "Weekly rewards granted successfully to {$grantedCount} active package(s). Total reward amount: {$totalReward}.";
-  }
-
-  public function grantDailyReward()
-  {
-    $today = Carbon::today();
-
-
-    // Get all active (approved & not expired) payments
-    $activePayments = Payment::with(['user', 'package']) // Make sure relations are defined
-      ->where('status', 'approved')
-      ->where('approved_at', '<=', now())
-      ->where('expires_at', '>', now())
-      ->whereHas('package', function ($query) {
-        $query->where('is_daily_rewards', 1);
-      })
-      ->get();
-
-
-    $grantedCount = 0;
-    $totalReward  = 0;
-
-    foreach ($activePayments as $payment) {
-      $user = $payment->user;
-      $package = $payment->package;
-
-      // Skip if user is inactive or package not found
-      if (!$user || $user->status != 1 || !$package) {
-        continue;
-      }
-
-      // === Prevent duplicate reward today for this specific payment ===
-      $alreadyRewardedToday = Transaction::where('user_id', $user->id)
-        ->where('trx_type', 'daily_reward')
-        ->whereDate('created_at', $today)
-        ->where('detail', 'LIKE', '%Payment ID: ' . $payment->id . '%')
-        ->exists();
-
-      if ($alreadyRewardedToday) {
-        continue;
-      }
-
-      // $package->daily_profit_min + 10 random (if you want to add some variability to daily rewards, otherwise just use daily_profit_min as fixed reward)
-      $baseReward = $package->daily_profit_min ?? 0;
-
-      // random value between 0 and +10
-      $variation = rand(0, 10);
-
-      $reward = $baseReward + $variation;
-      $totalReward += $reward;
-
-
-      // === Update user balance ===
-      $user->increment('balance', $reward);
-
-      // === Create transaction record ===
-      Transaction::create([
-        'user_id'    => $user->id,
-        'amount'     => $reward,
-        'trx_type'   => 'daily_reward',
-        'detail'     => "Daily reward from package: {$package->name} (ID: {$package->id}), Payment ID: {$payment->id}, Amount: {$reward}",
-      ]);
-
-      // === Create notification ===
-      DB::table('notifications')->insert([
-        'id' => Str::uuid(),
-        'type' => 'DailyReward',
-        'notifiable_type' => 'App\\Models\\User',
-        'notifiable_id' => $user->id,
-        'data' => json_encode([
-          'message' => "You received daily reward of {$reward} from package {$package->name}.",
-          'amount' => $reward,
-          'package_id' => $package->id,
-          'package_name' => $package->name,
-          'payment_id' => $payment->id,
-          'type' => 'daily_reward'
-        ]),
-        'created_at' => now(),
-        'updated_at' => now(),
-      ]);
-
-
-      //Log::info("Daily reward granted to User ID: {$user->id} | Amount: {$reward} | Package: {$package->name} | Payment ID: {$payment->id}");
-
-      $grantedCount++;
-    }
-
-    //Log::info("Daily rewards process completed. Total rewards granted: {$grantedCount}");
-
-    return "Daily rewards granted successfully to {$grantedCount} active package(s). Total reward amount: {$totalReward}.";
-  }
-
-  public function withdraw_requests()
-  {
-    // Get last approved withdraw date for each user
-    $lastApproved = Withdrawal::select('user_id', DB::raw('MAX(approved_at) as last_approved_at'))
-      ->where('status', 'approved')
-      ->groupBy('user_id');
-
-    $pending = Withdrawal::with('user')
-      ->leftJoinSub($lastApproved, 'last_withdraw', function ($join) {
-        $join->on('withdrawals.user_id', '=', 'last_withdraw.user_id');
-      })
-      ->where('withdrawals.status', 'pending')
-      ->orderBy('withdrawals.id', 'asc')
-      ->select('withdrawals.*', 'last_withdraw.last_approved_at')
-      ->get();
-
-    $approved = Withdrawal::with('user')
-      ->where('status', 'approved')
-      ->latest()
-      ->get();
-
-    $rejected = Withdrawal::with('user')
-      ->where('status', 'rejected')
-      ->latest()
-      ->get();
-
-    $cancelled = Withdrawal::with('user')
-      ->where('status', 'cancelled')
-      ->latest()
-      ->get();
-
-    return view('admin.withdraw_requests', compact('pending', 'approved', 'rejected', 'cancelled'));
-  }
-
-  public function edit_withdraw($id)
-  {
-    $withdrawal = Withdrawal::with('user')->findOrFail($id);
-    return view('admin.edit_withdraw', compact('withdrawal'));
-  }
-
-  // Clean & readable version I recommend
-  public function update_withdraw(Request $request, $id)
-  {
-    $withdrawal = Withdrawal::findOrFail($id);
-
+    // 1. Validate inputs – on failure, redirects back with old input automatically
     $validated = $request->validate([
-      'method'         => 'required|string|max:30',
-      'bank_name'      => 'nullable|string|max:500',
-      'amount'         => 'required|numeric|min:0',
-      'account_number' => 'required|string|max:100',
-      'account_title'  => 'required|string|max:150',
-      'status'         => 'required|in:pending,approved,rejected,cancelled,processing',
-      'transaction_id' => 'nullable|string|max:255',
-      'remarks'        => 'nullable|string',
-      'is_refund'      => 'nullable|boolean',     // ← added
+      'service_id'     => 'required|exists:services,id',
+      'nic_number'     => 'required|string|max:50',
+      'nic_expiry'     => 'required|date',
+      'nic_front'      => 'required|image|max:2048',
+      'nic_back'       => 'required|image|max:2048',
+      'selfie'         => 'required|image|max:2048',
     ]);
 
-    // Convert checkbox to proper boolean/tinyint
-    $validated['is_refund'] = $request->has('is_refund') ? 1 : 0;
-
-    $withdrawal->timestamps = false;
-    $withdrawal->update($validated);
-
-    return back()->with('success', 'Withdrawal updated successfully.');
-  }
-
-  public function approve_withdraw($id)
-  {
-    DB::beginTransaction();
-
-    try {
-
-      $withdrawal = DB::table('withdrawals')
-        ->where('id', $id)
-        ->lockForUpdate()
-        ->first();
-
-      if (!$withdrawal) {
-        DB::rollBack();
-        return back()->with('error', 'Withdrawal request not found.');
-      }
-
-      if ($withdrawal->status !== 'pending') {
-        DB::rollBack();
-        return back()->with('error', 'Withdrawal already processed.');
-      }
-
-      $now = now();
-
-      // 1️⃣ Update withdrawal
-      DB::table('withdrawals')
-        ->where('id', $id)
-        ->update([
-          'status'      => 'approved',
-          'approved_at' => $now,
-          'updated_at' => $now,
-        ]);
-
-      // 2️⃣ Insert transaction (Debit)
-      DB::table('transactions')->insert([
-        'user_id'    => $withdrawal->user_id,
-        'amount'     => $withdrawal->amount,
-        'trx_type'   => 'withdraw',
-        'detail'     => "Withdrawal approved. Request #{$withdrawal->id}, Amount: {$withdrawal->amount}, Service Charge: 100",
-        'created_at' => $now,
-        'updated_at' => $now,
-      ]);
-
-      // 3️⃣ Notify user
-      DB::table('notifications')->insert([
-        'id' => Str::uuid(),
-        'type' => 'WithdrawApproved',
-        'notifiable_type' => 'App\\Models\\User',
-        'notifiable_id' => $withdrawal->user_id,
-        'data' => json_encode([
-          'message' => "Your withdrawal request #{$withdrawal->id} has been approved. Service charge of Rs 100 has been deducted.",
-          'amount' => $withdrawal->amount,
-          'withdrawal_id' => $withdrawal->id,
-          'type' => 'withdraw_approved'
-        ]),
-        'created_at' => $now,
-        'updated_at' => $now,
-      ]);
-
-      DB::commit();
-
-      return back()->with('success', 'Withdrawal request approved successfully.');
-    } catch (\Exception $e) {
-      DB::rollBack();
-      return back()->with('error', 'Something went wrong.');
-    }
-  }
-
-
-
-  public function destroy($id)
-  {
-    $withdraw = Withdrawal::findOrFail($id);
-
-    // Find and delete the associated transaction using the withdrawal ID from the message
-    $transaction = Transaction::where('detail', 'LIKE', '%Ref: W' . $withdraw->id . '%')->first();
-
-    if ($transaction) {
-      $transaction->delete();
-    }
-
-    $withdraw->delete();
-
-    return redirect()->back()->with('success', 'Withdrawal request and associated transaction deleted successfully.');
-  }
-
-  public function approve_process($id)
-  {
-    DB::beginTransaction();
-
-    try {
-
-      $withdrawal = DB::table('withdrawals')
-        ->where('id', $id)
-        ->lockForUpdate()
-        ->first();
-
-      if (!$withdrawal) {
-        DB::rollBack();
-        return back()->with('error', 'Withdrawal request not found.');
-      }
-
-      if ($withdrawal->status !== 'pending') {
-        DB::rollBack();
-        return back()->with('error', 'Withdrawal already processed.');
-      }
-
-      $now = now();
-
-      // 1️⃣ Update withdrawal
-      DB::table('withdrawals')
-        ->where('id', $id)
-        ->update([
-          'status'      => 'approved + processed',
-          'approved_at' => $now,
-          'updated_at' => $now,
-        ]);
-
-      // 2️⃣ Insert transaction (Debit)
-      DB::table('transactions')->insert([
-        'user_id'    => $withdrawal->user_id,
-        'amount'     => $withdrawal->amount,
-        'trx_type'   => 'withdraw',
-        'detail'     => "Withdrawal approved and processed. Request #{$withdrawal->id}, Amount: {$withdrawal->amount}, Service Charge: 100",
-        'created_at' => $now,
-        'updated_at' => $now,
-      ]);
-
-      // 3️⃣ Notify user
-      DB::table('notifications')->insert([
-        'id' => Str::uuid(),
-        'type' => 'WithdrawApproved',
-        'notifiable_type' => 'App\\Models\\User',
-        'notifiable_id' => $withdrawal->user_id,
-        'data' => json_encode([
-          'message' => "Your withdrawal request #{$withdrawal->id} has been approved and processed. Service charge of Rs 100 has been deducted.",
-          'amount' => $withdrawal->amount,
-          'withdrawal_id' => $withdrawal->id,
-          'type' => 'withdraw_approved'
-        ]),
-        'created_at' => $now,
-        'updated_at' => $now,
-      ]);
-
-      DB::commit();
-
-      return back()->with('success', 'Withdrawal request approved and processed successfully.');
-    } catch (\Exception $e) {
-      DB::rollBack();
-      return back()->with('error', 'Something went wrong.');
-    }
-  }
-
-  public function reject_withdraw($id)
-  {
-    DB::beginTransaction();
-
-    try {
-
-      $withdrawal = DB::table('withdrawals')
-        ->where('id', $id)
-        ->lockForUpdate()
-        ->first();
-
-      if (!$withdrawal) {
-        DB::rollBack();
-        return back()->with('error', 'Withdrawal request not found.');
-      }
-
-      if ($withdrawal->status !== 'pending') {
-        DB::rollBack();
-        return back()->with('error', 'Withdrawal already processed.');
-      }
-
-      $now = now();
-      $refund = request()->has('payment'); // checkbox check
-
-      // 1️⃣ Update withdrawal status
-      DB::table('withdrawals')
-        ->where('id', $id)
-        ->update([
-          'status' => 'rejected',
-          'is_refund' => $refund ? 1 : 0,
-          'remarks' => request()->input('remarks', ''),
-          'rejected_at' => $now,
-          'updated_at' => $now,
-        ]);
-
-      // 2️⃣ Refund only if checkbox checked
-      if ($refund) {
-
-        DB::table('users')
-          ->where('id', $withdrawal->user_id)
-          ->increment('balance', $withdrawal->amount);
-
-        $message = "Your withdrawal request #{$withdrawal->id} has been rejected and amount refunded.";
-      } else {
-
-        $message = "Your withdrawal request #{$withdrawal->id} has been rejected.";
-      }
-
-      // 3️⃣ Notify user
-      DB::table('notifications')->insert([
-        'id' => Str::uuid(),
-        'type' => 'WithdrawRejected',
-        'notifiable_type' => 'App\\Models\\User',
-        'notifiable_id' => $withdrawal->user_id,
-        'data' => json_encode([
-          'message' => $message,
-          'amount' => $withdrawal->amount,
-          'withdrawal_id' => $withdrawal->id,
-          'type' => 'withdraw_rejected'
-        ]),
-        'created_at' => $now,
-        'updated_at' => $now,
-      ]);
-
-      DB::commit();
-
-      return back()->with(
-        'success',
-        $refund
-          ? 'Withdrawal rejected and amount refunded.'
-          : 'Withdrawal rejected without refund.'
-      );
-    } catch (\Exception $e) {
-      DB::rollBack();
-      return back()->with('error', 'Something went wrong.');
-    }
-  }
-
-
-
-  public function approve_package($id)
-  {
-    $payment = Payment::findOrFail($id);
-
-    if ($payment->status !== 'pending') {
-      return redirect()->back()->with('error', 'This payment has already been processed.');
-    }
-
-    $package = DB::table('packages')
-      ->where('id', $payment->plan_id)
-      ->first();
-
-    if (!$package) {
-      return redirect()->back()->with('error', 'Associated package not found.');
-    }
-
-    try {
-      DB::beginTransaction();
-
-      $now      = now();
-      $days     = (int) $package->duration_days - 1; // Subtract 1 day to make it inclusive of the start day
-      $investment = $package->investment_amount;
-
-      if ($days <= 0) {
-        throw new \Exception("Invalid package duration: {$days} days");
-      }
-
-      $expires = Carbon::parse($now)->addDays($days);
-
-      // 1. Update payment status
-      $payment->update([
-        'status'      => 'approved',
-        'approved_at' => $now,
-        'expires_at'  => $expires,
-        'admin_note'  => request()->input('note', 'Payment Verified'),
-      ]);
-
-      // 2. Notify the investor
-      DB::table('notifications')->insert([
-        'id'              => Str::uuid(),
-        'type'            => 'PackageApproved',
-        'notifiable_type' => 'App\\Models\\User',
-        'notifiable_id'   => $payment->user_id,
-        'data'            => json_encode([
-          'message'    => "Your package purchase has been approved.",
-          'package_id' => $package->id,
-          'expires_at' => $expires,
-          'type'       => 'package_approved'
-        ]),
-        'created_at'      => $now,
-        'updated_at'      => $now,
-      ]);
-
-      // if upgrade or internal transfer, approve payment and skip referral bonuses
-
-      if ($payment->payment_method_id == 100 || $payment->is_upgrade == 1) {
-        DB::commit();
-        return redirect()->back()->with('success', "Payment #{$payment->id} approved successfully. No referral bonuses processed (upgrade or internal transfer).");
-      }
-
-      // 3. Process referral bonuses (only if referrer has at least 1 active plan)
-      $investor = DB::table('users')
-        ->where('id', $payment->user_id)
-        ->first();
-
-      if (!$investor) {
-        throw new \Exception("Investor user not found");
-      }
-
-      $current_user_id = $investor->id;
-      $level = 1;
-      $max_levels = 3;
-
-      // Array to store usernames of those who actually receive a bonus
-      $beneficiaryUsernames = [];
-
-      while ($level <= $max_levels && $current_user_id) {
-        $referrer = DB::table('users')
-          ->where('id', $current_user_id)
-          ->where('status', 1)
-          ->first();
-
-        if (!$referrer || !$referrer->referred_by) {
-          break;
-        }
-
-        $referrer_id = $referrer->referred_by;
-
-        // ─── Check if referrer has at least 1 active package ───
-        $hasActivePlan = Payment::where('user_id', $referrer_id)
-          ->where('status', 'approved')
-          ->where('approved_at', '<=', now())
-          ->where('expires_at', '>', now())
-          ->exists();
-
-        if (!$hasActivePlan) {
-          // Skip this level (upline not active)
-          $current_user_id = $referrer->referred_by;
-          $level++;
-          continue;
-        }
-
-        $bonus_percent_column = "referral_bonus_level{$level}";
-
-        if (!property_exists($package, $bonus_percent_column) || $package->$bonus_percent_column <= 0) {
-          $level++;
-          $current_user_id = $referrer->referred_by;
-          continue;
-        }
-
-        $bonus_amount = $investment * ($package->$bonus_percent_column / 100);
-
-        // --- Get the username of the upline who will receive the bonus ---
-        $referrerName = DB::table('users')->where('id', $referrer_id)->value('username');
-        if ($referrerName) {
-          $beneficiaryUsernames[] = $referrerName;
-        }
-
-        // Credit referrer
-        DB::table('users')
-          ->where('id', $referrer_id)
-          ->increment('balance', $bonus_amount);
-
-        // Record transaction
-        DB::table('transactions')->insert([
-          'user_id'    => $referrer_id,
-          'amount'     => $bonus_amount,
-          'trx_type'   => 'referral_bonus',
-          'detail'     => "Level {$level} referral bonus from user #{$investor->id} ({$investor->username}) - Package #{$package->id}",
-          'created_at' => $now,
-          'updated_at' => $now,
-        ]);
-
-        // Notify referrer
-        DB::table('notifications')->insert([
-          'id'              => Str::uuid(),
-          'type'            => 'ReferralBonus',
-          'notifiable_type' => 'App\\Models\\User',
-          'notifiable_id'   => $referrer_id,
-          'data'            => json_encode([
-            'message'     => "You received Level {$level} referral bonus of {$bonus_amount} from {$investor->username}.",
-            'amount'      => $bonus_amount,
-            'level'       => $level,
-            'from_user_id' => $investor->id,
-            'package_id'  => $package->id,
-            'type'        => 'referral_bonus'
-          ]),
-          'created_at'      => $now,
-          'updated_at'      => $now,
-        ]);
-
-        // Move up
-        $current_user_id = $referrer->referred_by;
-        $level++;
-      }
-
-      DB::commit();
-
-      // Build the success message with the list of beneficiaries
-      $usernamesList = empty($beneficiaryUsernames)
-        ? 'No referral bonuses were given (no eligible upline).'
-        : implode(', ', $beneficiaryUsernames);
-
-      return redirect()->back()->with('success', "Payment #{$payment->id} approved successfully. Referral bonuses processed (up to level {$max_levels}): {$usernamesList}");
-    } catch (\Exception $e) {
-      DB::rollBack();
-
-      Log::error('Payment approval + referral processing failed', [
-        'payment_id' => $id,
-        'error'      => $e->getMessage(),
-        'trace'      => $e->getTraceAsString(),
-      ]);
-
-      return redirect()->back()->with('error', 'Approval failed: ' . $e->getMessage());
-    }
-  }
-
-
-  public function reject_package(Request $request, $id)
-  {
-    $payment = Payment::findOrFail($id);
-
-    // if ($payment->status !== 'pending') {
-    //     return redirect()
-    //         ->back()
-    //         ->with('error', 'This payment has already been processed.');
-    // }
-
-    try {
-      DB::beginTransaction();
-
-      $now = now();
-      $note = $request->admin_note ?? 'Payment not Verified';
-
-      // 1️⃣ Update payment status
-      $payment->update([
-        'status'      => 'rejected',
-        'admin_note'  => $note,
-        'rejected_at' => $now,
-      ]);
-
-      // 2️⃣ Notify package owner
-      DB::table('notifications')->insert([
-        'id' => Str::uuid(),
-        'type' => 'PackageRejected',
-        'notifiable_type' => 'App\\Models\\User',
-        'notifiable_id' => $payment->user_id,
-        'data' => json_encode([
-          'message' => "Your package payment #{$payment->id} has been rejected.",
-          'payment_id' => $payment->id,
-          'reason' => $note,
-          'type' => 'package_rejected'
-        ]),
-        'created_at' => $now,
-        'updated_at' => $now,
-      ]);
-
-      DB::commit();
-
-      return redirect()
-        ->back()
-        ->with('success', 'Payment #' . $payment->id . ' has been rejected.');
-    } catch (\Exception $e) {
-
-      DB::rollBack();
-
-      \Log::error('Payment rejection failed', [
-        'payment_id' => $id,
-        'error'      => $e->getMessage()
-      ]);
-
-      return redirect()
-        ->back()
-        ->with('error', 'Failed to reject payment. Please try again.');
-    }
-  }
-
-
-  public function package_requests()
-  {
-    $statuses = ['pending', 'approved', 'rejected'];
-    $requests = [];
-
-    $baseQuery = DB::table('payments')
-      ->join('users', 'payments.user_id', '=', 'users.id')
-      ->join('packages', 'payments.plan_id', '=', 'packages.id')
-      ->leftJoin('payment_methods', 'payments.payment_method_id', '=', 'payment_methods.id')
-      ->select(
-        'payments.*',
-        'users.username',
-        'users.phone',
-        'packages.name as plan_name',
-        'packages.id as package_id',
-        'payment_methods.account_type as payment_method_name',
-        'payment_methods.account_title as payment_method_title'
-      );
-
-    foreach ($statuses as $status) {
-      $requests[$status . 'Requests'] = (clone $baseQuery)
-        ->where('payments.status', $status)
-        ->get();
-    }
-
-    return view('admin.package_requests', $requests);
-  }
-
-
-
-  public function storePending(Request $request)
-  {
-    $request->validate([
-      'service_id'     => 'nullable|exists:services,id',
-      'nic_number'     => 'nullable|string|max:50',
-      'nic_expiry'     => 'nullable|date',
-      'nic_front'      => 'nullable|image|max:2048',
-      'nic_back'       => 'nullable|image|max:2048',
-      'selfie'         => 'nullable|image|max:2048',
-    ]);
-
-    $userId = auth()->id();
+    $userId = Auth::id();
     if (!$userId) {
       return redirect()->back()->with('error', 'You must be logged in.');
     }
 
+    // 2. Helper to save uploaded file and return public path
     $saveFile = function ($file) {
       $destinationPath = public_path('expert/images');
       if (!File::exists($destinationPath)) {
@@ -958,36 +98,18 @@ class Admin extends Controller
       $file->move($destinationPath, $fileName);
       return 'expert/images/' . $fileName;
     };
-        $data = [
-            'service_id'     => $request->service_id,
-            'nic_number'     => $request->nic_number,
-            'nic_expiry'     => $request->nic_expiry,
-            'payment_status' => $request->payment_status ?? 'Pending',
-            'profile_status' => 0,
-            'updated_at'     => now(),
-        ];
 
-        // Helper function to save file directly to public folder
-        $saveFile = function ($file, $subFolder = '') {
-            $destinationPath = public_path('expert/images' . ($subFolder ? '/' . $subFolder : ''));
-            if (!File::exists($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true);
-            }
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move($destinationPath, $fileName);
-            return 'expert/images' . ($subFolder ? '/' . $subFolder : '') . '/' . $fileName;
-        };
-
+    // 3. Prepare data array (match fillable fields in ExpertDetail model)
     $data = [
       'user_id'        => $userId,
       'service_id'     => $request->service_id,
       'nic_number'     => $request->nic_number,
       'nic_expiry'     => $request->nic_expiry,
-      'payment_status' => 0,   // pending
-      'created_at'     => now(),
-      'updated_at'     => now(),
+      'payment_status' => 'Pending',   // ENUM value
+      'profile_status' => 0,
     ];
 
+    // 4. Add file paths if uploaded
     if ($request->hasFile('nic_front')) {
       $data['nic_front_image'] = $saveFile($request->file('nic_front'));
     }
@@ -998,23 +120,28 @@ class Admin extends Controller
       $data['selfie_image'] = $saveFile($request->file('selfie'));
     }
 
-    $recordId = DB::table('expert_details')->insertGetId($data);
+    // 5. Create record using Eloquent model
+    $expertDetail = ExpertDetail::create($data);
+    $recordId = $expertDetail->id;
 
-    // Store the record ID in session to use on payment page
+    // 6. Store ID in session for payment step
     session(['pending_expert_id' => $recordId]);
 
-    // Get price from service
-    $price = DB::table('services')->where('id', $request->service_id)->value('price') ?? 0;
+    // 7. Get service price
+    $price = $expertDetail->service->price ?? 0; // using relation
 
-    return redirect()->route('expert.payment.page')->with('amount', $price);
+    // 8. Redirect to payment page with success message
+    return redirect()->route('expert.payment.page')
+      ->with('amount', $price)
+      ->with('success', 'Expert details saved. Please complete payment.');
   }
 
   public function showPaymentPage()
   {
     $amount = session('amount', 0);
-    if (!$amount) {
-      return redirect()->route('user_profile')->with('error', 'Invalid payment request.');
-    }
+    // if (!$amount) {
+    //   return redirect()->back()->with('error', 'Invalid payment request.');
+    // }
     return view('expert.payment', compact('amount'));
   }
 
@@ -1035,7 +162,7 @@ class Admin extends Controller
 
     $expertId = session('pending_expert_id');
     if (!$expertId) {
-      return redirect()->route('user_profile')->with('error', 'Session expired. Please start over.');
+      return redirect()->back()->with('error', 'Session expired. Please start over.');
     }
 
     // Update payment status to 1 (paid)

@@ -385,181 +385,7 @@ class Welcome extends Controller
   }
 
 
-  public function sendResetLink(Request $request)
-  {
-    $this->validate($request, [
-      'email' => 'required|email',
-    ]);
-
-    $email = $request->input('email');
-
-    $user = DB::table('users')->where('email', $email)->first();
-
-    if (!$user) {
-      return redirect()->back()->with('error', 'User not found');
-    } else {
-
-      DB::table('password_reset')->where('email', $email)->delete();
-      $token = Str::random(64);
-      DB::table('password_reset')->insert([
-        'email' => $request->email,
-        'token' => $token,
-        'created_at' => Carbon::now()
-      ]);
-
-      Mail::send('emails.reset_password_link', ['token' => $token], function ($message) use ($request) {
-        $message->from('secure@botaex.com', 'BotaEx');
-        $message->to($request->email);
-        $message->subject('Reset Password');
-      });
-
-      return back()->with('success', 'We have e-mailed your password reset link!');
-    }
-  }
-
-  public function forgot_password()
-  {
-    return view('auth.forgot_password');
-  }
-
-  public function user_profile()
-  {
-    $user = DB::table('users')->where('id', auth()->user()->id)->first();
-
-    if (!$user) {
-      // Handle the case where the user with the given ID is not found
-      return redirect()->back()->with('error', 'User not found');
-    }
-
-    return view('user.profile', [
-      'user' => $user
-    ]);
-  }
-
-  public function checkUsernameProfile(Request $request)
-  {
-    $request->validate([
-      'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/'
-    ]);
-
-    $username = $request->username;
-    $currentUserId = auth()->id();
-
-    $exists = User::where('username', $username)
-      ->where('id', '!=', $currentUserId)
-      ->exists();
-
-    return response()->json([
-      'available' => !$exists,
-      'message'   => $exists ? 'This username is already taken' : null
-    ]);
-  }
-
-  public function update_user_profile(Request $request)
-  {
-    $request->validate([
-      'name'    => 'nullable|string|max:255',
-      'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/|unique:users,username,' . auth()->id(),
-      'phone'   => 'required|string|max:20|unique:users,phone,' . auth()->id(),
-      'whatsapp' => 'nullable|string|max:20|unique:users,whatsapp,' . auth()->id(),
-      'email'   => 'nullable|email|max:255|unique:users,email,' . auth()->id(),
-      'pic'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB
-    ]);
-
-    $user = auth()->user();
-
-    // Handle avatar upload
-    if ($request->hasFile('pic')) {
-      // Delete old avatar if it exists
-      if ($user->pic) {
-        $oldPath = public_path('uploads/user/' . $user->pic);
-        if (file_exists($oldPath)) {
-          unlink($oldPath);
-        }
-      }
-
-      // Store the new file and get the path
-      $file = $request->file('pic');
-
-      // Option 1: Simple filename (recommended for most cases)
-      $filename = time() . '_' . $file->getClientOriginalName();
-      $path = $file->move(public_path('uploads/user'), $filename);
-      // → then $path would be full server path → you usually want relative path
-
-      // Most common & clean approach (using storage):
-      $user->pic = 'uploads/user/' . $filename;
-    }
-
-    // Update other fields (only if provided)
-    if ($request->filled('name')) {
-      $user->name = $request->name;
-    }
-    if ($request->filled('email')) {
-      $user->email = $request->email;
-    }
-    if ($request->filled('phone')) {
-      $user->phone = $request->phone;
-    }
-    if ($request->filled('whatsapp')) {
-      $user->whatsapp = $request->whatsapp;
-    }
-    if ($request->filled('username')) {
-      $user->username = $request->username;
-    }
-
-    $user->save();
-
-    return back()->with('success', 'Profile updated successfully!');
-  }
-
-  public function my_profile()
-  {
-    $user = DB::table('users')->where('id', auth()->user()->id)->first();
-
-    if (!$user) {
-      // Handle the case where the user with the given ID is not found
-      return redirect()->back()->with('error', 'User not found');
-    }
-
-    return view('admin.user_profile', [
-      'user' => $user
-    ]);
-  }
-
-  public function delete_account(Request $request)
-  {
-    $user = $request->user();
-
-    // 1️⃣ Validate password confirmation
-    $request->validate([
-      'password' => ['required'],
-    ]);
-
-    if (!Hash::check($request->password, $user->password)) {
-      return back()->withErrors([
-        'password' => 'The provided password is incorrect.'
-      ]);
-    }
-
-    if ($user->balance < 0) {
-      return back()->withErrors([
-        'error' => 'Cannot delete account: Your balance is negative. Please settle your dues first.'
-      ])->withInput();
-    }
-
-    // 2️⃣ Logout before deleting
-    Auth::logout();
-
-    // 3️⃣ Delete user (Soft delete recommended)
-    $user->delete();
-
-    // 4️⃣ Invalidate session
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect('/')
-      ->with('success', 'Your account has been deleted successfully.');
-  }
+  
 
 
   public function userDetails($id)
@@ -998,43 +824,6 @@ class Welcome extends Controller
       'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
         if (! Hash::check($value, $user->password)) {
           $fail('The current password is incorrect.');
-
-        $attempts = session($attemptKey, 0);
-
-
-        // ────────────────────────────────────────────────
-        // Try to log in
-        // ────────────────────────────────────────────────
-        if (! Auth::attempt($credentials)) {
-            // Failed attempt
-
-
-            $attempts++;
-            session([$attemptKey => $attempts]);
-
-            $message = 'Incorrect username/mobile or password.';
-
-            if ($attempts >= $maxAttempts) {
-                // Deactivate the account
-                $user->status = 0;
-                $user->save();  // or $user->update(['status' => 0]);
-
-                // Optional: clear sensitive session data
-                session()->forget($attemptKey);
-
-                $message = 'Too many failed login attempts. Your account has been deactivated for security reasons. Please contact support.';
-            } else {
-                $remaining = $maxAttempts - $attempts;
-                return back()
-                    ->withInput($request->only('login'))
-                    ->withErrors(['login' => $message])
-                    ->with('attempts_left', $remaining);
-            }
-
-
-            return back()
-                ->withInput($request->only('login'))
-                ->withErrors(['login' => $message ?? 'Incorrect username/mobile or password.']);
         }
       }],
       'password' => 'required|string|min:6|confirmed', // confirmed = checks password_confirmation field
@@ -1042,13 +831,6 @@ class Welcome extends Controller
 
     $user->password = Hash::make($validated['password']);
     $user->save();
-        // ────────────────────────────────────────────────
-        // SUCCESSFUL LOGIN
-        // ────────────────────────────────────────────────
-
-        // Reset counter on success
-        session()->forget($attemptKey);
-
 
     // Optional: force logout other devices (good security practice)
     Auth::logoutOtherDevices($validated['password']);
@@ -1066,25 +848,6 @@ class Welcome extends Controller
     $cities = City::where('is_active', 1)->orderBy('name')->get();
     return view('auth.register', compact('cities'));
   }
-        if ($user->status == 2) {
-            Auth::logout();
-            return redirect('/login')->with('error', 'Account is suspended.');
-        }
-
-        // Single-device logout for non-admins
-        if ($user->type != 0) {
-            Auth::logoutOtherDevices($request->password);
-        }
-
-        // Role-based redirect
-        return match ((int) $user->type) {
-            0 => redirect('dashboard'),
-            1 => redirect('user-dashboard'),
-            2 => redirect('expert-dashboard'),
-            default => abort(403),
-        };
-    }
-
 
   public function logout(Request $request)
   {
@@ -1094,52 +857,4 @@ class Welcome extends Controller
 
     return redirect('login')->with('success', 'Logged out successfully');
   }
-
-    public function change_password()
-    {
-        return view('auth.change_password');
-    }
-
-    public function change_password_update(Request $request)
-    {
-        $user = auth()->user();
-
-        $validated = $request->validate([
-            'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
-                if (! Hash::check($value, $user->password)) {
-                    $fail('The current password is incorrect.');
-                }
-            }],
-            'password' => 'required|string|min:6|confirmed', // confirmed = checks password_confirmation field
-        ]);
-
-        $user->password = Hash::make($validated['password']);
-        $user->save();
-
-        // Optional: force logout other devices (good security practice)
-        Auth::logoutOtherDevices($validated['password']);
-
-        return back()->with('success', 'Password changed successfully!');
-    }
-
-    public function login()
-    {
-        return view('auth.login');
-    }
-
-    public function register()
-    {
-        $cities = City::where('is_active', 1)->orderBy('name')->get();
-        return view('auth.register', compact('cities'));
-    }
-
-
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('login')->with('success', 'Logged out successfully');
-    }
 }

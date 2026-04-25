@@ -68,7 +68,7 @@ Route::get('/terms', fn() => view('privacy'));
 // Authenticated User Routes
 // ────────────────────────────────────────────────
 
-Route::group(['middleware' => 'CheckUserRole'], function () {
+Route::group(['middleware' => 'checkUserRole'], function () {
   Route::get('/recharge', [Welcome::class, 'recharge'])->name('market.recharge');
   Route::get('/pre-dashboard', [Welcome::class, 'pre_dashboard'])->name('pre_dashboard');
   Route::get('/user-dashboard', [Welcome::class, 'user_dashboard'])->name('user_dashboard');
@@ -76,34 +76,34 @@ Route::group(['middleware' => 'CheckUserRole'], function () {
   Route::post('/update-user-profile',   [Welcome::class, 'update_user_profile'])->name('user_profile.update');
 
 
-    Route::get('/recharge', [Welcome::class, 'recharge'])->name('market.recharge');
-    Route::get('/pre-dashboard', [Welcome::class, 'pre_dashboard'])->name('pre_dashboard');
-    Route::get('/user-dashboard', [Welcome::class, 'user_dashboard'])->name('user_dashboard');
+  Route::get('/recharge', [Welcome::class, 'recharge'])->name('market.recharge');
+  Route::get('/pre-dashboard', [Welcome::class, 'pre_dashboard'])->name('pre_dashboard');
+  Route::get('/user-dashboard', [Welcome::class, 'user_dashboard'])->name('user_dashboard');
 
-    Route::get('/user-profile',   [Welcome::class, 'user_profile'])->name('user_profile');
-    Route::post('/update-user-profile',   [Welcome::class, 'update_user_profile'])->name('user_profile.update');
-
-
-
-
-    Route::post('/username/check', [Welcome::class, 'checkUsernameProfile'])
-        ->name('user.username.check');
-
-    Route::get('/change-password', [Welcome::class, 'change_password'])->name('password.change');
-    Route::post('/change-password', [Welcome::class, 'change_password_update'])->name('password.update');
+  Route::get('/user-profile',   [Welcome::class, 'user_profile'])->name('user_profile');
+  Route::post('/update-user-profile',   [Welcome::class, 'update_user_profile'])->name('user_profile.update');
 
 
 
-    Route::delete('/delete-account', [Welcome::class, 'delete_account'])
-        ->middleware('auth')
-        ->name('account.delete');
+
+  Route::post('/username/check', [Welcome::class, 'checkUsernameProfile'])
+    ->name('user.username.check');
+
+  Route::get('/change-password', [Welcome::class, 'change_password'])->name('password.change');
+  Route::post('/change-password', [Welcome::class, 'change_password_update'])->name('password.update');
 
 
 
-    Route::get('/my-plans',       [Welcome::class, 'my_plans'])->name('my_plans');
+  Route::delete('/delete-account', [Welcome::class, 'delete_account'])
+    ->middleware('auth')
+    ->name('account.delete');
 
-    Route::get('/my-tasks',       [Welcome::class, 'my_tasks2'])->name('my_tasks');
-    Route::get('/my-orders',       [Welcome::class, 'my_orders'])->name('my_orders');
+
+
+  Route::get('/my-plans',       [Welcome::class, 'my_plans'])->name('my_plans');
+
+  Route::get('/my-tasks',       [Welcome::class, 'my_tasks2'])->name('my_tasks');
+  Route::get('/my-orders',       [Welcome::class, 'my_orders'])->name('my_orders');
 
 
   Route::post('/username/check', [Welcome::class, 'checkUsernameProfile'])
@@ -140,18 +140,18 @@ Route::group(['middleware' => 'CheckUserRole'], function () {
   Route::get('/awards', [Welcome::class, 'awards'])->name('awards');
   Route::get('/info', [Welcome::class, 'info'])->name('info');
   Route::get('/crypto', [Welcome::class, 'crypto'])->name('crypto');
-    Route::get('/my-complaints',  [Welcome::class, 'my_complaints'])->name('my_complaints');
-    Route::post('/complaints', [Complaint::class, 'store'])->name('complaints.store');
-    Route::get('/download-app', [Welcome::class, 'download_app'])->name('download_app');
-    Route::get('/share-balance', [Welcome::class, 'shareBalance'])->name('share.balance');
-    Route::post('/share-balance', [Welcome::class, 'transferBalance'])->name('transfer.balance');
-    Route::get('/notifications', [Welcome::class, 'notifications'])->name('notifications');
-    Route::post('/mark-read-all', [Welcome::class, 'markAllRead'])->name('readAll');
-    Route::get('/notification-read/{id}', [Welcome::class, 'markNotificationRead'])->name('notification.read');
-    // Route::get('/apply-fixed-deposit', [Welcome::class, 'applyFD'])->name('fd.apply');
-    Route::get('/awards', [Welcome::class, 'awards'])->name('awards');
-    Route::get('/info', [Welcome::class, 'info'])->name('info');
-    Route::get('/crypto', [Welcome::class, 'crypto'])->name('crypto');
+  Route::get('/my-complaints',  [Welcome::class, 'my_complaints'])->name('my_complaints');
+  Route::post('/complaints', [Complaint::class, 'store'])->name('complaints.store');
+  Route::get('/download-app', [Welcome::class, 'download_app'])->name('download_app');
+  Route::get('/share-balance', [Welcome::class, 'shareBalance'])->name('share.balance');
+  Route::post('/share-balance', [Welcome::class, 'transferBalance'])->name('transfer.balance');
+  Route::get('/notifications', [Welcome::class, 'notifications'])->name('notifications');
+  Route::post('/mark-read-all', [Welcome::class, 'markAllRead'])->name('readAll');
+  Route::get('/notification-read/{id}', [Welcome::class, 'markNotificationRead'])->name('notification.read');
+  // Route::get('/apply-fixed-deposit', [Welcome::class, 'applyFD'])->name('fd.apply');
+  Route::get('/awards', [Welcome::class, 'awards'])->name('awards');
+  Route::get('/info', [Welcome::class, 'info'])->name('info');
+  Route::get('/crypto', [Welcome::class, 'crypto'])->name('crypto');
 });
 
 // ────────────────────────────────────────────────
@@ -165,7 +165,6 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
   // Dashboard
   Route::get('/dashboard', [Welcome::class, 'dashboard'])->name('dashboard');
 
-  Route::get('/return-withdraw', [Welcome::class, 'returnWithdraw'])->name('return.withdraw');
   Route::get('/finish-complaints', [Welcome::class, 'finishComplaints'])->name('finish.complaints');
 
   Route::get('/balance-shares', [Welcome::class, 'balanceShares'])->name('balance.shares');
@@ -195,23 +194,36 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
   Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])
     ->name('important_note');
 
-    // Users Management
-    Route::get('/users',                    [Welcome::class, 'users'])->name('users');
-    Route::get('/user-details/{id}',        [Welcome::class, 'userDetails'])->name('userDetails');
+  // Users Management
+  Route::get('/users',                    [Welcome::class, 'users'])->name('users');
+  Route::get('/user-details/{id}',        [Welcome::class, 'userDetails'])->name('userDetails');
 
-    Route::post('users/{id}/force-logout', [Admin::class, 'forceLogout'])
-        ->name('admin.force-logout');
+  Route::post('users/{id}/force-logout', [Admin::class, 'forceLogout'])
+    ->name('admin.force-logout');
 
-    Route::delete('/delete-user/{id}',      [Admin::class, 'deleteUser'])->name('deleteUser');
-    Route::get('/suspend_user/{id}',        [Admin::class, 'suspendUser'])->name('suspendUser');
-    Route::get('/activate_user/{id}',       [Admin::class, 'activateUser'])->name('activateUser');
-    Route::get('/edit_user/{id}',           [Admin::class, 'editUser'])->name('editUser');
-    Route::post('/update_user/{id}', [Admin::class, 'update_user'])->name('user.update');
+  Route::delete('/delete-user/{id}',      [Admin::class, 'deleteUser'])->name('deleteUser');
+  Route::get('/suspend_user/{id}',        [Admin::class, 'suspendUser'])->name('suspendUser');
+  Route::get('/activate_user/{id}',       [Admin::class, 'activateUser'])->name('activateUser');
+  Route::get('/edit_user/{id}',           [Admin::class, 'editUser'])->name('editUser');
+  Route::post('/update_user/{id}', [Admin::class, 'update_user'])->name('user.update');
 
-    Route::get('/all-complaints',               [Admin::class, 'complaints'])->name('all_complaints');
-    Route::post('/complaint-update', [Complaint::class, 'update'])
-        ->name('admin.complaints.update');
-    Route::delete('/complaints/{complaint}', [Complaint::class, 'destroy'])->name('admin.complaints.destroy');
+  Route::get('/all-complaints',               [Admin::class, 'complaints'])->name('all_complaints');
+  Route::post('/complaint-update', [Complaint::class, 'update'])
+    ->name('admin.complaints.update');
+  Route::delete('/complaints/{complaint}', [Complaint::class, 'destroy'])->name('admin.complaints.destroy');
+
+
+  Route::get('/add_blogs', [BlogController::class, 'add'])->name('blogs.add');
+  Route::get('/blogs_list', [BlogController::class, 'blogs_list'])->name('blogs.list');
+  Route::post('/save_blog', [BlogController::class, 'save'])->name('blogs.save');
+  Route::get('/edit_blog/{blog}', [BlogController::class, 'edit'])->name('blogs.edit');
+  Route::put('/update_blog/{blog}', [BlogController::class, 'update'])->name('blogs.update');
+  Route::delete('/delete_blog/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
+  Route::post('/toggle_commentable/{blog}', [BlogController::class, 'toggleCommentable'])->name('blogs.toggle');
+
+
+  Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])
+    ->name('important_note');
 
 
   Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
@@ -229,57 +241,21 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
   Route::put('/cities/{id}', [CityController::class, 'update'])->name('cities.update');
   Route::delete('/cities/{id}', [CityController::class, 'destroy'])->name('cities.destroy');
 
+
   Route::post('/services/{id}/toggle-active', [ServiceController::class, 'toggleActive'])->name('services.toggleActive');
   Route::post('/cities/{id}/toggle-active', [CityController::class, 'toggleActive'])->name('cities.toggleActive');
-
-
-  Route::get('/add_blogs', [BlogController::class, 'add'])->name('blogs.add');
-  Route::get('/blogs_list', [BlogController::class, 'blogs_list'])->name('blogs.list');
-  Route::post('/save_blog', [BlogController::class, 'save'])->name('blogs.save');
-  Route::get('/edit_blog/{blog}', [BlogController::class, 'edit'])->name('blogs.edit');
-  Route::put('/update_blog/{blog}', [BlogController::class, 'update'])->name('blogs.update');
-  Route::delete('/delete_blog/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
-  Route::post('/toggle_commentable/{blog}', [BlogController::class, 'toggleCommentable'])->name('blogs.toggle');
-
-
-
-
-
-    Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])
-        ->name('important_note');
-
-
-    Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-    Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
-    Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
-    Route::get('/services/{id}/edit', [ServiceController::class, 'edit'])->name('services.edit');
-    Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
-    Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
-
-
-    Route::get('/cities', [CityController::class, 'index'])->name('cities.index');
-    Route::get('/cities/create', [CityController::class, 'create'])->name('cities.create');
-    Route::post('/cities', [CityController::class, 'store'])->name('cities.store');
-    Route::get('/cities/{id}/edit', [CityController::class, 'edit'])->name('cities.edit');
-    Route::put('/cities/{id}', [CityController::class, 'update'])->name('cities.update');
-    Route::delete('/cities/{id}', [CityController::class, 'destroy'])->name('cities.destroy');
-
-
-    Route::post('/services/{id}/toggle-active', [ServiceController::class, 'toggleActive'])->name('services.toggleActive');
-    Route::post('/cities/{id}/toggle-active', [CityController::class, 'toggleActive'])->name('cities.toggleActive');
 });
 
 // expert routes 
 Route::group(['middleware' => 'checkExpertRole'], function () {
-    Route::get('/expert-dashboard', [Welcome::class, 'expert_dashboard'])->name('expert_dashboard');
-    Route::post('/update-expert-profile', [Admin::class, 'updateExpert'])->name('expert.update');
-    Route::get('/expert-profile',   [Welcome::class, 'expert_profile'])->name('expert_profile');
+  Route::get('/expert-dashboard', [Welcome::class, 'expert_dashboard'])->name('expert_dashboard');
+  Route::post('/update-expert-profile', [Admin::class, 'updateExpert'])->name('expert_profile.update');
+  Route::get('/expert-profile',   [Welcome::class, 'expert_profile'])->name('expert_profile');
 
-    Route::get('/expert/payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page')->middleware('auth');
-  Route::post('/expert/payment/process', [Admin::class, 'processPayment'])->name('expert.payment.process')->middleware('auth');
-
+  // Route::get('/expert-payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page');
+  Route::post('/expert-payment/process', [Admin::class, 'processPayment'])->name('expert.payment.process');
 });
-
+Route::get('/expert-payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page');
 
 
 
