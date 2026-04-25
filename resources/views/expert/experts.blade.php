@@ -71,12 +71,12 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                           </tr>
                         </thead>
                         <tbody>
-                          @forelse ($experts as $expert)
+                          @forelse ($pendingExperts as $expert)
                           <tr>
                             <td>{{ $expert->id }}</td>
                             <td>
                               <strong>{{ $expert->username ?? 'N/A' }}</strong><br>
-                              <small class="text-muted">{{ $expert->email }}</small><br>
+                              <small class="text-muted">{{ $expert->email }}</small>
                               <small>{{ $expert->phone ?? 'No phone' }}</small>
                             </td>
                             <td>{{ $expert->service_name ?? 'Not assigned' }}</td>
@@ -96,11 +96,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                               @endif
                             </td>
                             <td>
-                              <span class="badge 
-                                                                    {{ $expert->payment_status == 'Paid' ? 'badge-success' : '' }}
-                                                                    {{ $expert->payment_status == 'Pending' ? 'badge-warning' : '' }}
-                                                                    {{ $expert->payment_status == 'Failed' ? 'badge-danger' : '' }}
-                                                                    {{ $expert->payment_status == 'Refunded' ? 'badge-secondary' : '' }}">
+                              <span class="badge {{ $expert->payment_status == 'Paid' ? 'badge-success' : '' }} {{ $expert->payment_status == 'Pending' ? 'badge-warning' : '' }} {{ $expert->payment_status == 'Failed' ? 'badge-danger' : '' }} {{ $expert->payment_status == 'Refunded' ? 'badge-secondary' : '' }}">
                                 {{ $expert->payment_status ?? 'Pending' }}
                               </span>
                             </td>
@@ -140,7 +136,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                           </tr>
                         </thead>
                         <tbody>
-                          @forelse ($experts as $expert)
+                          @forelse ($verifiedExperts as $expert)
                           <tr>
                             <td>{{ $expert->id }}</td>
                             <td>
