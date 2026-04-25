@@ -932,6 +932,80 @@ class Admin extends Controller
     }
 
 
+     public function updateExpert(Request $request)
+    {
+        $request->validate([
+            'service_id'     => 'nullable|exists:services,id',
+            'nic_number'     => 'nullable|string|max:50',
+            'nic_expiry'     => 'nullable|date',
+            'nic_front'      => 'nullable|image|max:2048',
+            'nic_back'       => 'nullable|image|max:2048',
+            'selfie'         => 'nullable|image|max:2048',
+            'payment_status' => 'nullable|in:Pending,Paid,Failed,Refunded',
+        ]);
+
+        $userId = Auth::id();
+        if (!$userId) {
+            return redirect()->back()->with('error', 'You must be logged in.');
+        }
+
+        $data = [
+            'service_id'     => $request->service_id,
+            'nic_number'     => $request->nic_number,
+            'nic_expiry'     => $request->nic_expiry,
+            'payment_status' => $request->payment_status ?? 'Pending',
+            'updated_at'     => now(),
+        ];
+
+        // Helper function to save file directly to public folder
+        $saveFile = function ($file, $subFolder = '') {
+            $destinationPath = public_path('expert/images' . ($subFolder ? '/' . $subFolder : ''));
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true);
+            }
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($destinationPath, $fileName);
+            return 'expert/images' . ($subFolder ? '/' . $subFolder : '') . '/' . $fileName;
+        };
+
+        // Handle file uploads
+        if ($request->hasFile('nic_front')) {
+            $data['nic_front_image'] = $saveFile($request->file('nic_front'));
+        }
+        if ($request->hasFile('nic_back')) {
+            $data['nic_back_image'] = $saveFile($request->file('nic_back'));
+        }
+        if ($request->hasFile('selfie')) {
+            $data['selfie_image'] = $saveFile($request->file('selfie'));
+        }
+
+        $existing = DB::table('expert_details')->where('user_id', $userId)->first();
+
+        if ($existing) {
+            // Optionally delete old files when replacing
+            if ($request->hasFile('nic_front') && $existing->nic_front_image) {
+                $oldPath = public_path($existing->nic_front_image);
+                if (File::exists($oldPath)) File::delete($oldPath);
+            }
+            if ($request->hasFile('nic_back') && $existing->nic_back_image) {
+                $oldPath = public_path($existing->nic_back_image);
+                if (File::exists($oldPath)) File::delete($oldPath);
+            }
+            if ($request->hasFile('selfie') && $existing->selfie_image) {
+                $oldPath = public_path($existing->selfie_image);
+                if (File::exists($oldPath)) File::delete($oldPath);
+            }
+            DB::table('expert_details')->where('user_id', $userId)->update($data);
+        } else {
+            $data['user_id'] = $userId;
+            $data['created_at'] = now();
+            DB::table('expert_details')->insert($data);
+        }
+
+        return redirect()->back()->with('success', 'Expert information saved successfully.');
+    }
+
+
 
     public function sendEmail(Request $request)
     {

@@ -183,6 +183,10 @@ Route::post('/cities/{id}/toggle-active', [CityController::class, 'toggleActive'
 
 });
 
+
+Route::group(['middleware' => 'checkAdminRole'], function () {
+  Route::post('/expert/update', [Admin::class, 'updateExpert'])->name('expert.update')->middleware('auth');
+});
 // ────────────────────────────────────────────────
 // Shared / Profile Routes (outside middleware)
 // ────────────────────────────────────────────────

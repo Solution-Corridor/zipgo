@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\City;
+use App\Models\Service;
 
 
 class Welcome extends Controller
@@ -588,14 +589,14 @@ class Welcome extends Controller
     }
 
 
-    public function dashboard()
-    {
-        $total_users = User::where('type', 1)->count();
+public function dashboard()
+{
+    $total_users    = User::where('type', 1)->count();
+    $total_services = Service::where('is_active', 1)->count();
+$total_cities   = City::where('is_active', 1)->count();
 
-        return view('admin.dashboard', compact(
-            'total_users'
-        ));
-    }
+    return view('admin.dashboard', compact('total_users', 'total_services', 'total_cities'));
+}
 
     public function user_dashboard()
     {
