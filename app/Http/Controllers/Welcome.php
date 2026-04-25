@@ -700,7 +700,7 @@ class Welcome extends Controller
         // Try to find the user first (without authenticating yet)
         $user = Auth::getProvider()->retrieveByCredentials($credentials);
 
-        $isSensitive = $user && $user->is_sensitive;
+        
 
         // Session key unique per login identifier (username/phone)
         $attemptKey = 'login_attempts_sensitive_' . md5($loginInput);
@@ -708,9 +708,9 @@ class Welcome extends Controller
         $attempts = 0;
         $maxAttempts = 5;
 
-        if ($isSensitive) {
+        
             $attempts = session($attemptKey, 0);
-        }
+        
 
         // ────────────────────────────────────────────────
         // Try to log in
@@ -718,7 +718,7 @@ class Welcome extends Controller
         if (! Auth::attempt($credentials)) {
             // Failed attempt
 
-            if ($isSensitive) {
+            
                 $attempts++;
                 session([$attemptKey => $attempts]);
 
@@ -740,7 +740,7 @@ class Welcome extends Controller
                         ->withErrors(['login' => $message])
                         ->with('attempts_left', $remaining);
                 }
-            }
+            
 
             return back()
                 ->withInput($request->only('login'))
@@ -750,10 +750,10 @@ class Welcome extends Controller
         // ────────────────────────────────────────────────
         // SUCCESSFUL LOGIN
         // ────────────────────────────────────────────────
-        if ($isSensitive) {
+        
             // Reset counter on success
             session()->forget($attemptKey);
-        }
+        
 
         $request->session()->regenerate();
 
@@ -776,12 +776,12 @@ class Welcome extends Controller
         }
 
         // Role-based redirect
-        return match ($user->type) {
-            0 => redirect('dashboard'),
-            1 => redirect('user-dashboard'),
-            2 => redirect('expert-dashboard'),
-            default => abort(403),
-        };
+        return match ((int) $user->type) {
+    0 => redirect('dashboard'),
+    1 => redirect('user-dashboard'),
+    2 => redirect('expert-dashboard'),
+    default => abort(403),
+};
     }
 
 

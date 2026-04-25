@@ -123,4 +123,13 @@ $username = auth()->user()?->username ?? 'Guest';
             <p><?php echo nl2br(e($importantNote->message)); ?></p>
         </div>
     <?php endif; ?>
-</div><?php /**PATH E:\xampp\htdocs\zipGo\resources\views/user/includes/top_greetings.blade.php ENDPATH**/ ?>
+</div>
+
+<?php if(auth()->user()->type==2): ?>
+Expert Dashboard
+SDDL (services)
+NIC nub, nic Expiry, 
+NIC Front, NIC Back
+Selfie with NIC
+payment status
+<?php endif; ?><?php /**PATH E:\xampp\htdocs\zipGo\resources\views/user/includes/top_greetings.blade.php ENDPATH**/ ?>

@@ -121,3 +121,12 @@ $username = auth()->user()?->username ?? 'Guest';
         </div>
     @endif
 </div>
+
+@if(auth()->user()->type==2)
+Expert Dashboard
+SDDL (services)
+NIC nub, nic Expiry, 
+NIC Front, NIC Back
+Selfie with NIC
+payment status
+@endif

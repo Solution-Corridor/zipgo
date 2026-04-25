@@ -37,6 +37,7 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
+        'type' => 'integer',
         'status'      => 'integer',
         'created_at'  => 'datetime',
         'updated_at'  => 'datetime',
