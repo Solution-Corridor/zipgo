@@ -20,7 +20,8 @@ class Welcome extends Controller
 
   public function index()
   {
-    return view('website.index');
+    $services = Service::where('is_active', 1)->orderBy('name')->get();
+    return view('website.index', compact('services'));
   }
 
 

@@ -197,7 +197,7 @@
     }
 
     /* Dropdown (Desktop + Mobile) */
-    .categories-dropdown {
+    .services-dropdown {
         position: relative;
     }
 
@@ -233,8 +233,8 @@
         color: white !important;
     }
 
-    .categories-dropdown.active .dropdown-menu,
-    .categories-dropdown:hover .dropdown-menu {
+    .services-dropdown.active .dropdown-menu,
+    .services-dropdown:hover .dropdown-menu {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
@@ -299,10 +299,8 @@
     </div>
     
     <div class="nav-links">
-        <a href="/quick-selling">Quick Selling</a>
-        <a href="/high-rated">High Rated</a>
-        <a href="/new-products">New Arrival</a>
-        <a href="/categories">Categories</a>
+        <a href="/areas">Areas</a>
+        <a href="/services">Services</a>
         @guest
         <a href="/login">Login</a>
         <a href="/register">Register</a>
@@ -310,6 +308,8 @@
         @auth
         @if(auth()->user()->type == 0)
         <a href="{{ route('dashboard') }}">Dashboard</a>
+        @elseif(auth()->user()->type == 2)
+        <a href="{{ route('expert_dashboard') }}">Dashboard</a>
         @else
         <a href="{{ route('user_dashboard') }}">Dashboard</a>
         @endif
@@ -346,6 +346,10 @@
             <a href="{{ route('dashboard') }}" style="color: #fc0;">
                 <i class="fa fa-tachometer-alt"></i> Dashboard
             </a>
+        @elseif(auth()->user()->type == 2)
+            <a href="{{ route('expert_dashboard') }}" style="color: #fc0;">
+                <i class="fa fa-user-circle"></i> Dashboard
+            </a>
         @else
             <a href="{{ route('user_dashboard') }}" style="color: #fc0;">
                 <i class="fa fa-user-circle"></i> Dashboard
@@ -353,20 +357,12 @@
         @endif
     @endauth
 
-    <a href="/quick-selling">
-        <i class="fa fa-bolt"></i> Quick Selling
+<a href="/areas">
+        <i class="fa fa-map-marker-alt"></i> Areas
     </a>
 
-    <a href="/high-rated">
-        <i class="fa fa-star"></i> High Rated
-    </a>
-
-    <a href="/new-products">
-        <i class="fa fa-box-open"></i> New Arrival
-    </a>
-
-    <a href="/categories">
-        <i class="fa fa-th-large"></i> Categories
+    <a href="/services">
+        <i class="fa fa-th-large"></i> Services
     </a>
 
     @auth

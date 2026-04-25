@@ -624,8 +624,8 @@ background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1
 
     <section class="category-section">
         <div class="category-header">
-            <h2>Explore By Category</h2>
-            <a href="/categories"><button class="view-all-btn">View More</button></a>
+            <h2>Explore By Services</h2>
+            <a href="/services"><button class="view-all-btn">View More</button></a>
         </div>
 
         <div class="carousel-wrapper">
@@ -634,49 +634,20 @@ background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1
                 <i class="bx bx-chevron-left"></i>
             </button>
 
-            @php
-    // Temporary dummy data – DELETE after testing
-    $categories = [
-        (object) [
-            'url' => 'dummy/electronics',
-            'feature_image' => 'https://picsum.photos/id/0/200/150',
-            'category_name' => 'Electronics',
-        ],
-        (object) [
-            'url' => 'dummy/fashion',
-            'feature_image' => 'https://picsum.photos/id/20/200/150',
-            'category_name' => 'Fashion',
-        ],
-        (object) [
-            'url' => 'dummy/books',
-            'feature_image' => 'https://picsum.photos/id/24/200/150',
-            'category_name' => 'Books',
-        ],
-        (object) [
-            'url' => 'dummy/toys',
-            'feature_image' => 'https://picsum.photos/id/26/200/150',
-            'category_name' => 'Toys & Games',
-        ],
-        (object) [
-            'url' => 'dummy/sports',
-            'feature_image' => 'https://picsum.photos/id/29/200/150',
-            'category_name' => 'Sports',
-        ],
-    ];
-@endphp
+            
 
 <!-- Carousel Track -->
 <div class="carousel-track" id="carouselTrack">
-    @foreach ($categories as $cat)
+    @foreach ($services as $service)
     <div class="category-item">
-        <a href="/{{ $cat->url }}">
+        <a href="/{{ $service->slug }}">
             <div class="category-img">
-                <img src="{{ $cat->feature_image }}"
+                <img src="{{ $service->pic }}"
                     onerror="this.onerror=null; this.src='/assets/images/favicon.png';"
-                    alt="{{ $cat->category_name }}"
-                    title="{{ $cat->category_name }}">
+                    alt="{{ $service->name }}"
+                    title="{{ $service->name }}">
             </div>
-            <p>{{ $cat->category_name }}</p>
+            <p>{{ $service->name }}</p>
         </a>
     </div>
     @endforeach
