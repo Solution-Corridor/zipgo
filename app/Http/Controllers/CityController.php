@@ -30,7 +30,7 @@ class CityController extends Controller
             'name'    => 'required|string|max:255',
             'slug'    => 'required|string|unique:cities,slug',
             'pic'     => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'detail'  => 'required|string',
+            'detail'  => 'nullable|string',
         ]);
 
         $picPath = null;
@@ -68,7 +68,7 @@ class CityController extends Controller
             'name'    => 'required|string|max:255',
             'slug'    => 'required|string|unique:cities,slug,' . $city->id,
             'pic'     => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'detail'  => 'required|string',
+            'detail'  => 'nullable|string',
         ]);
 
         $data = [

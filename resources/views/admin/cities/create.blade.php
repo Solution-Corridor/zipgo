@@ -60,7 +60,7 @@ Add City
 
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label>City Detail / Description <code>*</code></label>
+                                                <label>City Detail / Description</label>
                                                 <textarea name="detail" id="myTextarea" class="form-control" placeholder="Full description...">{{ old('detail') }}</textarea>
                                             </div>
                                             @error('detail')<p class="text-danger">{{ $message }}</p>@enderror

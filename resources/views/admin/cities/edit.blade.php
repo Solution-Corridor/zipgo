@@ -66,7 +66,7 @@ Edit City
 
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label>City Detail <code>*</code></label>
+                                                <label>City Detail</label>
                                                 <textarea name="detail" id="myTextarea" class="form-control">{{ old('detail', $city->detail) }}</textarea>
                                             </div>
                                             @error('detail')<p class="text-danger">{{ $message }}</p>@enderror
