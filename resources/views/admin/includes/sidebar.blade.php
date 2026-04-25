@@ -45,6 +45,13 @@
         </li>
 
         <li class="nav-item">
+          <a href="/experts" class="nav-link {{ request()->segment(1) == 'experts' ? 'active' : '' }}">
+            <i class="nav-icon fas fa-user-tie"></i>
+            <p>Experts</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
           <a href="{{ route('services.index') }}" class="nav-link {{ request()->segment(1) == 'services' ? 'active' : '' }}">
             <i class="nav-icon fas fa-cogs"></i>
             <p>Services</p>
@@ -63,7 +70,6 @@
             <i class="nav-icon fas fa-exclamation-triangle"></i>
             <p>
               Complaints
-
             </p>
           </a>
         </li>
