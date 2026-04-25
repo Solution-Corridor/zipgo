@@ -25,9 +25,9 @@ class User extends Authenticatable
         'username',
         'password',
         'type',
-        'status',        
+        'status',
         'balance',
-        'address',        
+        'address',
         'otp_code',
         'otp_expires_at',
     ];
@@ -45,11 +45,14 @@ class User extends Authenticatable
 
     protected $dates = ['last_activity'];
 
-   
+
     public function complaints()
     {
         return $this->hasMany(Complaint::class, 'user_id', 'id');
     }
 
-    
+    public function expertDetail()
+    {
+        return $this->hasOne(ExpertDetail::class, 'user_id');
+    }
 }

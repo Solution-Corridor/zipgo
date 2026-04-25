@@ -37,12 +37,12 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
-            
+
         ],
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -68,8 +68,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'checkUserRole' => \App\Http\Middleware\CheckUserRole::class,
         'checkAdminRole' => \App\Http\Middleware\CheckAdminRole::class,
-        'CheckUserRole' => \App\Http\Middleware\CheckUserRole::class,
-        'AdminRoutes' => \App\Http\Middleware\AdminRoutes::class,
-        'MarketRoutes' => \App\Http\Middleware\MarketRoutes::class,
+        'checkExpertRole' => \App\Http\Middleware\CheckExpertRole::class,
     ];
 }

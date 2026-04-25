@@ -14,7 +14,7 @@ class CheckAdminRole
         // Check if the user is authenticated
         if (Auth::check()) {
             // Check if the user has the required role (customize this logic as needed)
-            if (Auth::user()->type == '0' || Auth::user()->type == '2') {
+            if (Auth::user()->type == '0') {
                 return $next($request);
             }
         }

@@ -359,3 +359,4 @@ $username = auth()->user()?->username ?? 'Guest';
     </div>
 </div>
 @endif
+</script>

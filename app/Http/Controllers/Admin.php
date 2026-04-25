@@ -20,6 +20,7 @@ use App\Models\Complaint;
 use App\Models\ImportantNote;
 use App\Models\MobApp;
 
+use Illuminate\Support\Facades\File;
 
 use function Symfony\Component\Clock\now;
 
@@ -960,6 +961,25 @@ class Admin extends Controller
       $file->move($destinationPath, $fileName);
       return 'expert/images/' . $fileName;
     };
+        $data = [
+            'service_id'     => $request->service_id,
+            'nic_number'     => $request->nic_number,
+            'nic_expiry'     => $request->nic_expiry,
+            'payment_status' => $request->payment_status ?? 'Pending',
+            'profile_status' => 0,
+            'updated_at'     => now(),
+        ];
+
+        // Helper function to save file directly to public folder
+        $saveFile = function ($file, $subFolder = '') {
+            $destinationPath = public_path('expert/images' . ($subFolder ? '/' . $subFolder : ''));
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true);
+            }
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($destinationPath, $fileName);
+            return 'expert/images' . ($subFolder ? '/' . $subFolder : '') . '/' . $fileName;
+        };
 
     $data = [
       'user_id'        => $userId,
