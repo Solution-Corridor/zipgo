@@ -48,6 +48,12 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                         <span class="badge badge-success ml-1">{{ $verifiedExperts->count() }}</span>
                       </a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link {{ $currentTab == 'rejected' ? 'active' : '' }}" id="rejected-tab" data-toggle="pill" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">
+                        <i class="fa fa-times-circle"></i>&nbsp;&nbsp;Rejected
+                        <span class="badge badge-danger ml-1">{{ $rejectedExperts->count() }}</span>
+                      </a>
+                    </li>
                   </ul>
                 </div>
 
@@ -102,13 +108,24 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                             </td>
                             <td>{{ \Carbon\Carbon::parse($expert->created_at)->format('d M Y h:i A') }}</td>
                             <td>
-                              <form action="{{ route('admin.experts.verify', $expert->id) }}" method="POST" onsubmit="return confirm('Verify this expert? Their profile will become active.')">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-success">
-                                  <i class="fa fa-check"></i> Verify
-                                </button>
-                              </form>
-                            </td>
+    <div class="d-flex gap-2">
+        <form action="{{ route('admin.experts.verify', $expert->id) }}" method="POST"
+              onsubmit="return confirm('Verify this expert? Their profile will become active.')">
+            @csrf
+            <button type="submit" class="btn btn-success btn-sm mr-1">
+                <i class="fa fa-check"></i>
+            </button>
+        </form>
+
+        <form action="{{ route('admin.experts.reject', $expert->id) }}" method="POST"
+              onsubmit="return confirm('Reject this expert? Their profile will be marked as rejected.')">
+            @csrf
+            <button type="submit" class="btn btn-danger btn-sm">
+                <i class="fa fa-times"></i>
+            </button>
+        </form>
+    </div>
+</td>
                           </tr>
                           @empty
                           <tr>
@@ -179,6 +196,65 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                         </tbody>
                       </table>
                     </div>
+
+                    {{-- REJECTED TAB --}}
+                    <div class="tab-pane fade {{ $currentTab == 'rejected' ? 'show active' : '' }}" id="rejected" role="tabpanel">
+                      <table class="table table-bordered table-hover table-striped">
+                        <thead class="thead-dark">
+                          <tr>
+                            <th>ID</th>
+                            <th>Expert (User)</th>
+                            <th>Service</th>
+                            <th>NIC Details</th>
+                            <th>Documents</th>
+                            <th>Payment Status</th>
+                            <th>Rejected On</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @forelse ($rejectedExperts as $expert)
+                          <tr>
+                            <td>{{ $expert->id }}</td>
+                            <td>
+                              <strong>{{ $expert->username ?? 'N/A' }}</strong><br>
+                              <small class="text-muted">{{ $expert->email }}</small>
+                            </td>
+                            <td>{{ $expert->service_name ?? 'Not assigned' }}</td>
+                            <td>
+                              <strong>NIC #:</strong> {{ $expert->nic_number ?? '—' }}<br>
+                              <strong>Expiry:</strong> {{ $expert->nic_expiry ? \Carbon\Carbon::parse($expert->nic_expiry)->format('d M Y') : '—' }}
+                            </td>
+                            <td>    
+                              @if($expert->nic_front_image)
+                              <a href="{{ asset($expert->nic_front_image) }}" target="_blank" class="btn btn-xs btn-info">NIC Front</a>
+                              @endif
+                              @if($expert->nic_back_image)
+                              <a href="{{ asset($expert->nic_back_image) }}" target="_blank" class="btn btn-xs btn-info">NIC Back</a>
+                              @endif
+                              @if($expert->selfie_image)
+                              <a href="{{ asset($expert->selfie_image) }}" target="_blank" class="btn btn-xs btn-primary">Selfie</a>
+                              @endif
+                            </td>
+                            <td>
+                              <span class="badge 
+                                                                    {{ $expert->payment_status == 'Paid' ? 'badge-success' : '' }}
+                                                                    {{ $expert->payment_status == 'Pending' ? 'badge-warning' : '' }}
+                                                                    {{ $expert->payment_status == 'Failed' ? 'badge-danger' : '' }}
+                                                                    {{ $expert->payment_status == 'Refunded' ? 'badge-secondary' : '' }}">
+                                {{ $expert->payment_status ?? 'Pending' }}
+                              </span>
+                            </td>
+                            <td>{{ \Carbon\Carbon::parse($expert->updated_at)->format('d M Y h:i A') }}</td>
+                          </tr> 
+                          @empty
+                          <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                              No rejected experts.
+                            </td>
+                          </tr>
+                          @endforelse
+                        </tbody>
+                      </table>
                   </div>
                 </div>
               </div>

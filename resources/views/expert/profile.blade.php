@@ -1,3 +1,11 @@
+@php
+    $canEdit = true;  // default: new submission
+    if ($expertData) {
+        // status 0 (pending) or 1 (approved) → disable editing
+        // status 2 (rejected) → allow editing
+        $canEdit = ($expertData->profile_status == 2);
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
@@ -186,6 +194,13 @@
             border-radius: 12px;
         }
 
+        .select2-container--default .select2-selection--single[aria-disabled="true"] {
+    background-color: #1e293b !important;
+    color: #cbd5f5 !important;
+    border-color: #334155 !important;
+    cursor: not-allowed;
+}
+
         /* Force original select to be hidden after Select2 initialises */
         #serviceSelect.select2-hidden-accessible {
             position: absolute !important;
@@ -217,6 +232,41 @@
                     <div class="flex-1 h-px bg-gradient-to-r from-indigo-500/40 to-transparent"></div>
                 </div>
 
+                @if($expertData)
+    <div class="mb-4 p-3 rounded-lg {{ 
+        $expertData->profile_status == 0 ? 'bg-yellow-500/10 border border-yellow-500/30' : 
+        ($expertData->profile_status == 1 ? 'bg-green-500/10 border border-green-500/30' : 
+        'bg-red-500/10 border border-red-500/30') 
+    }}">
+        <div class="flex items-center gap-2">
+            <i data-lucide="{{ 
+                $expertData->profile_status == 0 ? 'clock' : 
+                ($expertData->profile_status == 1 ? 'badge-check' : 'x-circle') 
+            }}" class="w-4 h-4 {{ 
+                $expertData->profile_status == 0 ? 'text-yellow-400' : 
+                ($expertData->profile_status == 1 ? 'text-green-400' : 'text-red-400') 
+            }}"></i>
+            <span class="text-sm font-medium {{ 
+                $expertData->profile_status == 0 ? 'text-yellow-300' : 
+                ($expertData->profile_status == 1 ? 'text-green-300' : 'text-red-300') 
+            }}">
+                Profile Status: 
+                @if($expertData->profile_status == 0) Pending
+                @elseif($expertData->profile_status == 1) Approved
+                @else Rejected
+                @endif
+            </span>
+        </div>
+        @if($expertData->profile_status == 0)
+            <p class="text-xs text-yellow-400/70 mt-1">Your profile is under review. Editing is disabled until approval.</p>
+        @elseif($expertData->profile_status == 1)
+            <p class="text-xs text-green-400/70 mt-1">Your profile has been approved. You cannot edit it.</p>
+        @else
+            <p class="text-xs text-red-400/70 mt-1">Your profile was rejected. Please update and resubmit.</p>
+        @endif
+    </div>
+@endif
+
                 <form action="{{ route('expert_profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <!-- hidden user id -->
@@ -233,7 +283,8 @@
 
                                 <select id="serviceSelect"
                                     name="service_id"
-                                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 select2">
+                                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 select2"
+                                    {{ $canEdit ? '' : 'disabled' }}>
 
                                     <option value="">Select a service</option>
 
@@ -244,6 +295,8 @@
                                     </option>
                                     @endforeach
                                 </select>
+
+                                
 
                                 @error('service_id')
                                 <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
@@ -260,12 +313,12 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">NIC Number *</label>
-                                    <input type="text" name="nic_number" value="{{ old('nic_number', $expertData->nic_number ?? '') }}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="CNIC / NIC number">
+                                    <input type="text" name="nic_number" value="{{ old('nic_number', $expertData->nic_number ?? '') }}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="CNIC / NIC number" {{ $canEdit ? '' : 'disabled' }}>
                                     @error('nic_number')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Expiry Date</label>
-                                    <input type="date" name="nic_expiry" value="{{ old('nic_expiry', $expertData->nic_expiry ?? '') }}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500">
+                                    <input type="date" name="nic_expiry" value="{{ old('nic_expiry', $expertData->nic_expiry ?? '') }}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500" {{ $canEdit ? '' : 'disabled' }}>
                                     @error('nic_expiry')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                                 </div>
 
@@ -273,7 +326,7 @@
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">NIC Front Image</label>
                                     <div class="flex items-center gap-3 flex-wrap">
-                                        <input type="file" name="nic_front" id="nic_front_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-600/20 file:text-indigo-300 hover:file:bg-indigo-600/30 cursor-pointer">
+                                        <input type="file" name="nic_front" id="nic_front_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-600/20 file:text-indigo-300 hover:file:bg-indigo-600/30 cursor-pointer" {{ $canEdit ? '' : 'disabled' }}>
                                         <div id="nic_front_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex items-center justify-center">
                                             @if(!empty($expertData->nic_front_image))
                                             <img src="/{{ $expertData->nic_front_image }}" class="w-full h-full object-cover" alt="Front NIC">
@@ -290,7 +343,7 @@
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">NIC Back Image</label>
                                     <div class="flex items-center gap-3 flex-wrap">
-                                        <input type="file" name="nic_back" id="nic_back_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-600/20 file:text-indigo-300">
+                                        <input type="file" name="nic_back" id="nic_back_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-600/20 file:text-indigo-300" {{ $canEdit ? '' : 'disabled' }}>
                                         <div id="nic_back_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex items-center justify-center">
                                             @if(!empty($expertData->nic_back_image))
                                             <img src="/{{ $expertData->nic_back_image }}" class="w-full h-full object-cover" alt="Back NIC">
@@ -307,7 +360,7 @@
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Selfie with NIC</label>
                                     <div class="flex items-center gap-3 flex-wrap">
-                                        <input type="file" name="selfie" id="selfie_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-600/20 file:text-indigo-300">
+                                        <input type="file" name="selfie" id="selfie_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-600/20 file:text-indigo-300" {{ $canEdit ? '' : 'disabled' }}>
                                         <div id="selfie_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex items-center justify-center">
                                             @if(!empty($expertData->selfie_image))
                                             <img src="/{{ $expertData->selfie_image }}" class="w-full h-full object-cover" alt="Selfie">
@@ -323,9 +376,12 @@
                         </div>
 
                         <!-- submit button for expert data -->
-                        <button type="submit" class="w-full py-3.5 rounded-xl font-semibold text-white bg-indigo-700 hover:bg-indigo-600 shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                            <i data-lucide="shield-check" class="w-4 h-4"></i> Update Expert Profile
-                        </button>
+                        <button type="submit"
+    {{ $canEdit ? '' : 'disabled' }}
+    class="w-full py-3.5 rounded-xl font-semibold text-white bg-indigo-700 ... 
+    {{ $canEdit ? 'hover:bg-indigo-600' : 'opacity-60 cursor-not-allowed' }}">
+    {{ $canEdit ? 'Update Expert Profile' : 'Profile Locked' }}
+</button>
                     </div>
                 </form>
             </div>
@@ -381,6 +437,10 @@
                 }, 0);
             });
         });
+
+        if (!{{ $canEdit ? 'true' : 'false' }}) {
+    $('#serviceSelect').prop('disabled', true).trigger('change');
+}
     </script>
     <style>
         /* additional custom alignment */

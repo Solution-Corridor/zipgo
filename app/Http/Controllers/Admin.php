@@ -121,10 +121,13 @@ class Admin extends Controller
     }
 
     // 5. Create record using Eloquent model
-    $expertDetail = ExpertDetail::create($data);
+    $expertDetail = ExpertDetail::updateOrCreate(
+      ['user_id' => $userId],
+      $data
+    );
+
     $recordId = $expertDetail->id;
 
-    // 6. Store ID in session for payment step
     session(['pending_expert_id' => $recordId]);
 
     // 7. Get service price
@@ -139,19 +142,23 @@ class Admin extends Controller
   public function showPaymentPage()
   {
     $amount = session('amount', 0);
-    // if (!$amount) {
-    //   return redirect()->back()->with('error', 'Invalid payment request.');
-    // }
+    if (!$amount) {
+      return redirect()->back()->with('error', 'Invalid payment request.');
+    }
     return view('expert.payment', compact('amount'));
   }
 
   public function processPayment(Request $request)
   {
+    $request->merge([
+      'card_number' => preg_replace('/\s+/', '', $request->card_number),
+    ]);
+
     $request->validate([
-      'card_number'   => 'required|string|size:16',
-      'expiry_month'  => 'required|string|size:2',
-      'expiry_year'   => 'required|string|size:2',
-      'cvc'           => 'required|string|size:3',
+      'card_number'  => 'required|digits:16',
+      'expiry_month' => 'required|string|size:2',
+      'expiry_year'  => 'required|string|size:2',
+      'cvc'          => 'required|string|size:3',
     ]);
 
     // Validate card (Luhn, expiry) as before
@@ -226,7 +233,21 @@ class Admin extends Controller
       ->orderBy('expert_details.created_at', 'desc')
       ->get();
 
-    return view('expert.experts', compact('pendingExperts', 'verifiedExperts'));
+    $rejectedExperts = DB::table('expert_details')
+      ->join('users', 'expert_details.user_id', '=', 'users.id')
+      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id')
+      ->select(
+        'expert_details.*',
+        'users.username',
+        'users.email',
+        'users.phone',
+        'services.name as service_name'
+      )
+      ->where('expert_details.profile_status', 2)
+      ->orderBy('expert_details.created_at', 'desc')
+      ->get();
+
+    return view('expert.experts', compact('pendingExperts', 'verifiedExperts', 'rejectedExperts'));
   }
 
   // Handle expert verification
@@ -240,6 +261,19 @@ class Admin extends Controller
       return redirect()->back()->with('success', 'Expert verified successfully.');
     }
     return redirect()->back()->with('error', 'Verification failed.');
+  }
+
+  // Handle expert rejection
+  public function rejectExpert($id)
+  {
+    $updated = DB::table('expert_details')
+      ->where('id', $id)
+      ->update(['profile_status' => 2]);
+
+    if ($updated) {
+      return redirect()->back()->with('success', 'Expert rejected successfully.');
+    }
+    return redirect()->back()->with('error', 'Rejection failed.');
   }
 
   public function sendEmail(Request $request)

@@ -47,7 +47,9 @@
         <li class="nav-item">
           <a href="/experts" class="nav-link {{ request()->segment(1) == 'experts' ? 'active' : '' }}">
             <i class="nav-icon fas fa-user-tie"></i>
-            <p>Experts</p>
+            <p>Experts
+              <span class="badge badge-warning right mr-3">{{ \App\Models\ExpertDetail::where('profile_status', 0)->count() }}</span>            
+            </p>
           </a>
         </li>
 
@@ -101,7 +103,9 @@
             <p>
               Blogs
               <i class="fas fa-angle-left right"></i>
-              <span class="badge badge-info right mr-3">{{ \App\Models\Blog::where('is_commentable', 0)->count() }}</span>
+              <span class="badge badge-info right mr-3">
+    {{ \App\Models\Blog::count() }}
+</span>
             </p>
           </a>
           <ul class="nav nav-treeview">
@@ -120,15 +124,7 @@
           </ul>
         </li>
 
-        <li class="nav-item">
-          <a href="" class="nav-link {{ in_array(request()->segment(2), ['add_category','edit_category']) ? 'active' : '' }}">
-            <i class="nav-icon fa fa-layer-group"></i>
-            <p>Categories
-              <span class="badge badge-info right"></span>
-            </p>
-          </a>
-        </li>
-
+        
         <li class="nav-item" style="height: 60px;"></li>
       </ul>
     </nav>

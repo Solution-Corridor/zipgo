@@ -386,7 +386,7 @@ class Welcome extends Controller
   }
 
 
-  
+
 
 
   public function userDetails($id)
@@ -402,201 +402,207 @@ class Welcome extends Controller
     ]);
   }
 
-    public function sendResetLink(Request $request)
-    {
-        $this->validate($request, [
-            'email' => 'required|email',
-        ]);
+  public function sendResetLink(Request $request)
+  {
+    $this->validate($request, [
+      'email' => 'required|email',
+    ]);
 
-        $email = $request->input('email');
+    $email = $request->input('email');
 
-        $user = DB::table('users')->where('email', $email)->first();
+    $user = DB::table('users')->where('email', $email)->first();
 
-        if (!$user) {
-            return redirect()->back()->with('error', 'User not found');
-        } else {
+    if (!$user) {
+      return redirect()->back()->with('error', 'User not found');
+    } else {
 
-            DB::table('password_reset')->where('email', $email)->delete();
-            $token = Str::random(64);
-            DB::table('password_reset')->insert([
-                'email' => $request->email,
-                'token' => $token,
-                'created_at' => Carbon::now()
-            ]);
+      DB::table('password_reset')->where('email', $email)->delete();
+      $token = Str::random(64);
+      DB::table('password_reset')->insert([
+        'email' => $request->email,
+        'token' => $token,
+        'created_at' => Carbon::now()
+      ]);
 
-            Mail::send('emails.reset_password_link', ['token' => $token], function ($message) use ($request) {
-                $message->from('secure@botaex.com', 'BotaEx');
-                $message->to($request->email);
-                $message->subject('Reset Password');
-            });
+      Mail::send('emails.reset_password_link', ['token' => $token], function ($message) use ($request) {
+        $message->from('secure@botaex.com', 'BotaEx');
+        $message->to($request->email);
+        $message->subject('Reset Password');
+      });
 
-            return back()->with('success', 'We have e-mailed your password reset link!');
-        }
+      return back()->with('success', 'We have e-mailed your password reset link!');
+    }
+  }
+
+  public function forgot_password()
+  {
+    return view('auth.forgot_password');
+  }
+
+  public function user_profile()
+  {
+    $user = DB::table('users')->where('id', auth()->user()->id)->first();
+
+    if (!$user) {
+      // Handle the case where the user with the given ID is not found
+      return redirect()->back()->with('error', 'User not found');
     }
 
-    public function forgot_password()
-    {
-        return view('auth.forgot_password');
+    return view('user.profile', [
+      'user' => $user
+    ]);
+  }
+
+
+  public function expert_profile()
+  {
+    $user = DB::table('users')->where('id', auth()->id())->first();
+
+    if (!$user) {
+      return redirect()->back()->with('error', 'User not found');
     }
 
-    public function user_profile()
-    {
-        $user = DB::table('users')->where('id', auth()->user()->id)->first();
+    // Fetch expert details for the current user
+    $expertData = DB::table('expert_details')
+      ->where('user_id', auth()->id())
+      ->first();
 
-        if (!$user) {
-            // Handle the case where the user with the given ID is not found
-            return redirect()->back()->with('error', 'User not found');
+    $services = DB::table('services')
+      ->where('is_active', 1)
+      ->orderBy('name')
+      ->get();
+
+    return view('expert.profile', [
+      'user'       => $user,
+      'services'   => $services,
+      'expertData' => $expertData,   // now defined in view
+    ]);
+  }
+
+  public function checkUsernameProfile(Request $request)
+  {
+    $request->validate([
+      'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/'
+    ]);
+
+    $username = $request->username;
+    $currentUserId = auth()->id();
+
+    $exists = User::where('username', $username)
+      ->where('id', '!=', $currentUserId)
+      ->exists();
+
+    return response()->json([
+      'available' => !$exists,
+      'message'   => $exists ? 'This username is already taken' : null
+    ]);
+  }
+
+  public function update_user_profile(Request $request)
+  {
+    $request->validate([
+      'name'    => 'nullable|string|max:255',
+      'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/|unique:users,username,' . auth()->id(),
+      'phone'   => 'required|string|max:20|unique:users,phone,' . auth()->id(),
+      'whatsapp' => 'nullable|string|max:20|unique:users,whatsapp,' . auth()->id(),
+      'email'   => 'nullable|email|max:255|unique:users,email,' . auth()->id(),
+      'pic'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB
+    ]);
+
+    $user = auth()->user();
+
+    // Handle avatar upload
+    if ($request->hasFile('pic')) {
+      // Delete old avatar if it exists
+      if ($user->pic) {
+        $oldPath = public_path('uploads/user/' . $user->pic);
+        if (file_exists($oldPath)) {
+          unlink($oldPath);
         }
+      }
 
-        return view('user.profile', [
-            'user' => $user
-        ]);
+      // Store the new file and get the path
+      $file = $request->file('pic');
+
+      // Option 1: Simple filename (recommended for most cases)
+      $filename = time() . '_' . $file->getClientOriginalName();
+      $path = $file->move(public_path('uploads/user'), $filename);
+      // → then $path would be full server path → you usually want relative path
+
+      // Most common & clean approach (using storage):
+      $user->pic = 'uploads/user/' . $filename;
     }
 
-    public function expert_profile()
-    {
-        $user = DB::table('users')->where('id', auth()->user()->id)->first();
-
-        if (!$user) {
-            // Handle the case where the user with the given ID is not found
-            return redirect()->back()->with('error', 'User not found');
-        }
-
-        $services = DB::table('services')
-            ->where('is_active', 1)
-            ->orderBy('name')
-            ->get();
-
-        return view('expert.profile', [
-            'user' => $user,
-            'services' => $services
-        ]);
+    // Update other fields (only if provided)
+    if ($request->filled('name')) {
+      $user->name = $request->name;
+    }
+    if ($request->filled('email')) {
+      $user->email = $request->email;
+    }
+    if ($request->filled('phone')) {
+      $user->phone = $request->phone;
+    }
+    if ($request->filled('whatsapp')) {
+      $user->whatsapp = $request->whatsapp;
+    }
+    if ($request->filled('username')) {
+      $user->username = $request->username;
     }
 
-    public function checkUsernameProfile(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/'
-        ]);
+    $user->save();
 
-        $username = $request->username;
-        $currentUserId = auth()->id();
+    return back()->with('success', 'Profile updated successfully!');
+  }
 
-        $exists = User::where('username', $username)
-            ->where('id', '!=', $currentUserId)
-            ->exists();
+  public function my_profile()
+  {
+    $user = DB::table('users')->where('id', auth()->user()->id)->first();
 
-        return response()->json([
-            'available' => !$exists,
-            'message'   => $exists ? 'This username is already taken' : null
-        ]);
+    if (!$user) {
+      // Handle the case where the user with the given ID is not found
+      return redirect()->back()->with('error', 'User not found');
     }
 
-    public function update_user_profile(Request $request)
-    {
-        $request->validate([
-            'name'    => 'nullable|string|max:255',
-            'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/|unique:users,username,' . auth()->id(),
-            'phone'   => 'required|string|max:20|unique:users,phone,' . auth()->id(),
-            'whatsapp' => 'nullable|string|max:20|unique:users,whatsapp,' . auth()->id(),
-            'email'   => 'nullable|email|max:255|unique:users,email,' . auth()->id(),
-            'pic'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB
-        ]);
+    return view('admin.user_profile', [
+      'user' => $user
+    ]);
+  }
 
-        $user = auth()->user();
+  public function delete_account(Request $request)
+  {
+    $user = $request->user();
 
-        // Handle avatar upload
-        if ($request->hasFile('pic')) {
-            // Delete old avatar if it exists
-            if ($user->pic) {
-                $oldPath = public_path('uploads/user/' . $user->pic);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
-                }
-            }
+    // 1️⃣ Validate password confirmation
+    $request->validate([
+      'password' => ['required'],
+    ]);
 
-            // Store the new file and get the path
-            $file = $request->file('pic');
-
-            // Option 1: Simple filename (recommended for most cases)
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->move(public_path('uploads/user'), $filename);
-            // → then $path would be full server path → you usually want relative path
-
-            // Most common & clean approach (using storage):
-            $user->pic = 'uploads/user/' . $filename;
-        }
-
-        // Update other fields (only if provided)
-        if ($request->filled('name')) {
-            $user->name = $request->name;
-        }
-        if ($request->filled('email')) {
-            $user->email = $request->email;
-        }
-        if ($request->filled('phone')) {
-            $user->phone = $request->phone;
-        }
-        if ($request->filled('whatsapp')) {
-            $user->whatsapp = $request->whatsapp;
-        }
-        if ($request->filled('username')) {
-            $user->username = $request->username;
-        }
-
-        $user->save();
-
-        return back()->with('success', 'Profile updated successfully!');
+    if (!Hash::check($request->password, $user->password)) {
+      return back()->withErrors([
+        'password' => 'The provided password is incorrect.'
+      ]);
     }
 
-    public function my_profile()
-    {
-        $user = DB::table('users')->where('id', auth()->user()->id)->first();
-
-        if (!$user) {
-            // Handle the case where the user with the given ID is not found
-            return redirect()->back()->with('error', 'User not found');
-        }
-
-        return view('admin.user_profile', [
-            'user' => $user
-        ]);
+    if ($user->balance < 0) {
+      return back()->withErrors([
+        'error' => 'Cannot delete account: Your balance is negative. Please settle your dues first.'
+      ])->withInput();
     }
 
-    public function delete_account(Request $request)
-    {
-        $user = $request->user();
+    // 2️⃣ Logout before deleting
+    Auth::logout();
 
-        // 1️⃣ Validate password confirmation
-        $request->validate([
-            'password' => ['required'],
-        ]);
+    // 3️⃣ Delete user (Soft delete recommended)
+    $user->delete();
 
-        if (!Hash::check($request->password, $user->password)) {
-            return back()->withErrors([
-                'password' => 'The provided password is incorrect.'
-            ]);
-        }
+    // 4️⃣ Invalidate session
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-        if ($user->balance < 0) {
-            return back()->withErrors([
-                'error' => 'Cannot delete account: Your balance is negative. Please settle your dues first.'
-            ])->withInput();
-        }
-
-        // 2️⃣ Logout before deleting
-        Auth::logout();
-
-        // 3️⃣ Delete user (Soft delete recommended)
-        $user->delete();
-
-        // 4️⃣ Invalidate session
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/')
-            ->with('success', 'Your account has been deleted successfully.');
-    }
+    return redirect('/')
+      ->with('success', 'Your account has been deleted successfully.');
+  }
 
 
   public function users()

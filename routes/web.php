@@ -248,6 +248,7 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
   
   Route::get('/experts', [Admin::class, 'experts'])->name('experts');
   Route::post('/admin/experts/verify/{id}', [Admin::class, 'verifyExpert'])->name('admin.experts.verify');
+  Route::post('/admin/experts/reject/{id}', [Admin::class, 'rejectExpert'])->name('admin.experts.reject');
 
 });
 
