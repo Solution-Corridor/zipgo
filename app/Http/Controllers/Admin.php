@@ -543,6 +543,8 @@ class Admin extends Controller
       ],
       'password'    => 'required|min:6',
       'referred_by' => 'nullable|integer|exists:users,id',
+      'city_id'     => 'required|exists:cities,id',
+      'user_type'   => 'required|in:customer,expert',
     ]);
 
     // Look for existing user by BOTH username AND phone
@@ -628,9 +630,10 @@ class Admin extends Controller
       'phone'       => $validated['phone'],
       'password'    => Hash::make($validated['password']),
       'status'      => 1,
-      'type'        => 1,
+      'type'        => $validated['user_type'] === 'expert' ? 2 : 1,
+      'city_id'     => $validated['city_id'],
       'referred_by' => $validated['referred_by'] ?? null,
-      'balance'     => 300, // welcome bonus
+      'balance'     => 300,
     ]);
 
     Auth::login($user);

@@ -761,8 +761,8 @@
   <!-- Products Carousel Section -->
   <section class="container-fluid">
     <div class="products-grid-sm">
-      @foreach ($experts as $expert)
       @include('includes.experts_card')
+      @foreach ($experts as $expert)
       @endforeach
     </div>
   </section>
