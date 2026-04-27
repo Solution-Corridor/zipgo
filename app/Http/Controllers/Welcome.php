@@ -13,6 +13,8 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\City;
 use App\Models\Service;
+use App\Models\ExpertDetail;
+use App\Models\Blog;
 
 
 class Welcome extends Controller
@@ -21,7 +23,8 @@ class Welcome extends Controller
   public function index()
   {
     $services = Service::where('is_active', 1)->orderBy('name')->get();
-    return view('website.index', compact('services'));
+    $experts = ExpertDetail::with('user')->where('profile_status', 1)->get();
+    return view('website.index', compact('services', 'experts'));
   }
 
 
@@ -647,24 +650,78 @@ class Welcome extends Controller
   }
 
 
+  public function liveSearch(Request $request)
+  {
+    $query = $request->get('q', '');
+    if (strlen($query) < 2) {
+      return response()->json([]);
+    }
+
+    $cities = City::where('name', 'LIKE', "%{$query}%")
+      ->limit(5)
+      ->get(['id', 'name', 'slug']);
+
+    $services = Service::where('name', 'LIKE', "%{$query}")
+      ->orWhere('name', 'LIKE', "%{$query}%")
+      ->limit(5)
+      ->get(['id', 'name', 'slug']);
+
+    // Experts: users with type 2 (expert) or those who have expert_details
+    $experts = User::where('name', 'LIKE', "%{$query}%")
+      ->where('type', 2)  // adjust if your expert type is different
+      ->orWhereHas('expertDetail', function ($q) use ($query) {
+        $q->where('nic_number', 'LIKE', "%{$query}%");
+      })
+      ->with('expertDetail')
+      ->limit(5)
+      ->get(['id', 'name', 'email']);
+
+    return response()->json([
+      'cities'   => $cities,
+      'services' => $services,
+      'experts'  => $experts,
+    ]);
+  }
+
   public function show($slug)
   {
-    // Try to find a service with the given slug
-    $service = Service::where('slug', $slug)->first();
+    // Service check
+    $service = Service::with('experts.user')
+      ->where('slug', $slug)
+      ->first();
     if ($service) {
       return view('website.show-experts', compact('service'));
     }
 
-    // If not a service, try to find a city
+    // City check
     $city = City::where('slug', $slug)->first();
     if ($city) {
-      return view('website.show-experts', compact('city'));
+      $experts = ExpertDetail::with('user')
+        ->whereHas('user', function ($q) use ($city) {
+          $q->where('city_id', $city->id);
+        })
+        ->get();
+      return view('website.show-experts', compact('city', 'experts'));
     }
 
-    // If neither exists, return 404
-    abort(404, 'Page not found');
+    abort(404);
   }
 
+  public function blogs()
+  {
+    $blogs = Blog::orderBy('created_at', 'desc')->paginate(12);
+    return view('website.blogs', compact('blogs'));
+  }
+
+  public function blog_detail($slug)
+  {
+    $blog = Blog::where('slug', $slug)->firstOrFail();
+    $recentBlogs = Blog::where('blog_id', '!=', $blog->blog_id)
+      ->orderBy('created_at', 'desc')
+      ->limit(5)
+      ->get();
+    return view('website.blog_detail', compact('blog', 'recentBlogs'));
+  }
 
 
   public function verify_email(Request $req)

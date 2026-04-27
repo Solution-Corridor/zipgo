@@ -115,7 +115,7 @@ $cities = App\Models\City::where('is_active', 1)
   </div>
   <div class="city-grid">
     @foreach ($cities as $city)
-    <a href="{{ $city->slug }}">
+    <a href="/city/{{ $city->slug }}">
       <div class="city-card">
         <div class="city-card-media" style="background-image: url('{{ $city->pic }}');">
         </div>

@@ -44,6 +44,7 @@ Route::post('/verify_email', [Welcome::class, 'verify_email']);
 
 Route::get('/send-email', [Welcome::class, 'sendEmail'])->name('send-email');
 
+
 // Cache clearing (development helper)
 Route::get('/clear-cache', function () {
   Artisan::call('cache:clear');
@@ -58,10 +59,14 @@ Route::get('/clear-cache', function () {
 
 Route::get('/', [Welcome::class, 'index'])->name('welcome');
 
+Route::get('/live-search', [Welcome::class, 'liveSearch'])->name('live.search');
+Route::get('/service/{slug}', [Welcome::class, 'show'])->name('detail.show');
+Route::get('/city/{slug}', [Welcome::class, 'show'])->name('detail.show');
 
 Route::get('/privacy', fn() => view('privacy'));
 Route::get('/terms', fn() => view('privacy'));
-
+Route::get('/blogs', [Welcome::class, 'blogs'])->name('blogs');
+Route::get('/blog/{slug}', [Welcome::class, 'blog_detail'])->name('blogs.show');
 
 
 // ────────────────────────────────────────────────
@@ -264,7 +269,6 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
   });
 
 
-
 // ────────────────────────────────────────────────
 // Shared / Profile Routes (outside middleware)
 // ────────────────────────────────────────────────
@@ -272,7 +276,5 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
 Route::post('/update_profile',   [Admin::class, 'updateProfile'])->name('updateProfile');
 Route::post('/change_password',  [Admin::class, 'changePassword'])->name('change.password');
 
-
-Route::get('/service/{slug}', [Welcome::class, 'show'])->name('detail.show');
 
 //embed other routes file name market.php

@@ -640,7 +640,7 @@
       <div class="carousel-track" id="carouselTrack">
         @foreach ($services as $service)
         <div class="category-item">
-          <a href="/{{ $service->slug }}">
+          <a href="/service/{{ $service->slug }}">
             <div class="category-img">
               <img src="{{ $service->pic }}"
                 onerror="this.onerror=null; this.src='/assets/images/favicon.png';"
@@ -757,41 +757,6 @@
 
 
 
-  @php
-  // TEMPORARY dummy products – matches your $p->slug, $p->pic, $p->name, $p->price
-  $products = [
-  (object) [
-  'slug' => 'wireless-mouse-x1',
-  'pic' => 'https://picsum.photos/id/1/200/200',
-  'name' => 'Wireless Optical Mouse X1',
-  'price' => 1299,
-  ],
-  (object) [
-  'slug' => 'bluetooth-headphones-pro',
-  'pic' => 'https://picsum.photos/id/20/200/200',
-  'name' => 'Bluetooth Headphones Pro ANC',
-  'price' => 3499,
-  ],
-  (object) [
-  'slug' => 'smart-watch-s5',
-  'pic' => 'https://picsum.photos/id/24/200/200',
-  'name' => 'Smart Watch S5 – Fitness Tracker',
-  'price' => 5499,
-  ],
-  (object) [
-  'slug' => 'usb-c-charger-65w',
-  'pic' => 'https://picsum.photos/id/26/200/200',
-  'name' => '65W GaN USB-C Fast Charger',
-  'price' => 1899,
-  ],
-  (object) [
-  'slug' => 'laptop-stand-alu',
-  'pic' => 'https://picsum.photos/id/29/200/200',
-  'name' => 'Aluminum Laptop Stand Ergonomic',
-  'price' => 2499,
-  ],
-  ];
-  @endphp
 
   <!-- Products Carousel Section -->
   <section class="container-fluid">
@@ -799,8 +764,8 @@
       <h2 class="fs-4" align="center">PRODUCTS OF YOUR INTEREST</h2>
     </div>
     <div class="products-grid-sm">
-      @foreach ($products as $p)
-      @include('includes.product_card_small')
+      @foreach ($experts as $expert)
+      @include('includes.experts_card')
       @endforeach
     </div>
   </section>

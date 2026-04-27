@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'pic', 'price', 'detail', 'is_active'];
+  protected $fillable = ['name', 'slug', 'pic', 'price', 'detail', 'is_active'];
 
-    public function expertDetails()
-    {
-        return $this->hasMany(ExpertDetail::class, 'service_id');
-    }
+  public function experts()
+  {
+    return $this->hasMany(ExpertDetail::class, 'service_id');
+  }
 }

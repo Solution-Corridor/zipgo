@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -11,144 +11,154 @@
     {{ $city->name }} Experts
     @endisset
   </title>
-  <!-- Simple inline styles – you can replace with your own CSS -->
+  @include('includes.header_links')
   <style>
-    .header {
-      padding: 1.5rem 2rem;
-      border-bottom: 1px solid #e5e7eb;
-      background: #f9fafb;
+    /* Simple white background, no gradients */
+    body {
+      background: #f5f7fb;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    .experts-page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
     }
 
-    .header-img {
-      width: 64px;
-      height: 64px;
-      border-radius: 9999px;
-      object-fit: cover;
-      background: #e5e7eb;
+    /* Simple page title */
+    .page-title {
+      margin-top: 2.6rem;
+      margin-bottom: 2rem;
     }
 
-    .city-bg {
-      background-size: cover;
-      background-position: center;
-    }
-
-    h1 {
-      font-size: 1.875rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-
-    .subtitle {
-      color: #6b7280;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      padding: 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
-      text-align: left;
-      padding: 0.75rem 1.5rem;
-      background-color: #f9fafb;
-      font-size: 0.75rem;
+    .page-title h1 {
+      font-size: 1.8rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #4b5563;
-      border-bottom: 1px solid #e5e7eb;
+      color: #1f2937;
+      margin: 0;
     }
 
-    td {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid #f0f0f0;
-      vertical-align: top;
+    .page-title p {
+      color: #6b7280;
+      margin-top: 0.25rem;
     }
 
-    .expert-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+    /* Card grid */
+    .experts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
     }
 
-    .expert-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 9999px;
-      background: #d1d5db;
+    /* Simple white card */
+    .expert-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 1.25rem;
+      transition: 0.2s;
+      border: 1px solid #eef2f6;
+    }
+
+    .expert-card:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .card-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #eef2ff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      color: #4b5563;
+      font-size: 28px;
+      font-weight: 600;
+      color: #4f46e5;
+      margin: 0 auto 1rem;
       overflow: hidden;
     }
 
-    .expert-avatar img {
+    .card-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
     .expert-name {
-      font-weight: 500;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
       color: #111827;
+      margin-bottom: 0.25rem;
     }
 
-    .expert-bio {
-      font-size: 0.875rem;
-      color: #6b7280;
-      max-width: 250px;
+    .expert-nic {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-bottom: 1rem;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #374151;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-row i {
+      width: 20px;
+      color: #4f46e5;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+      border-top: 1px solid #edf2f7;
+      padding-top: 0.75rem;
     }
 
     .rating {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 4px;
+      color: #f59e0b;
     }
 
-    .star {
-      color: #fbbf24;
-      font-weight: bold;
-    }
-
-    .btn-link {
-      color: #4f46e5;
+    .btn-view {
+      display: block;
+      background: #4f46e5;
+      color: white;
+      text-align: center;
+      padding: 0.5rem;
+      border-radius: 40px;
       text-decoration: none;
       font-weight: 500;
+      font-size: 0.85rem;
+      transition: 0.2s;
     }
 
-    .btn-link:hover {
-      color: #4338ca;
-      text-decoration: underline;
+    .btn-view:hover {
+      background: #4338ca;
     }
 
     .empty-state {
       text-align: center;
-      padding: 3rem 2rem;
-    }
-
-    .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      padding: 3rem;
+      background: white;
+      border-radius: 16px;
+      color: #6c757d;
     }
 
     .back-link {
       display: inline-block;
-      margin-top: 1rem;
-      margin-left: 2rem;
-      margin-bottom: 1rem;
+      margin-top: 2rem;
       color: #4f46e5;
       text-decoration: none;
     }
@@ -156,130 +166,89 @@
     .back-link:hover {
       text-decoration: underline;
     }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.75rem;
-      color: #9ca3af;
-      border-top: 1px solid #e5e7eb;
-    }
   </style>
 </head>
 
 <body>
-  <div class="container">
+  @include('includes.navbar')
+
+  <div class="experts-page">
     @isset($service)
-    {{-- Service Header --}}
-    <div class="header">
-      <div class="header-content">
-        @if($service->pic)
-        <img src="{{ $service->pic }}" alt="{{ $service->name }}" class="header-img">
-        @else
-        <div class="header-img" style="background: #e5e7eb; display: flex; align-items: center; justify-content: center;">📌</div>
-        @endif
-        <div>
-          <h1>{{ $service->name }} Experts</h1>
-          <p class="subtitle">Top professionals offering {{ $service->name }} services</p>
-        </div>
-      </div>
-    </div>
     @php $experts = $service->experts ?? collect(); @endphp
+    <div class="page-title">
+      <h1>{{ $service->name }} Experts</h1>
+      <p>Verified professionals offering {{ $service->name }} services</p>
+    </div>
     @endisset
 
     @isset($city)
-    {{-- City Header --}}
-    <div class="header">
-      <div class="header-content">
-        @if($city->pic)
-        <div class="header-img city-bg" style="background-image: url('{{ $city->pic }}');"></div>
-        @else
-        <div class="header-img" style="background: #e5e7eb; display: flex; align-items: center; justify-content: center;">🏙️</div>
-        @endif
-        <div>
-          <h1>Experts in {{ $city->name }}</h1>
-          <p class="subtitle">Qualified professionals located in {{ $city->name }}</p>
-        </div>
-      </div>
+    @php
+    // $experts is already passed from controller for city
+    @endphp
+    <div class="page-title">
+      <h1>Experts in {{ $city->name }}</h1>
+      <p>Local trusted experts available in {{ $city->name }}</p>
     </div>
-    @php $experts = $city->experts ?? collect(); @endphp
     @endisset
 
-    <div class="table-wrapper">
-      @if($experts && $experts->count() > 0)
-      <table>
-        <thead>
-          <tr>
-            <th>Expert</th>
-            <th>Contact</th>
-            <th>Experience</th>
-            <th>Rating</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($experts as $expert)
-          <tr>
-            <td>
-              <div class="expert-info">
-                <div class="expert-avatar">
-                  @if($expert->image)
-                  <img src="{{ $expert->image }}" alt="{{ $expert->name }}">
-                  @else
-                  {{ strtoupper(substr($expert->name, 0, 1)) }}
-                  @endif
-                </div>
-                <div>
-                  <div class="expert-name">{{ $expert->name }}</div>
-                  @if($expert->bio)
-                  <div class="expert-bio">{{ Str::limit($expert->bio, 60) }}</div>
-                  @endif
-                </div>
-              </div>
-            </td>
-            <td>
-              <div>{{ $expert->email ?? '—' }}</div>
-              <div class="expert-bio">{{ $expert->phone ?? '—' }}</div>
-            </td>
-            <td>
-              {{ $expert->experience_years ?? 'N/A' }} years
-            </td>
-            <td>
-              <div class="rating">
-                <span>{{ number_format($expert->rating ?? 0, 1) }}</span>
-                <span class="star">★</span>
-              </div>
-            </td>
-            <td>
-              <a href="/expert/{{ $expert->slug ?? $expert->id }}" class="btn-link">View Profile →</a>
-            </td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
-      @else
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        <h3 style="margin-bottom: 0.5rem;">No experts found</h3>
-        <p style="color: #6b7280;">
-          @isset($service)
-          No professionals currently listed for {{ $service->name }}.
+    @if(isset($experts) && $experts->count() > 0)
+    <div class="experts-grid">
+      @foreach($experts as $expert)
+      @php
+      // $expert is an ExpertDetail model (from expert_details table)
+      $user = $expert->user;
+      $name = $user->name ?? 'Expert';
+      $email = $user->email ?? '—';
+      $phone = $expert->phone ?? '—';
+      $nic = $expert->nic_number ?? '—';
+      $expYears = $expert->experience_years ?? 'N/A';
+      $rating = $expert->rating ?? 0;
+      $avatar = $user->avatar ?? null;
+      @endphp
+      <div class="expert-card">
+        <div class="card-avatar">
+          @if($avatar)
+          <img src="{{ $avatar }}" alt="{{ $name }}">
           @else
-          No experts available in {{ $city->name }} at the moment.
-          @endisset
-        </p>
+          {{ strtoupper(substr($name, 0, 1)) }}
+          @endif
+        </div>
+        <div class="expert-name">{{ $name }}</div>
+        <div class="expert-nic">NIC: {{ $nic }}</div>
+
+        <div class="info-row">
+          <i>📧</i> <span>{{ $email }}</span>
+        </div>
+        <div class="info-row">
+          <i>📞</i> <span>{{ $phone }}</span>
+        </div>
+
+        <div class="meta-row">
+          <div class="rating">⭐ {{ number_format($rating, 1) }}</div>
+          <div>📅 {{ $expYears }} yrs</div>
+        </div>
+
+        <a href="/expert/{{ $user->id }}" class="btn-view">View Profile →</a>
       </div>
-      @endif
+      @endforeach
     </div>
-
-    <div>
-      <a href="javascript:history.back()" class="back-link">← Back</a>
+    @else
+    <div class="empty-state">
+      <span style="font-size: 3rem;">🔍</span>
+      <h3 style="margin: 1rem 0 0.5rem;">No experts found</h3>
+      <p>
+        @isset($service)
+        No professionals currently listed for {{ $service->name }}.
+        @else
+        No experts available in {{ $city->name }} at the moment.
+        @endisset
+      </p>
     </div>
-
-    <footer>
-      &copy; {{ date('Y') }} Expert Directory. All rights reserved.
-    </footer>
+    @endif
   </div>
+
+  @include('includes.footer')
+  @include('includes.footer_links')
 </body>
 
 </html>

@@ -14,3 +14,6 @@ CREATE TABLE `expert_details` (
   KEY `expert_details_user_id_foreign` (`user_id`),
   KEY `expert_details_service_id_foreign` (`service_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `users` ADD `city_id` INT(11) NOT NULL AFTER `address`;
