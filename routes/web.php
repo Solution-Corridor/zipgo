@@ -273,5 +273,6 @@ Route::post('/update_profile',   [Admin::class, 'updateProfile'])->name('updateP
 Route::post('/change_password',  [Admin::class, 'changePassword'])->name('change.password');
 
 
+Route::get('/{slug}', [Welcome::class, 'show'])->name('detail.show');
 
 //embed other routes file name market.php

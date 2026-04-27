@@ -647,7 +647,23 @@ class Welcome extends Controller
   }
 
 
+  public function show($slug)
+  {
+    // Try to find a service with the given slug
+    $service = Service::where('slug', $slug)->first();
+    if ($service) {
+      return view('website.show-experts', compact('service'));
+    }
 
+    // If not a service, try to find a city
+    $city = City::where('slug', $slug)->first();
+    if ($city) {
+      return view('website.show-experts', compact('city'));
+    }
+
+    // If neither exists, return 404
+    abort(404, 'Page not found');
+  }
 
 
 
