@@ -13,28 +13,19 @@ $cities = App\Models\City::where('is_active', 1)
 
 <style>
   .section-title p {
-    text-align: center;
-  }
-
-  .section-title p {
+    text-align: center !important;
     color: #4a5568;
     font-size: 0.9rem;
     margin-top: 0.5rem;
   }
 
-  /* GRID: Desktop 6 cards in one row, Mobile 2 cards per row (3 rows) */
   .city-grid {
     display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
     margin-top: 1.8rem;
   }
 
-  /* default mobile: 2 columns */
-  .city-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* tablet+ desktop: 6 columns */
   @media (min-width: 1024px) {
     .city-grid {
       grid-template-columns: repeat(6, 1fr);
@@ -42,88 +33,110 @@ $cities = App\Models\City::where('is_active', 1)
     }
   }
 
-  /* small mobile fine-tune */
-  @media (max-width: 640px) {
-    .city-grid {
-      gap: 1rem;
-    }
-  }
-
-  /* small card design */
   .city-card {
-    background: #ffffff;
+    background: #fff;
     border-radius: 1.2rem;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
     border: 1px solid #e9edf2;
     cursor: pointer;
+    transition: 0.3s;
   }
 
   .city-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 18px 30px -12px rgba(0, 0, 0, 0.15);
-    border-color: #cbd5e6;
   }
 
-  /* image area with actual photography */
   .city-card-media {
-    height: 120px;
-    position: relative;
+    height: 110px;
     background-size: cover;
-    background-position: center 50%;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-start;
-    padding: 0.6rem;
-    transition: transform 0.2s ease;
+    background-position: center;
   }
 
-  .city-card:hover .city-card-media {
-    transform: scale(1.02);
-  }
-
-  /* card content compact */
   .city-card-content {
-    padding: 0.8rem 0.85rem 1rem 0.85rem;
+    padding: 0.7rem;
   }
 
   .city-name {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     text-align: center;
     color: #0f172a;
-    margin-bottom: 0.1rem;
   }
 
-  /* responsive text adjustments */
   @media (max-width: 640px) {
-    .city-card-content {
-      padding: 0.7rem;
-    }
-
     .city-name {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
   }
 </style>
-<!-- CITIES -->
+
 <section class="container my-5">
   <div class="mb-4 section-title" align="center">
-    <h2 class="fs-4">Top Cities</h2>
-    <p>Find The Best Services in Your City</p>
+    <h2>Top Cities</h2>
+    <p align="center">Find The Best Services in Your City</p>
   </div>
+
   <div class="city-grid">
-    @foreach ($cities as $city)
-    <a href="/city/{{ $city->slug }}">
+
+    <!-- Karachi -->
+    <a href="/city/karachi">
       <div class="city-card">
-        <div class="city-card-media" style="background-image: url('{{ $city->pic }}');">
-        </div>
+        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1580651315530-69c8e0026377');"></div>
         <div class="city-card-content">
-          <div class="city-name">{{ $city->name }}</div>
+          <div class="city-name">Karachi</div>
         </div>
       </div>
     </a>
-    @endforeach
+
+    <!-- Lahore -->
+    <a href="/city/lahore">
+      <div class="city-card">
+        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1580130732478-4e339fb6836f');"></div>
+        <div class="city-card-content">
+          <div class="city-name">Lahore</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Faisalabad -->
+    <a href="/city/faisalabad">
+      <div class="city-card">
+        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1593642634367-d91a135587b5');"></div>
+        <div class="city-card-content">
+          <div class="city-name">Faisalabad</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Rawalpindi -->
+    <a href="/city/rawalpindi">
+      <div class="city-card">
+        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1564501049412-61c2a3083791');"></div>
+        <div class="city-card-content">
+          <div class="city-name">Rawalpindi</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Gujranwala -->
+    <a href="/city/gujranwala">
+      <div class="city-card">
+        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad');"></div>
+        <div class="city-card-content">
+          <div class="city-name">Gujranwala</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Peshawar -->
+    <a href="/city/peshawar">
+      <div class="city-card">
+        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1578926375605-eaf7559b1458');"></div>
+        <div class="city-card-content">
+          <div class="city-name">Peshawar</div>
+        </div>
+      </div>
+    </a>
+
   </div>
 </section>

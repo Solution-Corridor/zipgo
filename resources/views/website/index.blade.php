@@ -427,12 +427,12 @@
   <style>
     /* Section */
     .category-section {
-  margin: 0 auto;
-  padding: 20px;
-  margin-top: 50px;
-   background: #0f2027;
-  background: linear-gradient(0deg, #0f2027 0%, #2c5364 100%);
-}
+      margin: 0 auto;
+      padding: 20px;
+      margin-top: 50px;
+      background: #0f2027;
+      background: linear-gradient(0deg, #0f2027 0%, #2c5364 100%);
+    }
 
     /* Header (Category + View All) */
     .category-header {
@@ -760,9 +760,6 @@
 
   <!-- Products Carousel Section -->
   <section class="container-fluid">
-    <div class="mb-4">
-      <h2 class="fs-4" align="center">PRODUCTS OF YOUR INTEREST</h2>
-    </div>
     <div class="products-grid-sm">
       @foreach ($experts as $expert)
       @include('includes.experts_card')

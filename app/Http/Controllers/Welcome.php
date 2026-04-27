@@ -724,6 +724,12 @@ class Welcome extends Controller
   }
 
 
+  public function expert_detail($id)
+  {
+    return view('website.expert-detail');
+  }
+
+
   public function verify_email(Request $req)
   {
     $validation = $req->validate([

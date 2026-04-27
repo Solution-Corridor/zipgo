@@ -67,7 +67,7 @@ Route::get('/privacy', fn() => view('privacy'));
 Route::get('/terms', fn() => view('privacy'));
 Route::get('/blogs', [Welcome::class, 'blogs'])->name('blogs');
 Route::get('/blog/{slug}', [Welcome::class, 'blog_detail'])->name('blogs.show');
-
+Route::get('/expert/{id}', [Welcome::class, 'expert_detail'])->name('expert.detail');
 
 // ────────────────────────────────────────────────
 // Authenticated User Routes
