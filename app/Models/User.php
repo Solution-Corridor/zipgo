@@ -24,7 +24,8 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
-        'type',
+        'type', // 0=> admin, 1=> user, 2=> expert
+        'city_id',
         'status',
         'balance',
         'address',
@@ -39,11 +40,11 @@ class User extends Authenticatable
     protected $casts = [
         'type' => 'integer',
         'status'      => 'integer',
+        'city_id'     => 'integer',
+        'balance'     => 'float',
         'created_at'  => 'datetime',
         'updated_at'  => 'datetime',
     ];
-
-    protected $dates = ['last_activity'];
 
 
     public function complaints()
@@ -54,5 +55,10 @@ class User extends Authenticatable
     public function expertDetail()
     {
         return $this->hasOne(ExpertDetail::class, 'user_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'city_id');
     }
 }

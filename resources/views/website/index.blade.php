@@ -427,13 +427,12 @@
   <style>
     /* Section */
     .category-section {
-      /* max-width: 1280px; */
-      margin: 0 auto;
-      padding: 20px;
-      margin-top: 50px;
-      background: #22C1C3;
-      background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
-    }
+  margin: 0 auto;
+  padding: 20px;
+  margin-top: 50px;
+   background: #0f2027;
+  background: linear-gradient(0deg, #0f2027 0%, #2c5364 100%);
+}
 
     /* Header (Category + View All) */
     .category-header {
@@ -446,7 +445,7 @@
     .category-header h2 {
       font-size: 24px;
       font-weight: 600;
-      color: #222;
+      color: #fff;
     }
 
     @media (max-width: 480px) {
@@ -537,7 +536,7 @@
 
     .category-item p {
       font-size: 14px;
-      color: #333;
+      color: #fff;
       font-weight: 500;
     }
 
