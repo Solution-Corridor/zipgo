@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    @include('user.includes.general_style')
+    @include('expert.includes.general_style')
     <title>Complete Payment | ProHub</title>
     <style>
         * {
@@ -31,7 +31,7 @@
 </head>
 <body class="min-h-screen bg-[#0A0A0F] antialiased">
     <div class="mx-auto max-w-[420px] min-h-screen bg-[#0A0A0F] shadow-2xl shadow-black/50 relative">
-        @include('user.includes.top_greetings')
+        @include('expert.includes.top_greetings')
 
         <div class="px-4 pt-4 pb-28">
             @include('includes.success')
@@ -105,7 +105,7 @@
             </div>
         </div>
 
-        @include('user.includes.bottom_navigation')
+        @include('expert.includes.bottom_navigation')
     </div>
 
     <script>

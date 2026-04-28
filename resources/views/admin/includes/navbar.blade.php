@@ -13,7 +13,7 @@
     </li>
 
         <li class="nav-item d-none d-sm-inline-block">
-      <a href="/user-dashboard" class="nav-link btn btn-link"> <i class="fas fa-tachometer-alt"></i> User Dashboard</a>
+      <a href="{{ route('user.dashboard') }}" class="nav-link btn btn-link"> <i class="fas fa-tachometer-alt"></i> User Dashboard</a>
     </li>
 
     

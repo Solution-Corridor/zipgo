@@ -108,24 +108,24 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                             </td>
                             <td>{{ \Carbon\Carbon::parse($expert->created_at)->format('d M Y h:i A') }}</td>
                             <td>
-    <div class="d-flex gap-2">
-        <form action="{{ route('admin.experts.verify', $expert->id) }}" method="POST"
-              onsubmit="return confirm('Verify this expert? Their profile will become active.')">
-            @csrf
-            <button type="submit" class="btn btn-success btn-sm mr-1">
-                <i class="fa fa-check"></i>
-            </button>
-        </form>
+                              <div class="d-flex gap-2">
+                                <form action="{{ route('admin.experts.verify', $expert->id) }}" method="POST"
+                                  onsubmit="return confirm('Verify this expert? Their profile will become active.')">
+                                  @csrf
+                                  <button type="submit" class="btn btn-success btn-sm mr-1">
+                                    <i class="fa fa-check"></i>
+                                  </button>
+                                </form>
 
-        <form action="{{ route('admin.experts.reject', $expert->id) }}" method="POST"
-              onsubmit="return confirm('Reject this expert? Their profile will be marked as rejected.')">
-            @csrf
-            <button type="submit" class="btn btn-danger btn-sm">
-                <i class="fa fa-times"></i>
-            </button>
-        </form>
-    </div>
-</td>
+                                <form action="{{ route('admin.experts.reject', $expert->id) }}" method="POST"
+                                  onsubmit="return confirm('Reject this expert? Their profile will be marked as rejected.')">
+                                  @csrf
+                                  <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-times"></i>
+                                  </button>
+                                </form>
+                              </div>
+                            </td>
                           </tr>
                           @empty
                           <tr>
@@ -177,10 +177,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                               @endif
                             </td>
                             <td>
-                              <span class="badge 
-                                                                    {{ $expert->payment_status == 'Paid' ? 'badge-success' : '' }}
-                                                                    {{ $expert->payment_status == 'Pending' ? 'badge-warning' : '' }}
-                                                                    {{ $expert->payment_status == 'Failed' ? 'badge-danger' : '' }}">
+                              <span class="badge {{ $expert->payment_status == 'Paid' ? 'badge-success' : '' }} {{ $expert->payment_status == 'Pending' ? 'badge-warning' : '' }} {{ $expert->payment_status == 'Failed' ? 'badge-danger' : '' }}">
                                 {{ $expert->payment_status ?? 'Pending' }}
                               </span>
                             </td>
@@ -224,7 +221,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                               <strong>NIC #:</strong> {{ $expert->nic_number ?? '—' }}<br>
                               <strong>Expiry:</strong> {{ $expert->nic_expiry ? \Carbon\Carbon::parse($expert->nic_expiry)->format('d M Y') : '—' }}
                             </td>
-                            <td>    
+                            <td>
                               @if($expert->nic_front_image)
                               <a href="{{ asset($expert->nic_front_image) }}" target="_blank" class="btn btn-xs btn-info">NIC Front</a>
                               @endif
@@ -236,16 +233,12 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                               @endif
                             </td>
                             <td>
-                              <span class="badge 
-                                                                    {{ $expert->payment_status == 'Paid' ? 'badge-success' : '' }}
-                                                                    {{ $expert->payment_status == 'Pending' ? 'badge-warning' : '' }}
-                                                                    {{ $expert->payment_status == 'Failed' ? 'badge-danger' : '' }}
-                                                                    {{ $expert->payment_status == 'Refunded' ? 'badge-secondary' : '' }}">
+                              <span class="badge {{ $expert->payment_status == 'Paid' ? 'badge-success' : '' }} {{ $expert->payment_status == 'Pending' ? 'badge-warning' : '' }} {{ $expert->payment_status == 'Failed' ? 'badge-danger' : '' }} {{ $expert->payment_status == 'Refunded' ? 'badge-secondary' : '' }}">
                                 {{ $expert->payment_status ?? 'Pending' }}
                               </span>
                             </td>
                             <td>{{ \Carbon\Carbon::parse($expert->updated_at)->format('d M Y h:i A') }}</td>
-                          </tr> 
+                          </tr>
                           @empty
                           <tr>
                             <td colspan="7" class="text-center text-muted py-4">
@@ -255,12 +248,12 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                           @endforelse
                         </tbody>
                       </table>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
       </section>
     </div>
 

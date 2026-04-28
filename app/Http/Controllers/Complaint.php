@@ -164,4 +164,18 @@ class Complaint extends Controller
 
     return redirect()->back()->with('success', 'Complaint deleted successfully.');
   }
+
+
+
+  public function finishComplaints()
+  {
+    $peindingComplaints = Complaint::where('status', 'pending')->get();
+    foreach ($peindingComplaints as $complaint) {
+      $complaint->status = 'not_valid';
+      $complaint->updated_at = now();
+      $complaint->save();
+    }
+
+    return back()->with('success', 'All pending complaints have been marked as not valid.');
+  }
 }

@@ -366,11 +366,11 @@
     @endguest
     @auth
     @if(auth()->user()->type == 0)
-    <a href="{{ route('dashboard') }}">Dashboard</a>
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a>
     @elseif(auth()->user()->type == 2)
-    <a href="{{ route('expert_dashboard') }}">Dashboard</a>
+    <a href="{{ route('expert.dashboard') }}">Dashboard</a>
     @else
-    <a href="{{ route('user_dashboard') }}">Dashboard</a>
+    <a href="{{ route('user.dashboard') }}">Dashboard</a>
     @endif
     <a href="/logout" class="text-danger">Logout</a>
     @endauth
@@ -404,15 +404,15 @@
 
   @auth
   @if(auth()->user()->type == 0)
-  <a href="{{ route('dashboard') }}" style="color: #fc0;">
+  <a href="{{ route('admin.dashboard') }}" style="color: #fc0;">
     <i class="fa fa-tachometer-alt"></i> Dashboard
   </a>
   @elseif(auth()->user()->type == 2)
-  <a href="{{ route('expert_dashboard') }}" style="color: #fc0;">
+  <a href="{{ route('expert.dashboard') }}" style="color: #fc0;">
     <i class="fa fa-user-circle"></i> Dashboard
   </a>
   @else
-  <a href="{{ route('user_dashboard') }}" style="color: #fc0;">
+  <a href="{{ route('user.dashboard') }}" style="color: #fc0;">
     <i class="fa fa-user-circle"></i> Dashboard
   </a>
   @endif

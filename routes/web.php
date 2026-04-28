@@ -1,14 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Welcome;
-use App\Http\Controllers\Admin;
-use App\Http\Controllers\Complaint;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\CityController;
-use App\Http\Controllers\BlogController;
 
 require "expert.php";
 require "user.php";
@@ -57,5 +53,8 @@ Route::get('/blogs', [Welcome::class, 'blogs'])->name('blogs');
 Route::get('/blog/{slug}', [Welcome::class, 'blog_detail'])->name('blogs.show');
 Route::get('/expert/{id}', [Welcome::class, 'expert_detail'])->name('expert.detail');
 
-Route::post('/update_profile',   [Admin::class, 'updateProfile'])->name('updateProfile');
-Route::post('/change_password',  [Admin::class, 'changePassword'])->name('change.password');
+
+
+
+Route::get('/change-password', [Welcome::class, 'change_password'])->name('password.change');
+Route::post('/change-password', [Welcome::class, 'change_password_update'])->name('password.update');

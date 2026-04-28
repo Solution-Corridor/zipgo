@@ -2,7 +2,7 @@
 <html lang="en" class="scroll-smooth">
 
 <head>
-  @include('user.includes.general_style')
+  @include('expert.includes.general_style')
   <title>My Service Rates | Expert Dashboard</title>
 </head>
 
@@ -171,7 +171,7 @@
     </dialog>
 
     <!-- Bottom Navigation (as per your existing include) -->
-    @include('user.includes.bottom_navigation')
+    @include('expert.includes.bottom_navigation')
   </div>
 
   <script>

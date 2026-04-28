@@ -20,7 +20,7 @@ $canEdit = ($expertData->profile_status == 2);
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  @include('user.includes.general_style')
+  @include('expert.includes.general_style')
   <title>Expert Profile</title>
 
   <style>
@@ -220,7 +220,7 @@ $canEdit = ($expertData->profile_status == 2);
 
   <div class="mx-auto max-w-[420px] min-h-screen bg-[#0A0A0F] shadow-2xl shadow-black/50 relative">
     <!-- top greeting (dynamic greeting area) -->
-    @include('user.includes.top_greetings')
+    @include('expert.includes.top_greetings')
 
     <div class="px-4 pt-4 pb-28">
       @include('includes.success')
@@ -387,7 +387,7 @@ $canEdit = ($expertData->profile_status == 2);
       </div>
     </div>
 
-    @include('user.includes.bottom_navigation')
+    @include('expert.includes.bottom_navigation')
   </div>
 
   <script>

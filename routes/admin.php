@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Welcome;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Complaint;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +28,8 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::get('/services/{id}/edit', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+    Route::post('/services/{id}/toggle-active', [ServiceController::class, 'toggleActive'])->name('services.toggleActive');
+
 
     Route::get('/cities', [CityController::class, 'index'])->name('cities.index');
     Route::get('/cities/create', [CityController::class, 'create'])->name('cities.create');
@@ -36,11 +37,14 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::get('/cities/{id}/edit', [CityController::class, 'edit'])->name('cities.edit');
     Route::put('/cities/{id}', [CityController::class, 'update'])->name('cities.update');
     Route::delete('/cities/{id}', [CityController::class, 'destroy'])->name('cities.destroy');
+    Route::post('/cities/{id}/toggle-active', [CityController::class, 'toggleActive'])->name('cities.toggleActive');
+
 
     Route::get('/all-complaints', [Complaint::class, 'complaints'])->name('all_complaints');
     Route::post('/complaint-update', [Complaint::class, 'update'])
       ->name('admin.complaints.update');
     Route::delete('/complaints/{complaint}', [Complaint::class, 'destroy'])->name('admin.complaints.destroy');
+    Route::get('/finish-complaints', [Complaint::class, 'finishComplaints'])->name('finish.complaints');
 
     // Users Management
     Route::get('/users', [Admin::class, 'users'])->name('admin.users');
@@ -53,42 +57,7 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::get('/edit_user/{id}', [Admin::class, 'editUser'])->name('editUser');
     Route::post('/update_user/{id}', [Admin::class, 'update_user'])->name('user.update');
 
-
-
-
-
-
-    Route::get('/finish-complaints', [Welcome::class, 'finishComplaints'])->name('finish.complaints');
-
-    Route::get('/balance-shares', [Welcome::class, 'balanceShares'])->name('balance.shares');
-
-
-
-
-
-
-
-
-    Route::get('/my-profile', [Welcome::class, 'my_profile'])->name('my_profile');
-
-    Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])
-      ->name('important_note');
-
-
-    Route::post('users/{id}/force-logout', [Admin::class, 'forceLogout'])
-      ->name('admin.force-logout');
-
-    Route::delete('/delete-user/{id}',      [Admin::class, 'deleteUser'])->name('deleteUser');
-    Route::get('/suspend_user/{id}',        [Admin::class, 'suspendUser'])->name('suspendUser');
-    Route::get('/activate_user/{id}',       [Admin::class, 'activateUser'])->name('activateUser');
-    Route::get('/edit_user/{id}',           [Admin::class, 'editUser'])->name('editUser');
-    Route::post('/update_user/{id}', [Admin::class, 'update_user'])->name('user.update');
-
-    Route::get('/all-complaints',               [Admin::class, 'complaints'])->name('all_complaints');
-    Route::post('/complaint-update', [Complaint::class, 'update'])
-      ->name('admin.complaints.update');
-    Route::delete('/complaints/{complaint}', [Complaint::class, 'destroy'])->name('admin.complaints.destroy');
-
+    Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])->name('important_note');
 
     Route::get('/add_blogs', [BlogController::class, 'add'])->name('blogs.add');
     Route::get('/blogs_list', [BlogController::class, 'blogs_list'])->name('blogs.list');
@@ -98,18 +67,8 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::delete('/delete_blog/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
     Route::post('/toggle_commentable/{blog}', [BlogController::class, 'toggleCommentable'])->name('blogs.toggle');
 
-
-    Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])
-      ->name('important_note');
-
-
-
-
-
-
-
-
-    Route::post('/services/{id}/toggle-active', [ServiceController::class, 'toggleActive'])->name('services.toggleActive');
-    Route::post('/cities/{id}/toggle-active', [CityController::class, 'toggleActive'])->name('cities.toggleActive');
+    Route::get('/my-profile', [Admin::class, 'my_profile'])->name('my_profile');
+    Route::post('/update_profile',   [Admin::class, 'updateProfile'])->name('updateProfile');
+    Route::post('/change_password',  [Admin::class, 'changePassword'])->name('change.password');
   });
 });
