@@ -23,7 +23,7 @@ class ExpertRateController extends Controller
     {
         $expert = $this->getCurrentExpert();
         $rates = $expert->rates()->latest()->get();
-        return view('user.expert_rates', compact('rates'));
+        return view('expert.expert_rates', compact('rates'));
     }
 
     public function store(Request $request)

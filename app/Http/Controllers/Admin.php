@@ -5,28 +5,157 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Pagination\Paginator;
+use App;
+use Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\File;
-use App;
-use Session;
-use Hash;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\City;
+use App\Models\Service;
+use App\Models\ExpertDetail;
+use App\Models\Blog;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\File;
+use Session;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
-use App\Models\User;
 use App\Models\Complaint;
 use App\Models\ImportantNote;
-
 use function Symfony\Component\Clock\now;
-
-use App\Models\ExpertDetail;
-
 use Illuminate\Validation\ValidationException;
+
+
 
 class Admin extends Controller
 {
+  public function dashboard()
+  {
+    $total_users    = User::where('type', 1)->count();
+    $total_services = Service::where('is_active', 1)->count();
+    $total_cities   = City::where('is_active', 1)->count();
+
+    return view('admin.dashboard', compact('total_users', 'total_services', 'total_cities'));
+  }
+
+  public function experts(Request $request)
+  {
+    // Pending experts (profile_status = 0)
+    $pendingExperts = DB::table('expert_details')
+      ->join('users', 'expert_details.user_id', '=', 'users.id')
+      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id') // left join in case service is null
+      ->select(
+        'expert_details.*',
+        'users.username',
+        'users.email',
+        'users.phone',
+        'services.name as service_name'
+      )
+      ->where('expert_details.profile_status', 0)
+      ->orderBy('expert_details.created_at', 'desc')
+      ->get();
+
+    // Verified experts (profile_status = 1)
+    $verifiedExperts = DB::table('expert_details')
+      ->join('users', 'expert_details.user_id', '=', 'users.id')
+      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id')
+      ->select(
+        'expert_details.*',
+        'users.username',
+        'users.email',
+        'users.phone',
+        'services.name as service_name'
+      )
+      ->where('expert_details.profile_status', 1)
+      ->orderBy('expert_details.created_at', 'desc')
+      ->get();
+
+    $rejectedExperts = DB::table('expert_details')
+      ->join('users', 'expert_details.user_id', '=', 'users.id')
+      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id')
+      ->select(
+        'expert_details.*',
+        'users.username',
+        'users.email',
+        'users.phone',
+        'services.name as service_name'
+      )
+      ->where('expert_details.profile_status', 2)
+      ->orderBy('expert_details.created_at', 'desc')
+      ->get();
+
+    return view('expert.experts', compact('pendingExperts', 'verifiedExperts', 'rejectedExperts'));
+  }
+
+  // Handle expert verification
+  public function verifyExpert($id)
+  {
+    $updated = DB::table('expert_details')
+      ->where('id', $id)
+      ->update(['profile_status' => 1]);
+
+    if ($updated) {
+      return redirect()->back()->with('success', 'Expert verified successfully.');
+    }
+    return redirect()->back()->with('error', 'Verification failed.');
+  }
+
+  // Handle expert rejection
+  public function rejectExpert($id)
+  {
+    $updated = DB::table('expert_details')
+      ->where('id', $id)
+      ->update(['profile_status' => 2]);
+
+    if ($updated) {
+      return redirect()->back()->with('success', 'Expert rejected successfully.');
+    }
+    return redirect()->back()->with('error', 'Rejection failed.');
+  }
+
+  public function users()
+  {
+    $users = User::with('referrer')
+      ->withCount(['payments as active_plans_count' => function ($q) {
+        $q->where('status', 'approved');
+        $q->where('expires_at', '>=', now());   // if needed
+      }])
+      ->get();
+
+    return view('admin.users', compact('users'));
+  }
+
+  public function userDetails($id)
+  {
+    $user = User::with('referrer')->find($id);
+
+    if (!$user) {
+      return redirect()->back()->with('error', 'User not found');
+    }
+
+    return view('admin.user_details', [
+      'user' => $user,
+    ]);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -52,22 +181,7 @@ class Admin extends Controller
   }
 
 
-  public function complaints()
-  {
-    // Pending complaints 
-    $pending = Complaint::with('user')
-      ->where('status', 'pending')
-      ->latest()
-      ->paginate(20);
 
-    // All other complaints
-    $others = Complaint::with('user')
-      ->where('status', '!=', 'pending')
-      ->latest()
-      ->paginate(20);
-
-    return view('admin.complaints', compact('pending', 'others'));
-  }
 
 
   public function updateExpert(Request $request)
@@ -201,80 +315,7 @@ class Admin extends Controller
   }
 
 
-  public function experts(Request $request)
-  {
-    // Pending experts (profile_status = 0)
-    $pendingExperts = DB::table('expert_details')
-      ->join('users', 'expert_details.user_id', '=', 'users.id')
-      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id') // left join in case service is null
-      ->select(
-        'expert_details.*',
-        'users.username',
-        'users.email',
-        'users.phone',
-        'services.name as service_name'
-      )
-      ->where('expert_details.profile_status', 0)
-      ->orderBy('expert_details.created_at', 'desc')
-      ->get();
 
-    // Verified experts (profile_status = 1)
-    $verifiedExperts = DB::table('expert_details')
-      ->join('users', 'expert_details.user_id', '=', 'users.id')
-      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id')
-      ->select(
-        'expert_details.*',
-        'users.username',
-        'users.email',
-        'users.phone',
-        'services.name as service_name'
-      )
-      ->where('expert_details.profile_status', 1)
-      ->orderBy('expert_details.created_at', 'desc')
-      ->get();
-
-    $rejectedExperts = DB::table('expert_details')
-      ->join('users', 'expert_details.user_id', '=', 'users.id')
-      ->leftJoin('services', 'expert_details.service_id', '=', 'services.id')
-      ->select(
-        'expert_details.*',
-        'users.username',
-        'users.email',
-        'users.phone',
-        'services.name as service_name'
-      )
-      ->where('expert_details.profile_status', 2)
-      ->orderBy('expert_details.created_at', 'desc')
-      ->get();
-
-    return view('expert.experts', compact('pendingExperts', 'verifiedExperts', 'rejectedExperts'));
-  }
-
-  // Handle expert verification
-  public function verifyExpert($id)
-  {
-    $updated = DB::table('expert_details')
-      ->where('id', $id)
-      ->update(['profile_status' => 1]);
-
-    if ($updated) {
-      return redirect()->back()->with('success', 'Expert verified successfully.');
-    }
-    return redirect()->back()->with('error', 'Verification failed.');
-  }
-
-  // Handle expert rejection
-  public function rejectExpert($id)
-  {
-    $updated = DB::table('expert_details')
-      ->where('id', $id)
-      ->update(['profile_status' => 2]);
-
-    if ($updated) {
-      return redirect()->back()->with('success', 'Expert rejected successfully.');
-    }
-    return redirect()->back()->with('error', 'Rejection failed.');
-  }
 
   public function sendEmail(Request $request)
   {
@@ -530,148 +571,5 @@ class Admin extends Controller
     $user->update(['remember_token' => null]);
 
     return back()->with('success', "All sessions of {$user->username} have been terminated.");
-  }
-
-
-  public function saveRegister(Request $request)
-  {
-    $validated = $request->validate([
-      'username'    => 'required|string|min:3|max:30',
-      'phone'       => [
-        'required',
-        'regex:/^[0-9]{11,11}$/',
-      ],
-      'password'    => 'required|min:6',
-      'referred_by' => 'nullable|integer|exists:users,id',
-      'city_id'     => 'required|exists:cities,id',
-      'user_type'   => 'required|in:customer,expert',
-    ]);
-
-    // Look for existing user by BOTH username AND phone
-    $user = User::where('username', $validated['username'])
-      ->where('phone', $validated['phone'])
-      ->first();
-
-    if ($user) {
-      // ─── Existing user ─── attempt login
-
-      if (!Hash::check($validated['password'], $user->password)) {
-        // Password incorrect
-        if ($user->is_sensitive) {
-          $attemptKey = 'login_attempts_sensitive_' . md5($validated['phone']);
-          $attempts   = session($attemptKey, 0) + 1;
-          session([$attemptKey => $attempts]);
-
-          if ($attempts >= 3) {
-            $user->update(['status' => 0]);
-            session()->forget($attemptKey);
-
-            return redirect('/login')
-              ->with('error', 'Too many failed attempts. Account has been deactivated.');
-          }
-
-          $remaining = 3 - $attempts;
-
-          return back()
-            ->withInput($request->only('username', 'phone', 'referred_by'))
-            ->withErrors(['password' => 'Incorrect password.'])
-            ->with('attempts_left', $remaining);
-        }
-
-        // Normal (non-sensitive) failure
-        return back()
-          ->withInput($request->only('username', 'phone', 'referred_by'))
-          ->withErrors(['password' => 'The password you entered is incorrect.']);
-      }
-
-      // ─── Password correct ─── apply security checks
-
-      // Status checks
-      if ($user->status == 0) {
-        return redirect('/login')
-          ->with('error', 'Account is inactive.');
-      }
-
-      if ($user->status == 2) {
-        return redirect('/login')
-          ->with('error', 'Account is suspended.');
-      }
-
-      // Single-device logout for non-admins
-      if ($user->type != 0) {
-        Auth::logoutOtherDevices($validated['password']);
-      }
-
-      // Success → reset sensitive attempts if applicable
-      if ($user->is_sensitive) {
-        $attemptKey = 'login_attempts_sensitive_' . md5($validated['phone']);
-        session()->forget($attemptKey);
-      }
-
-      // Log in the user
-      Auth::login($user);
-      $request->session()->regenerate();
-
-
-      return redirect()
-        ->route('user_dashboard')
-        ->with('success', 'Welcome back!');
-    }
-
-    // ─── New user ─── enforce uniqueness and create
-
-    $request->validate([
-      'username' => 'unique:users,username',
-      'phone'    => 'unique:users,phone',
-    ]);
-
-    $user = User::create([
-      'username'    => $validated['username'],
-      'phone'       => $validated['phone'],
-      'password'    => Hash::make($validated['password']),
-      'status'      => 1,
-      'type'        => $validated['user_type'] === 'expert' ? 2 : 1,
-      'city_id'     => $validated['city_id'],
-      'referred_by' => $validated['referred_by'] ?? null,
-      'balance'     => 300,
-    ]);
-
-    Auth::login($user);
-    $request->session()->regenerate();
-
-    return redirect()
-      ->route('user_dashboard')
-      ->with('success', 'Registration successful! Welcome on board.');
-  }
-
-
-  public function contactUs(Request $req)
-  {
-
-    $validation = $req->validate([
-      'name' => 'required',
-      'email' => 'required|email',
-      'subject' => 'required',
-      'message' => 'required',
-    ]);
-
-    if (!$validation) {
-      return back()->withInput()->withErrors($validation);
-    }
-
-    $data = array(
-      "name" => $req->get('name'),
-      "email" => $req->get('email'),
-      "subject" => $req->get('subject'),
-      "message" => $req->get('message')
-    );
-
-    $insert = DB::table('contact')->insert($data);
-
-    if ($insert) {
-      return back()->with('success', 'Message sent successfully');
-    } else {
-      return back()->withInput()->with('error', 'Message not saved, technical error');
-    }
   }
 }

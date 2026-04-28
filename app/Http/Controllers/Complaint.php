@@ -83,6 +83,23 @@ class Complaint extends Controller
     return view('user.complaint_show', compact('complaint'));
   }
 
+  public function complaints()
+  {
+    // Pending complaints 
+    $pending = Complaint::with('user')
+      ->where('status', 'pending')
+      ->latest()
+      ->paginate(20);
+
+    // All other complaints
+    $others = Complaint::with('user')
+      ->where('status', '!=', 'pending')
+      ->latest()
+      ->paginate(20);
+
+    return view('admin.complaints', compact('pending', 'others'));
+  }
+
   public function update(Request $request)
   {
     $complaintId = $request->input('id');

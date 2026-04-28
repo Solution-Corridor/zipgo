@@ -20,31 +20,224 @@ use App\Models\Blog;
 class Welcome extends Controller
 {
 
-  public function index()
+  // ================================== AUTH SYSTEM ==========================
+  public function register()
   {
-    $services = Service::where('is_active', 1)->orderBy('name')->get();
-    $experts = ExpertDetail::with('user')->where('profile_status', 1)->get();
-    return view('website.index', compact('services', 'experts'));
+    $cities = City::where('is_active', 1)->orderBy('name')->get();
+    return view('auth.register', compact('cities'));
   }
 
-
-
-  public function finishComplaints()
+  public function login()
   {
-    $peindingComplaints = Complaint::where('status', 'pending')->get();
-    foreach ($peindingComplaints as $complaint) {
-      $complaint->status = 'not_valid';
-      $complaint->updated_at = now();
-      $complaint->save();
+    return view('auth.login');
+  }
+
+  public function postLogin(Request $request)
+  {
+    $validated = $request->validate([
+      'login'     => 'required|string|min:3|max:30',
+      'password'  => 'required|string|min:6',
+    ]);
+
+    $loginInput = $request->input('login');
+    $fieldType  = is_numeric($loginInput) ? 'phone' : 'username';
+
+    $credentials = [
+      $fieldType => $loginInput,
+      'password' => $request->password,
+    ];
+
+    // Try to find the user first (without authenticating yet)
+    $user = Auth::getProvider()->retrieveByCredentials($credentials);
+
+    // Session key unique per login identifier (username/phone)
+    $attemptKey = 'login_attempts_sensitive_' . md5($loginInput);
+
+    $attempts = 0;
+    $maxAttempts = 5;
+    $attempts = session($attemptKey, 0);
+
+    // Try to log in
+    if (! Auth::attempt($credentials)) {
+
+      // Failed attempt
+      $attempts++;
+      session([$attemptKey => $attempts]);
+
+      $message = 'Incorrect username/mobile or password.';
+
+      if ($attempts >= $maxAttempts) {
+        // Deactivate the account
+        $user->status = 0;
+        $user->save();  // or $user->update(['status' => 0]);
+
+        // Optional: clear sensitive session data
+        session()->forget($attemptKey);
+
+        $message = 'Too many failed login attempts. Your account has been deactivated for security reasons. Please contact support.';
+      } else {
+        $remaining = $maxAttempts - $attempts;
+        return back()
+          ->withInput($request->only('login'))
+          ->withErrors(['login' => $message])
+          ->with('attempts_left', $remaining);
+      }
+
+
+      return back()
+        ->withInput($request->only('login'))
+        ->withErrors(['login' => $message ?? 'Incorrect username/mobile or password.']);
     }
 
-    return back()->with('success', 'All pending complaints have been marked as not valid.');
+    // SUCCESSFUL LOGIN
+    // Reset counter on success
+    session()->forget($attemptKey);
+    $request->session()->regenerate();
+    $user = Auth::user();  // Now authenticated
+
+    // Status checks (important: sensitive user might have been deactivated elsewhere)
+    if ($user->status == 0) {
+      Auth::logout();
+      return redirect('/login')->with('error', 'Account is inactive.');
+    }
+
+    if ($user->status == 2) {
+      Auth::logout();
+      return redirect('/login')->with('error', 'Account is suspended.');
+    }
+
+    // Single-device logout for non-admins
+    if ($user->type != 0) {
+      Auth::logoutOtherDevices($request->password);
+    }
+
+    // Role-based redirect
+    return match ((int) $user->type) {
+      0 => redirect()->route('admin.dashboard'),
+      1 => redirect()->route('user.dashboard'),
+      2 => redirect()->route('expert.dashboard'),
+      default => abort(403),
+    };
   }
 
-
-  public function forgotPassword()
+  public function logout(Request $request)
   {
-    return view('auth.forgot_password');
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('login')->with('success', 'Logged out successfully');
+  }
+
+  public function saveRegister(Request $request)
+  {
+    $validated = $request->validate([
+      'username'    => 'required|string|min:3|max:30',
+      'phone'       => [
+        'required',
+        'regex:/^[0-9]{11,11}$/',
+      ],
+      'password'    => 'required|min:6',
+      'referred_by' => 'nullable|integer|exists:users,id',
+      'city_id'     => 'required|exists:cities,id',
+      'user_type'   => 'required|in:customer,expert',
+    ]);
+
+    // Look for existing user by BOTH username AND phone
+    $user = User::where('username', $validated['username'])
+      ->where('phone', $validated['phone'])
+      ->first();
+
+    if ($user) {
+      // ─── Existing user ─── attempt login
+
+      if (!Hash::check($validated['password'], $user->password)) {
+        // Password incorrect
+        if ($user->is_sensitive) {
+          $attemptKey = 'login_attempts_sensitive_' . md5($validated['phone']);
+          $attempts   = session($attemptKey, 0) + 1;
+          session([$attemptKey => $attempts]);
+
+          if ($attempts >= 3) {
+            $user->update(['status' => 0]);
+            session()->forget($attemptKey);
+
+            return redirect('/login')
+              ->with('error', 'Too many failed attempts. Account has been deactivated.');
+          }
+
+          $remaining = 3 - $attempts;
+
+          return back()
+            ->withInput($request->only('username', 'phone', 'referred_by'))
+            ->withErrors(['password' => 'Incorrect password.'])
+            ->with('attempts_left', $remaining);
+        }
+
+        // Normal (non-sensitive) failure
+        return back()
+          ->withInput($request->only('username', 'phone', 'referred_by'))
+          ->withErrors(['password' => 'The password you entered is incorrect.']);
+      }
+
+      // ─── Password correct ─── apply security checks
+
+      // Status checks
+      if ($user->status == 0) {
+        return redirect('/login')
+          ->with('error', 'Account is inactive.');
+      }
+
+      if ($user->status == 2) {
+        return redirect('/login')
+          ->with('error', 'Account is suspended.');
+      }
+
+      // Single-device logout for non-admins
+      if ($user->type != 0) {
+        Auth::logoutOtherDevices($validated['password']);
+      }
+
+      // Success → reset sensitive attempts if applicable
+      if ($user->is_sensitive) {
+        $attemptKey = 'login_attempts_sensitive_' . md5($validated['phone']);
+        session()->forget($attemptKey);
+      }
+
+      // Log in the user
+      Auth::login($user);
+      $request->session()->regenerate();
+
+
+      return redirect()
+        ->route('user_dashboard')
+        ->with('success', 'Welcome back!');
+    }
+
+    // ─── New user ─── enforce uniqueness and create
+
+    $request->validate([
+      'username' => 'unique:users,username',
+      'phone'    => 'unique:users,phone',
+    ]);
+
+    $user = User::create([
+      'username'    => $validated['username'],
+      'phone'       => $validated['phone'],
+      'password'    => Hash::make($validated['password']),
+      'status'      => 1,
+      'type'        => $validated['user_type'] === 'expert' ? 2 : 1,
+      'city_id'     => $validated['city_id'],
+      'referred_by' => $validated['referred_by'] ?? null,
+      'balance'     => 300,
+    ]);
+
+    Auth::login($user);
+    $request->session()->regenerate();
+
+    return redirect()
+      ->route('user_dashboard')
+      ->with('success', 'Registration successful! Welcome on board.');
   }
 
   public function checkUsername(Request $request)
@@ -68,6 +261,212 @@ class Welcome extends Controller
       'available' => true
     ]);
   }
+
+  public function verify_otp($v_token)
+  {
+    // echo 'salman';
+    // die();
+
+    return view('auth.verify_otp', ['v_token' => $v_token]);
+  }
+
+  public function verify_email(Request $req)
+  {
+    $validation = $req->validate([
+      'v_token' => 'required',
+      'otp' => 'required'
+    ]);
+
+    if ($validation) {
+      $token = $req->get('v_token');
+      $otp = $req->get('otp');
+
+      // Retrieve user by verification token and verify OTP
+      $user = DB::table('users')->where('verification_token', $token)->first();
+
+      // echo $user->otp;
+      // die();
+
+      if ($user && $user->otp == $otp) {
+        // OTP matched, update user status
+        $update = DB::table('users')->where('verification_token', $token)->update([
+          "status" => 1,
+          "verification_token" => 'verified',
+          "otp" => 1
+        ]);
+
+        if ($update) {
+          return redirect('/login')->with('success', 'OTP Verified Successfully');
+        } else {
+          return back()->withInput()->with('error', 'Technical Error');
+        }
+      } else {
+        return back()->withInput()->with('error', 'Incorrect OTP');
+      }
+    } else {
+      return back()->withInput()->withErrors($validation);
+    }
+  }
+
+  public function sendEmail(Request $request)
+  {
+    $email = $request->get('email');
+
+    Mail::send('emails.test_mail', ['email' => $email], function ($message) {
+      $message->from('secure@botaex.com', 'BotaEx');
+      $message->to('salmanbhatti2010@gmail.com'); // Set your static email here
+      $message->subject('Test Email');
+    });
+    echo 'Email sent successfully!';
+  }
+
+  // ================================== AUTH SYSTEM END ==========================
+
+  public function index()
+  {
+    $services = Service::where('is_active', 1)->orderBy('name')->get();
+    $experts = ExpertDetail::with('user')->where('profile_status', 1)->get();
+    return view('website.index', compact('services', 'experts'));
+  }
+
+  public function liveSearch(Request $request)
+  {
+    $query = $request->get('q', '');
+    if (strlen($query) < 2) {
+      return response()->json([]);
+    }
+
+    $cities = City::where('name', 'LIKE', "%{$query}%")
+      ->limit(5)
+      ->get(['id', 'name', 'slug']);
+
+    $services = Service::where('name', 'LIKE', "%{$query}")
+      ->orWhere('name', 'LIKE', "%{$query}%")
+      ->limit(5)
+      ->get(['id', 'name', 'slug']);
+
+    // Experts: users with type 2 (expert) or those who have expert_details
+    $experts = User::where('name', 'LIKE', "%{$query}%")
+      ->where('type', 2)  // adjust if your expert type is different
+      ->orWhereHas('expertDetail', function ($q) use ($query) {
+        $q->where('nic_number', 'LIKE', "%{$query}%");
+      })
+      ->with('expertDetail')
+      ->limit(5)
+      ->get(['id', 'name', 'email']);
+
+    return response()->json([
+      'cities'   => $cities,
+      'services' => $services,
+      'experts'  => $experts,
+    ]);
+  }
+
+
+  public function show($slug)
+  {
+    // Service check
+    $service = Service::with('experts.user')
+      ->where('slug', $slug)
+      ->first();
+    if ($service) {
+      return view('website.show-experts', compact('service'));
+    }
+
+    // City check
+    $city = City::where('slug', $slug)->first();
+    if ($city) {
+      $experts = ExpertDetail::with('user')
+        ->whereHas('user', function ($q) use ($city) {
+          $q->where('city_id', $city->id);
+        })
+        ->get();
+      return view('website.show-experts', compact('city', 'experts'));
+    }
+
+    abort(404);
+  }
+
+  public function blogs()
+  {
+    $blogs = Blog::orderBy('created_at', 'desc')->paginate(12);
+    return view('website.blogs', compact('blogs'));
+  }
+
+  public function blog_detail($slug)
+  {
+    $blog = Blog::where('slug', $slug)->firstOrFail();
+    $recentBlogs = Blog::where('blog_id', '!=', $blog->blog_id)
+      ->orderBy('created_at', 'desc')
+      ->limit(5)
+      ->get();
+    return view('website.blog_detail', compact('blog', 'recentBlogs'));
+  }
+
+  public function expert_detail($id)
+  {
+    return view('website.expert-detail');
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  public function finishComplaints()
+  {
+    $peindingComplaints = Complaint::where('status', 'pending')->get();
+    foreach ($peindingComplaints as $complaint) {
+      $complaint->status = 'not_valid';
+      $complaint->updated_at = now();
+      $complaint->save();
+    }
+
+    return back()->with('success', 'All pending complaints have been marked as not valid.');
+  }
+
+
 
 
   public function pre_dashboard()
@@ -300,14 +699,6 @@ class Welcome extends Controller
     return view('user.my_complaints', compact('complaints'));
   }
 
-  public function contact_us()
-  {
-
-    $msgs = DB::select('SELECT * FROM contact');
-    return view('admin.contact', [
-      'msgs' => $msgs
-    ]);
-  }
 
 
 
@@ -392,18 +783,7 @@ class Welcome extends Controller
 
 
 
-  public function userDetails($id)
-  {
-    $user = User::with('referrer')->find($id);
 
-    if (!$user) {
-      return redirect()->back()->with('error', 'User not found');
-    }
-
-    return view('admin.user_details', [
-      'user' => $user,
-    ]);
-  }
 
   public function sendResetLink(Request $request)
   {
@@ -608,27 +988,10 @@ class Welcome extends Controller
   }
 
 
-  public function users()
-  {
-    $users = User::with('referrer')
-      ->withCount(['payments as active_plans_count' => function ($q) {
-        $q->where('status', 'approved');
-        $q->where('expires_at', '>=', now());   // if needed
-      }])
-      ->get();
-
-    return view('admin.users', compact('users'));
-  }
 
 
-  public function dashboard()
-  {
-    $total_users    = User::where('type', 1)->count();
-    $total_services = Service::where('is_active', 1)->count();
-    $total_cities   = City::where('is_active', 1)->count();
 
-    return view('admin.dashboard', compact('total_users', 'total_services', 'total_cities'));
-  }
+
 
   public function user_dashboard()
   {
@@ -650,248 +1013,26 @@ class Welcome extends Controller
   }
 
 
-  public function liveSearch(Request $request)
-  {
-    $query = $request->get('q', '');
-    if (strlen($query) < 2) {
-      return response()->json([]);
-    }
-
-    $cities = City::where('name', 'LIKE', "%{$query}%")
-      ->limit(5)
-      ->get(['id', 'name', 'slug']);
-
-    $services = Service::where('name', 'LIKE', "%{$query}")
-      ->orWhere('name', 'LIKE', "%{$query}%")
-      ->limit(5)
-      ->get(['id', 'name', 'slug']);
-
-    // Experts: users with type 2 (expert) or those who have expert_details
-    $experts = User::where('name', 'LIKE', "%{$query}%")
-      ->where('type', 2)  // adjust if your expert type is different
-      ->orWhereHas('expertDetail', function ($q) use ($query) {
-        $q->where('nic_number', 'LIKE', "%{$query}%");
-      })
-      ->with('expertDetail')
-      ->limit(5)
-      ->get(['id', 'name', 'email']);
-
-    return response()->json([
-      'cities'   => $cities,
-      'services' => $services,
-      'experts'  => $experts,
-    ]);
-  }
-
-  public function show($slug)
-  {
-    // Service check
-    $service = Service::with('experts.user')
-      ->where('slug', $slug)
-      ->first();
-    if ($service) {
-      return view('website.show-experts', compact('service'));
-    }
-
-    // City check
-    $city = City::where('slug', $slug)->first();
-    if ($city) {
-      $experts = ExpertDetail::with('user')
-        ->whereHas('user', function ($q) use ($city) {
-          $q->where('city_id', $city->id);
-        })
-        ->get();
-      return view('website.show-experts', compact('city', 'experts'));
-    }
-
-    abort(404);
-  }
-
-  public function blogs()
-  {
-    $blogs = Blog::orderBy('created_at', 'desc')->paginate(12);
-    return view('website.blogs', compact('blogs'));
-  }
-
-  public function blog_detail($slug)
-  {
-    $blog = Blog::where('slug', $slug)->firstOrFail();
-    $recentBlogs = Blog::where('blog_id', '!=', $blog->blog_id)
-      ->orderBy('created_at', 'desc')
-      ->limit(5)
-      ->get();
-    return view('website.blog_detail', compact('blog', 'recentBlogs'));
-  }
-
-
-  public function expert_detail($id)
-  {
-    return view('website.expert-detail');
-  }
-
-
-  public function verify_email(Request $req)
-  {
-    $validation = $req->validate([
-      'v_token' => 'required',
-      'otp' => 'required'
-    ]);
-
-    if ($validation) {
-      $token = $req->get('v_token');
-      $otp = $req->get('otp');
-
-      // Retrieve user by verification token and verify OTP
-      $user = DB::table('users')->where('verification_token', $token)->first();
-
-      // echo $user->otp;
-      // die();
-
-      if ($user && $user->otp == $otp) {
-        // OTP matched, update user status
-        $update = DB::table('users')->where('verification_token', $token)->update([
-          "status" => 1,
-          "verification_token" => 'verified',
-          "otp" => 1
-        ]);
-
-        if ($update) {
-          return redirect('/login')->with('success', 'OTP Verified Successfully');
-        } else {
-          return back()->withInput()->with('error', 'Technical Error');
-        }
-      } else {
-        return back()->withInput()->with('error', 'Incorrect OTP');
-      }
-    } else {
-      return back()->withInput()->withErrors($validation);
-    }
-  }
-
-  public function verify_otp($v_token)
-  {
-    // echo 'salman';
-    // die();
-
-    return view('auth.verify_otp', ['v_token' => $v_token]);
-  }
 
 
 
-  public function sendEmail(Request $request)
-  {
-    $email = $request->get('email');
 
-    Mail::send('emails.test_mail', ['email' => $email], function ($message) {
-      $message->from('secure@botaex.com', 'BotaEx');
-      $message->to('salmanbhatti2010@gmail.com'); // Set your static email here
-      $message->subject('Test Email');
-    });
-    echo 'Email sent successfully!';
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   //========login......
-  public function postLogin(Request $request)
-  {
-    $validated = $request->validate([
-      'login'     => 'required|string|min:3|max:30',
-      'password'  => 'required|string|min:6',
-    ]);
 
-    $loginInput = $request->input('login');
-    $fieldType  = is_numeric($loginInput) ? 'phone' : 'username';
-
-    $credentials = [
-      $fieldType => $loginInput,
-      'password' => $request->password,
-    ];
-
-    // Try to find the user first (without authenticating yet)
-    $user = Auth::getProvider()->retrieveByCredentials($credentials);
-
-
-
-    // Session key unique per login identifier (username/phone)
-    $attemptKey = 'login_attempts_sensitive_' . md5($loginInput);
-
-    $attempts = 0;
-    $maxAttempts = 5;
-
-
-    $attempts = session($attemptKey, 0);
-
-
-    // ────────────────────────────────────────────────
-    // Try to log in
-    // ────────────────────────────────────────────────
-    if (! Auth::attempt($credentials)) {
-      // Failed attempt
-
-
-      $attempts++;
-      session([$attemptKey => $attempts]);
-
-      $message = 'Incorrect username/mobile or password.';
-
-      if ($attempts >= $maxAttempts) {
-        // Deactivate the account
-        $user->status = 0;
-        $user->save();  // or $user->update(['status' => 0]);
-
-        // Optional: clear sensitive session data
-        session()->forget($attemptKey);
-
-        $message = 'Too many failed login attempts. Your account has been deactivated for security reasons. Please contact support.';
-      } else {
-        $remaining = $maxAttempts - $attempts;
-        return back()
-          ->withInput($request->only('login'))
-          ->withErrors(['login' => $message])
-          ->with('attempts_left', $remaining);
-      }
-
-
-      return back()
-        ->withInput($request->only('login'))
-        ->withErrors(['login' => $message ?? 'Incorrect username/mobile or password.']);
-    }
-
-    // ────────────────────────────────────────────────
-    // SUCCESSFUL LOGIN
-    // ────────────────────────────────────────────────
-
-    // Reset counter on success
-    session()->forget($attemptKey);
-
-
-    $request->session()->regenerate();
-
-    $user = Auth::user();  // Now authenticated
-
-    // Status checks (important: sensitive user might have been deactivated elsewhere)
-    if ($user->status == 0) {
-      Auth::logout();
-      return redirect('/login')->with('error', 'Account is inactive.');
-    }
-
-    if ($user->status == 2) {
-      Auth::logout();
-      return redirect('/login')->with('error', 'Account is suspended.');
-    }
-
-    // Single-device logout for non-admins
-    if ($user->type != 0) {
-      Auth::logoutOtherDevices($request->password);
-    }
-
-    // Role-based redirect
-    return match ((int) $user->type) {
-      0 => redirect('dashboard'),
-      1 => redirect('user-dashboard'),
-      2 => redirect('expert-dashboard'),
-      default => abort(403),
-    };
-  }
 
 
 
@@ -922,25 +1063,5 @@ class Welcome extends Controller
     Auth::logoutOtherDevices($validated['password']);
 
     return back()->with('success', 'Password changed successfully!');
-  }
-
-  public function login()
-  {
-    return view('auth.login');
-  }
-
-  public function register()
-  {
-    $cities = City::where('is_active', 1)->orderBy('name')->get();
-    return view('auth.register', compact('cities'));
-  }
-
-  public function logout(Request $request)
-  {
-    Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect('login')->with('success', 'Logged out successfully');
   }
 }

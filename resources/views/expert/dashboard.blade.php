@@ -125,6 +125,17 @@
             <span class="font-medium text-sm text-gray-100">Refresh</span>
         </button>
 
+        
+
+        <!-- NEW: My Rate List Button (placed right after Refresh) -->
+        <a href="{{ route('expert.rates') }}"
+          class="flex items-center gap-3 bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-lg px-4 py-1 shadow-md hover:shadow-lg hover:from-gray-800 hover:to-gray-700 active:scale-[0.97] transition-all">
+          <div class="w-8 h-8 bg-emerald-500/10 rounded-md flex items-center justify-center">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <span class="font-medium text-sm text-gray-100">My Rate List</span>
+        </a>
+
     </div>
 </div>
 
