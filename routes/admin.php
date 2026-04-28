@@ -47,11 +47,10 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::get('/user-details/{id}', [Admin::class, 'userDetails'])->name('userDetails');
 
     Route::post('users/{id}/force-logout', [Admin::class, 'forceLogout'])->name('admin.force-logout');
-
-    Route::delete('/delete-user/{id}',      [Admin::class, 'deleteUser'])->name('deleteUser');
-    Route::get('/suspend_user/{id}',        [Admin::class, 'suspendUser'])->name('suspendUser');
-    Route::get('/activate_user/{id}',       [Admin::class, 'activateUser'])->name('activateUser');
-    Route::get('/edit_user/{id}',           [Admin::class, 'editUser'])->name('editUser');
+    Route::delete('/delete-user/{id}', [Admin::class, 'deleteUser'])->name('deleteUser');
+    Route::get('/suspend_user/{id}', [Admin::class, 'suspendUser'])->name('suspendUser');
+    Route::get('/activate_user/{id}', [Admin::class, 'activateUser'])->name('activateUser');
+    Route::get('/edit_user/{id}', [Admin::class, 'editUser'])->name('editUser');
     Route::post('/update_user/{id}', [Admin::class, 'update_user'])->name('user.update');
 
 
@@ -75,9 +74,6 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::match(['get', 'post'], '/important-note', [Admin::class, 'importantNote'])
       ->name('important_note');
 
-    // Users Management
-    Route::get('/users',                    [Welcome::class, 'users'])->name('users');
-    Route::get('/user-details/{id}',        [Welcome::class, 'userDetails'])->name('userDetails');
 
     Route::post('users/{id}/force-logout', [Admin::class, 'forceLogout'])
       ->name('admin.force-logout');
