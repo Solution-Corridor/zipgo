@@ -164,6 +164,76 @@
       color: #334155;
     }
 
+    /* Service Rate Card Styles */
+    .service-rates-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .rate-card {
+      background: #ffffff;
+      border: 1px solid #eef2f6;
+      border-radius: 20px;
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .rate-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+    }
+
+    .rate-image {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f1f5f9;
+    }
+
+    .rate-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .rate-details {
+      flex: 1;
+    }
+
+    .rate-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #0f172a;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .rate-price {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .rate-desc {
+      font-size: 0.85rem;
+      color: #475569;
+      line-height: 1.4;
+      margin-top: 0.3rem;
+    }
+
     .info-list {
       list-style: none;
       padding: 0;
@@ -241,6 +311,17 @@
       .expert-name {
         font-size: 1.5rem;
       }
+
+      .rate-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .rate-image {
+        width: 100px;
+        height: 100px;
+      }
     }
   </style>
 </head>
@@ -281,10 +362,78 @@
             <h3><i class="fas fa-user-circle"></i> About Dr. Ahmed Raza</h3>
             <p>Dr. Ahmed Raza is a highly skilled cardiologist with over 12 years of experience in diagnosing and treating heart conditions. He is known for his patient‑centered approach and has successfully performed hundreds of procedures. He is verified and trusted by Feature Desk.</p>
           </div>
+
+          <!-- NEW: Detailed Service Rates Section with Images -->
           <div class="detail-section">
-            <h3><i class="fas fa-briefcase"></i> Services Offered</h3>
-            <p>Cardiac consultation, ECG, stress testing, echocardiography, and post‑surgery follow‑up.</p>
+            <h3><i class="fas fa-hand-holding-usd"></i> Service Rates & Packages</h3>
+            <div class="service-rates-grid">
+              
+              <!-- Dummy Service 1 -->
+              <div class="rate-card">
+                <div class="rate-image">
+                  <img src="https://placehold.co/400x400/eef2ff/3b82f6?text=ECG" alt="ECG Test">
+                </div>
+                <div class="rate-details">
+                  <div class="rate-title">
+                    ECG (Electrocardiogram)
+                    <span class="rate-price">Rs. 1,500</span>
+                  </div>
+                  <div class="rate-desc">
+                    Detailed ECG analysis with immediate report. Includes basic consultation.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dummy Service 2 -->
+              <div class="rate-card">
+                <div class="rate-image">
+                  <img src="https://placehold.co/400x400/fef9c3/ca8a04?text=Echo" alt="Echocardiography">
+                </div>
+                <div class="rate-details">
+                  <div class="rate-title">
+                    Echocardiography
+                    <span class="rate-price">Rs. 4,500</span>
+                  </div>
+                  <div class="rate-desc">
+                    Complete heart ultrasound, 2D echo with colour Doppler. Printed report included.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dummy Service 3 -->
+              <div class="rate-card">
+                <div class="rate-image">
+                  <img src="https://placehold.co/400x400/dcfce7/15803d?text=Stress" alt="Stress Test">
+                </div>
+                <div class="rate-details">
+                  <div class="rate-title">
+                    Treadmill Stress Test (TMT)
+                    <span class="rate-price">Rs. 3,200</span>
+                  </div>
+                  <div class="rate-desc">
+                    Monitored exercise test to evaluate heart performance under stress.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dummy Service 4 -->
+              <div class="rate-card">
+                <div class="rate-image">
+                  <img src="https://placehold.co/400x400/fee2e2/b91c1c?text=Consult" alt="Consultation">
+                </div>
+                <div class="rate-details">
+                  <div class="rate-title">
+                    Cardiology Consultation
+                    <span class="rate-price">Rs. 2,500</span>
+                  </div>
+                  <div class="rate-desc">
+                    In‑depth consultation, medical history review, and treatment plan (30‑45 mins).
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+
           <div class="detail-section">
             <h3><i class="fas fa-star"></i> Customer Reviews</h3>
             <div style="margin-bottom: 1rem;">
@@ -303,6 +452,8 @@
             </div>
           </div>
         </div>
+
+        <!-- Right Sidebar (unchanged but kept consistent) -->
         <div class="right-column">
           <div class="sidebar-card">
             <h4><i class="fas fa-id-card"></i> Verification & Info</h4>

@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ExpertRateController;
 // ────────────────────────────────────────────────
 // Public / Guest Routes
 // ────────────────────────────────────────────────
@@ -80,6 +81,12 @@ Route::group(['middleware' => 'checkUserRole'], function () {
   Route::get('/user-profile',   [Welcome::class, 'user_profile'])->name('user_profile');
   Route::post('/update-user-profile',   [Welcome::class, 'update_user_profile'])->name('user_profile.update');
 
+  Route::prefix('experts')->name('expert.')->group(function () {
+    Route::get('/rates', [ExpertRateController::class, 'index'])->name('rates');
+    Route::post('/rates', [ExpertRateController::class, 'store'])->name('rates.store');
+    Route::post('/update/rates/{rate}', [ExpertRateController::class, 'update'])->name('rates.update');
+    Route::delete('/rates/{rate}', [ExpertRateController::class, 'destroy'])->name('rates.destroy');
+  });
 
   Route::get('/recharge', [Welcome::class, 'recharge'])->name('market.recharge');
   Route::get('/pre-dashboard', [Welcome::class, 'pre_dashboard'])->name('pre_dashboard');
@@ -250,11 +257,10 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
   Route::post('/services/{id}/toggle-active', [ServiceController::class, 'toggleActive'])->name('services.toggleActive');
   Route::post('/cities/{id}/toggle-active', [CityController::class, 'toggleActive'])->name('cities.toggleActive');
 
-  
+
   Route::get('/experts', [Admin::class, 'experts'])->name('experts');
   Route::post('/admin/experts/verify/{id}', [Admin::class, 'verifyExpert'])->name('admin.experts.verify');
   Route::post('/admin/experts/reject/{id}', [Admin::class, 'rejectExpert'])->name('admin.experts.reject');
-
 });
 
 // expert routes 
@@ -265,8 +271,7 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
 
   Route::get('/expert-payment', [Admin::class, 'showPaymentPage'])->name('expert.payment.page');
   Route::post('/expert-payment/process', [Admin::class, 'processPayment'])->name('expert.payment.process');
-
-  });
+});
 
 
 // ────────────────────────────────────────────────

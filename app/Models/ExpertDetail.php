@@ -41,4 +41,9 @@ class ExpertDetail extends Model
   {
     return $this->belongsTo(Service::class, 'service_id');
   }
+
+  public function rates()
+  {
+    return $this->hasMany(ExpertRate::class, 'expert_id');
+  }
 }

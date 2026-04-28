@@ -181,42 +181,42 @@
             <!-- Options Grid -->
             <div class="grid">
                 <!-- Shopping -->
-                <a href="{{ route('home') }}" class="option-box">
+                <a href="" class="option-box">
                     <div class="icon">🛍️</div>
                     <div class="title">Shopping</div>
                     <div class="subtitle">Earn & Shop</div>
                 </a>
 
                 <!-- Games -->
-                <a href="{{ route('games') }}" class="option-box">
+                <a href="" class="option-box">
                     <div class="icon">🎮</div>
                     <div class="title">Games</div>
                     <div class="subtitle">Play & Earn</div>
                 </a>
 
                 <!-- Tasks -->
-                <a href="{{ route('my_tasks') }}" class="option-box">
+                <a href="" class="option-box">
                     <div class="icon">✅</div>
                     <div class="title">Tasks</div>
                     <div class="subtitle">Complete & Earn</div>
                 </a>
 
                 <!-- Crypto -->
-                <a href="{{ route('crypto') }}" class="option-box">
+                <a href="" class="option-box">
                     <div class="icon">₿</div>
                     <div class="title">Crypto</div>
                     <div class="subtitle">Trade & Invest</div>
                 </a>
 
                 <!-- Recharge Account -->
-                <a href="{{ route('market.recharge') }}" class="option-box recharge-special">
+                <a href="" class="option-box recharge-special">
                     <div class="icon">⚡📱</div>
                     <div class="title">Recharge Account</div>
                     <div class="subtitle">Add funds & pay</div>
                 </a>
 
                 <!-- My Orders -->
-                <a href="{{ route('my_orders') }}" class="option-box orders-accent">
+                <a href="" class="option-box orders-accent">
                     <div class="icon">📦🧾</div>
                     <div class="title">My Orders</div>
                     <div class="subtitle">Track & history</div>

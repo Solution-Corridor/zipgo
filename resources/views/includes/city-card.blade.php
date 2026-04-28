@@ -78,65 +78,16 @@ $cities = App\Models\City::where('is_active', 1)
 
   <div class="city-grid">
 
-    <!-- Karachi -->
-    <a href="/city/karachi">
+    @foreach ($cities as $city)
+    <a href="/city/{{ $city->slug }}">
       <div class="city-card">
-        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1580651315530-69c8e0026377');"></div>
+        <div class="city-card-media" style="background-image:url('{{ $city->img }}');"></div>
         <div class="city-card-content">
-          <div class="city-name">Karachi</div>
+          <div class="city-name">{{ $city->name }}</div>
         </div>
       </div>
     </a>
-
-    <!-- Lahore -->
-    <a href="/city/lahore">
-      <div class="city-card">
-        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1580130732478-4e339fb6836f');"></div>
-        <div class="city-card-content">
-          <div class="city-name">Lahore</div>
-        </div>
-      </div>
-    </a>
-
-    <!-- Faisalabad -->
-    <a href="/city/faisalabad">
-      <div class="city-card">
-        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1593642634367-d91a135587b5');"></div>
-        <div class="city-card-content">
-          <div class="city-name">Faisalabad</div>
-        </div>
-      </div>
-    </a>
-
-    <!-- Rawalpindi -->
-    <a href="/city/rawalpindi">
-      <div class="city-card">
-        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1564501049412-61c2a3083791');"></div>
-        <div class="city-card-content">
-          <div class="city-name">Rawalpindi</div>
-        </div>
-      </div>
-    </a>
-
-    <!-- Gujranwala -->
-    <a href="/city/gujranwala">
-      <div class="city-card">
-        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad');"></div>
-        <div class="city-card-content">
-          <div class="city-name">Gujranwala</div>
-        </div>
-      </div>
-    </a>
-
-    <!-- Peshawar -->
-    <a href="/city/peshawar">
-      <div class="city-card">
-        <div class="city-card-media" style="background-image:url('https://images.unsplash.com/photo-1578926375605-eaf7559b1458');"></div>
-        <div class="city-card-content">
-          <div class="city-name">Peshawar</div>
-        </div>
-      </div>
-    </a>
+    @endforeach
 
   </div>
 </section>
