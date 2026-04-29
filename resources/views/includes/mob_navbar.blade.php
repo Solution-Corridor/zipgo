@@ -75,13 +75,13 @@
 
       {{-- If Normal User --}}
       @elseif(auth()->user()->type == 2)
-      <a href="{{ route('expert_dashboard') }}"
+      <a href="{{ route('expert.dashboard') }}"
         class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">
         Dashboard
       </a>
       @else
 
-      <a href="{{ route('user_dashboard') }}"
+      <a href="{{ route('user.dashboard') }}"
         class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">
         Dashboard
       </a>
@@ -91,7 +91,7 @@
 
 
 
-      <a href="{{ route('user_profile') }}" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Settings</a>
+      <a href="{{ route('user.profile') }}" class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">Settings</a>
       <div class="pt-4">
         <a href="{{ route('logout') }}" style="color: #f70212;"
           class="w-full text-left flex items-center gap-4 text-[#ef4444] hover:text-[#f87171] transition-colors p-3 rounded-lg hover:bg-white/5">

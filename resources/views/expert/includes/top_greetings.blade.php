@@ -26,7 +26,7 @@ $username = auth()->user()?->username ?? 'Guest';
 
     @auth
     <!-- Authenticated: Avatar & Username -->
-    <a href="{{ route('user_profile') }}" class="inline-block">
+    <a href="{{ route('expert_profile') }}" class="inline-block">
       <div class="relative shrink-0">
         <div class="w-14 h-14 rounded-full overflow-hidden ring-1 ring-indigo-400/30 shadow-md">
           @if (auth()->user()->pic)

@@ -63,7 +63,7 @@
             Please enter your password to continue.
           </p>
 
-          <form method="POST" action="{{ route('account.delete') }}">
+          <form method="POST" action="{{ route('user.delete_account') }}">
             @csrf
             @method('DELETE')
 

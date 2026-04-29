@@ -3,21 +3,21 @@
 
 <head>
   <!-- Open Graph / Social Media -->
-  <meta property="og:title" content="Feature Desk - Best Deals & Discounts in Pakistan">
-  <meta property="og:description" content="Feature Desk offers the best online shopping experience in Pakistan with huge discounts, flash sales, and genuine products. Shop now and save big!">
+  <meta property="og:title" content="ZipGo - Best Deals & Discounts in Pakistan">
+  <meta property="og:description" content="ZipGo offers the best online shopping experience in Pakistan with huge discounts, flash sales, and genuine products. Shop now and save big!">
 
   @include('includes.header_links')
-  <title>Feature Desk - Best Deals & Discounts in Pakistan</title>
-  <meta name="description" content="Feature Desk offers the best online shopping experience in Pakistan with huge discounts, flash sales, and genuine products. Shop now and save big!">
-  <meta name="keywords" content="Feature Desk, online shopping pakistan, discounts pakistan, flash sale, cheap products, best deals pakistan, ecommerce pakistan">
+  <title>ZipGo - Best Deals & Discounts in Pakistan</title>
+  <meta name="description" content="ZipGo offers the best online shopping experience in Pakistan with huge discounts, flash sales, and genuine products. Shop now and save big!">
+  <meta name="keywords" content="ZipGo, online shopping pakistan, discounts pakistan, flash sale, cheap products, best deals pakistan, ecommerce pakistan">
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "Feature Desk",
+      "name": "ZipGo",
       "url": "{{ url('/') }}",
       "logo": "{{ asset('mk_assets/images/feature-desk-logo.png') }}",
-      "description": "Feature Desk is Pakistan's leading online marketplace offering huge discounts and flash sales on genuine products.",
+      "description": "ZipGo is Pakistan's leading online marketplace offering huge discounts and flash sales on genuine products.",
       "contactPoint": {
         "@type": "ContactPoint",
         "telephone": "+447412803448",

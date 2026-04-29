@@ -8,6 +8,42 @@ Route::group(['middleware' => 'checkUserRole'], function () {
   Route::prefix('user')->group(function () {
 
     Route::get('/dashboard', [MainUser::class, 'user_dashboard'])->name('user.dashboard');
+
+    Route::get('/explore', [MainUser::class, 'explore'])->name('user.explore');
+
+    // Search / Find professionals
+    Route::get('/search', [MainUser::class, 'search'])->name('user.search');
+    Route::get('/search/results', [MainUser::class, 'search_results'])->name('user.search.results');
+
+    // Bookings (my service requests)
+    Route::get('/bookings', [MainUser::class, 'bookings'])->name('user.bookings');
+    Route::get('/bookings/{id}', [MainUser::class, 'booking_show'])->name('bookings.show');
+    Route::post('/bookings', [MainUser::class, 'booking_store'])->name('bookings.store');
+
+    Route::get('/user-profile',   [MainUser::class, 'user_profile'])->name('user.profile');
+    Route::post('/update-user-profile',   [MainUser::class, 'update_user_profile'])->name('user_profile.update');
+
+
+    Route::delete('/delete-account', [MainUser::class, 'delete_account'])->middleware('auth')->name('user.delete_account');
+
+    Route::get('/change-password', [MainUser::class, 'change_password'])->name('user.change_password');
+    Route::post('/change-password', [MainUser::class, 'change_password_update'])->name('password.update');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     Route::get('/awards', [MainUser::class, 'awards'])->name('awards');
     Route::get('/info', [MainUser::class, 'info'])->name('info');
     Route::get('/share-balance', [MainUser::class, 'shareBalance'])->name('share.balance');
@@ -29,10 +65,8 @@ Route::group(['middleware' => 'checkUserRole'], function () {
 
 
     Route::get('/pre-dashboard', [MainUser::class, 'pre_dashboard'])->name('pre_dashboard');
-    Route::get('/user-profile',   [MainUser::class, 'user_profile'])->name('user_profile');
-    Route::post('/update-user-profile',   [MainUser::class, 'update_user_profile'])->name('user_profile.update');
+
     Route::post('/username/check', [MainUser::class, 'checkUsernameProfile'])->name('user.username.check');
-    Route::delete('/delete-account', [MainUser::class, 'delete_account'])->middleware('auth')->name('account.delete');
     Route::get('/notifications', [MainUser::class, 'notifications'])->name('notifications');
     Route::post('/mark-read-all', [MainUser::class, 'markAllRead'])->name('readAll');
     Route::get('/notification-read/{id}', [MainUser::class, 'markNotificationRead'])->name('notification.read');

@@ -53,8 +53,3 @@ Route::get('/blogs', [Welcome::class, 'blogs'])->name('blogs');
 Route::get('/blog/{slug}', [Welcome::class, 'blog_detail'])->name('blogs.show');
 Route::get('/expert/{id}', [Welcome::class, 'expert_detail'])->name('expert.detail');
 
-
-
-
-Route::get('/change-password', [Welcome::class, 'change_password'])->name('password.change');
-Route::post('/change-password', [Welcome::class, 'change_password_update'])->name('password.update');

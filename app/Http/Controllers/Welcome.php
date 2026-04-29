@@ -646,30 +646,5 @@ class Welcome extends Controller
 
 
 
-  public function change_password()
-  {
-    return view('auth.change_password');
-  }
-
-  public function change_password_update(Request $request)
-  {
-    $user = auth()->user();
-
-    $validated = $request->validate([
-      'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
-        if (! Hash::check($value, $user->password)) {
-          $fail('The current password is incorrect.');
-        }
-      }],
-      'password' => 'required|string|min:6|confirmed', // confirmed = checks password_confirmation field
-    ]);
-
-    $user->password = Hash::make($validated['password']);
-    $user->save();
-
-    // Optional: force logout other devices (good security practice)
-    Auth::logoutOtherDevices($validated['password']);
-
-    return back()->with('success', 'Password changed successfully!');
-  }
+  
 }

@@ -14,7 +14,7 @@
 $username = auth()->user()?->username ?? 'Guest';
 @endphp
 
-<!-- Sticky Top Greeting Header - Full Top Touch -->
+<!-- Sticky Top Greeting Header - Full Top Touch (Customer Version) -->
 <div class="sticky top-0 z-50 bg-slate-950">
   <div class="flex items-center gap-4 
                 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950
@@ -26,13 +26,13 @@ $username = auth()->user()?->username ?? 'Guest';
 
     @auth
     <!-- Authenticated: Avatar & Username -->
-    <a href="{{ route('user_profile') }}" class="inline-block">
+    <a href="{{ route('user.profile') }}" class="inline-block">
       <div class="relative shrink-0">
-        <div class="w-14 h-14 rounded-full overflow-hidden ring-1 ring-indigo-400/30 shadow-md">
+        <div class="w-14 h-14 rounded-full overflow-hidden ring-1 ring-emerald-400/30 shadow-md">
           @if (auth()->user()->pic)
           <img src="/{{ auth()->user()->pic }}" class="w-full h-full object-cover" alt="">
           @else
-          <div class="w-full h-full bg-gradient-to-br from-slate-700 via-indigo-800 to-slate-800 flex items-center justify-center text-2xl font-bold text-indigo-200">
+          <div class="w-full h-full bg-gradient-to-br from-slate-700 via-emerald-800 to-slate-800 flex items-center justify-center text-2xl font-bold text-emerald-200">
             {{ strtoupper(substr($username, 0, 1)) }}
           </div>
           @endif
@@ -42,7 +42,7 @@ $username = auth()->user()?->username ?? 'Guest';
     </a>
 
     <div class="flex-1 min-w-0">
-      <a href="{{ route('user_profile') }}" class="inline-block">
+      <a href="{{ route('user.profile') }}" class="inline-block">
         <h2 class="text-base font-semibold tracking-tight text-slate-100">
           {{ $username }}
         </h2>
@@ -54,18 +54,18 @@ $username = auth()->user()?->username ?? 'Guest';
       <button
         x-data="{}"
         @click="$dispatch('open-login-modal')"
-        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-full shadow-md transition-all duration-200">
+        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-full shadow-md transition-all duration-200">
         Log in / Sign up
       </button>
     </div>
     @endauth
 
-    <!-- Notification Bell with Dropdown -->
+    <!-- Notification Bell with Dropdown (emerald style) -->
     <div x-data="{ open: false }" class="relative inline-flex items-center">
       <button
         @click="open = !open"
         type="button"
-        class="relative w-10 h-10 rounded-full bg-gradient-to-br from-slate-800 to-indigo-900/80 flex items-center justify-center shadow-md shadow-black/30 active:scale-95 transition-all duration-200 ring-1 ring-slate-700/50 hover:ring-indigo-500/40">
+        class="relative w-10 h-10 rounded-full bg-gradient-to-br from-slate-800 to-emerald-900/80 flex items-center justify-center shadow-md shadow-black/30 active:scale-95 transition-all duration-200 ring-1 ring-slate-700/50 hover:ring-emerald-500/40">
         <i class="fas fa-bell text-slate-200 text-lg"></i>
 
         @auth
@@ -106,16 +106,16 @@ $username = auth()->user()?->username ?? 'Guest';
               @endauth
             </div>
             <div class="px-5 py-3.5 border-t border-slate-800/70 bg-slate-950/60">
-              <a href="/notifications" class="block text-center text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">View all notifications →</a>
+              <a href="/notifications" class="block text-center text-sm font-medium text-emerald-400 hover:text-emerald-300 transition">View all notifications →</a>
             </div>
           </div>
         </div>
       </template>
     </div>
 
-    <!-- Plan / + Button -->
-    <a href="/plan" class="relative w-10 h-10 rounded-full bg-gradient-to-br from-slate-800 to-indigo-900/80 flex items-center justify-center text-xl font-bold shadow-md shadow-black/30 active:scale-95 transition-all duration-200 ring-1 ring-slate-700/50 hover:ring-indigo-500/40">
-      <span class="relative z-10 text-slate-200">+</span>
+    <!-- Support / Help Button (replaces old Plan/+) -->
+    <a href="tel:+919876543210" class="relative w-10 h-10 rounded-full bg-gradient-to-br from-slate-800 to-emerald-900/80 flex items-center justify-center shadow-md shadow-black/30 active:scale-95 transition-all duration-200 ring-1 ring-slate-700/50 hover:ring-emerald-500/40">
+      <i class="fas fa-headset text-slate-200 text-lg"></i>
     </a>
   </div>
 </div>

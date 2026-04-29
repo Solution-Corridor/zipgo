@@ -21,12 +21,320 @@ class MainUser extends Controller
 {
   public function user_dashboard()
   {
+    // 1. Categories for horizontal scroll
+    $categories = [
+      (object) ['name' => 'Plumber', 'icon' => 'droplet', 'color' => 'blue'],
+      (object) ['name' => 'Electrician', 'icon' => 'zap', 'color' => 'yellow'],
+      (object) ['name' => 'Carpenter', 'icon' => 'hammer', 'color' => 'amber'],
+      (object) ['name' => 'AC Repair', 'icon' => 'snowflake', 'color' => 'cyan'],
+      (object) ['name' => 'Painter', 'icon' => 'palette', 'color' => 'purple'],
+      (object) ['name' => 'Cleaner', 'icon' => 'spray-can', 'color' => 'green'],
+      (object) ['name' => 'Electrician', 'icon' => 'plug', 'color' => 'orange'],
+      (object) ['name' => 'Plumber', 'icon' => 'wrench', 'color' => 'teal'],
+    ];
+
+    // 2. Nearby professionals
+    $nearbyProfessionals = [
+      (object) [
+        'name' => 'Ramesh K.',
+        'profession' => 'Plumber',
+        'rating' => 4.9,
+        'distance' => '1.2 km',
+        'price' => 299,
+        'avatar' => 'R',
+        'avatar_color' => 'blue'
+      ],
+      (object) [
+        'name' => 'Sunil E.',
+        'profession' => 'Electrician',
+        'rating' => 4.8,
+        'distance' => '3.0 km',
+        'price' => 399,
+        'avatar' => 'S',
+        'avatar_color' => 'yellow'
+      ],
+      (object) [
+        'name' => 'Mohan C.',
+        'profession' => 'Carpenter',
+        'rating' => 4.7,
+        'distance' => '2.5 km',
+        'price' => 499,
+        'avatar' => 'M',
+        'avatar_color' => 'amber'
+      ],
+    ];
+
+    // 3. Service packages
+    $packages = [
+      (object) [
+        'title' => 'Plumbing Maintenance',
+        'discount' => '20% OFF',
+        'price' => 999,
+        'description' => 'Includes inspection + 2 repairs',
+        'icon' => 'gift'
+      ],
+      (object) [
+        'title' => 'Full Home Electrification',
+        'discount' => '15% OFF',
+        'price' => 2499,
+        'description' => 'Wiring + 10 points + safety check',
+        'icon' => 'gift'
+      ],
+      (object) [
+        'title' => 'AC Service & Repair',
+        'discount' => '10% OFF',
+        'price' => 1499,
+        'description' => 'Gas refill + cleaning + check',
+        'icon' => 'gift'
+      ],
+    ];
+
+    // You can also add a welcome message for top_greetings (optional)
+    // The top_greetings include already uses $user->name etc.
+
+    return view('user.dashboard', compact('categories', 'nearbyProfessionals', 'packages'));
+  }
+
+  public function explore()
+  {
+    // Dummy categories with sub‑services
+    $exploreCategories = [
+      (object) ['name' => 'Plumbing', 'icon' => 'droplet', 'services' => ['Tap repair', 'Pipe leakage', 'Water heater install']],
+      (object) ['name' => 'Electrical', 'icon' => 'zap', 'services' => ['Wiring', 'Fan repair', 'Switchboard fix']],
+      (object) ['name' => 'Carpentry', 'icon' => 'hammer', 'services' => ['Furniture assembly', 'Door repair', 'Cabinet making']],
+      (object) ['name' => 'Cleaning', 'icon' => 'spray-can', 'services' => ['Sofa cleaning', 'Bathroom scrub', 'Kitchen deep clean']],
+    ];
+
+    return view('user.explore', compact('exploreCategories'));
+  }
+
+  public function search()
+  {
+    // Show search form with popular keywords
+    $popularSearches = ['Plumber near me', 'AC repair', 'Electrician 24/7', 'Carpenter for shelf'];
+    return view('user.search', compact('popularSearches'));
+  }
+
+  public function search_results(Request $request)
+  {
+    $query = $request->input('query');
+    // Dummy results
+    $results = [
+      (object) ['name' => 'Rajesh Plumber', 'rating' => 4.9, 'distance' => '0.8 km', 'price' => 299, 'expertise' => 'Leakage & Installation'],
+      (object) ['name' => 'Elite Electricians', 'rating' => 4.8, 'distance' => '1.2 km', 'price' => 399, 'expertise' => 'Wiring & Repairs'],
+      (object) ['name' => 'CoolAir AC', 'rating' => 4.7, 'distance' => '2.0 km', 'price' => 499, 'expertise' => 'Gas refill, Service'],
+    ];
+
+    return view('user.search-results', compact('query', 'results'));
+  }
+
+  public function bookings()
+  {
+    // Dummy bookings (upcoming & past)
+    $upcoming = [
+      (object) ['id' => 101, 'professional' => 'Ramesh K.', 'service' => 'Plumbing', 'date' => '2025-05-05 10:00 AM', 'status' => 'Confirmed'],
+      (object) ['id' => 102, 'professional' => 'Sunil E.', 'service' => 'Electrical', 'date' => '2025-05-07 02:00 PM', 'status' => 'Pending'],
+    ];
+
+    $past = [
+      (object) ['id' => 99, 'professional' => 'Mohan C.', 'service' => 'Carpentry', 'date' => '2025-04-20', 'status' => 'Completed'],
+    ];
+
+    return view('user.bookings', compact('upcoming', 'past'));
+  }
+
+  public function booking_show($id)
+  {
+    // Dummy single booking detail
+    $booking = (object) [
+      'id' => $id,
+      'professional' => 'Ramesh K.',
+      'service' => 'Plumbing',
+      'date' => '2025-05-05 10:00 AM',
+      'address' => '123 Main St, Bangalore',
+      'price' => 299,
+      'status' => 'Confirmed',
+      'description' => 'Fix leaking kitchen pipe',
+    ];
+
+    return view('user.booking-detail', compact('booking'));
+  }
+
+  public function booking_store(Request $request)
+  {
+    // Dummy store – redirect back with success
+    return redirect()->route('customer.bookings')->with('success', 'Booking created (demo)!');
+  }
+
+
+  public function user_profile()
+  {
+    $user = DB::table('users')->where('id', auth()->user()->id)->first();
+
+    if (!$user) {
+      // Handle the case where the user with the given ID is not found
+      return redirect()->back()->with('error', 'User not found');
+    }
+
+    return view('user.profile', [
+      'user' => $user
+    ]);
+  }
+
+  public function update_user_profile(Request $request)
+  {
+    $request->validate([
+      'name'    => 'nullable|string|max:255',
+      'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/|unique:users,username,' . auth()->id(),
+      'phone'   => 'required|string|max:20|unique:users,phone,' . auth()->id(),
+      'whatsapp' => 'nullable|string|max:20|unique:users,whatsapp,' . auth()->id(),
+      'email'   => 'nullable|email|max:255|unique:users,email,' . auth()->id(),
+      'pic'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB
+    ]);
+
     $user = auth()->user();
 
-    return view('user.dashboard', compact(
-      'user'
-    ));
+    // Handle avatar upload
+    if ($request->hasFile('pic')) {
+      // Delete old avatar if it exists
+      if ($user->pic) {
+        $oldPath = public_path('uploads/user/' . $user->pic);
+        if (file_exists($oldPath)) {
+          unlink($oldPath);
+        }
+      }
+
+      // Store the new file and get the path
+      $file = $request->file('pic');
+
+      // Option 1: Simple filename (recommended for most cases)
+      $filename = time() . '_' . $file->getClientOriginalName();
+      $path = $file->move(public_path('uploads/user'), $filename);
+      // → then $path would be full server path → you usually want relative path
+
+      // Most common & clean approach (using storage):
+      $user->pic = 'uploads/user/' . $filename;
+    }
+
+    // Update other fields (only if provided)
+    if ($request->filled('name')) {
+      $user->name = $request->name;
+    }
+    if ($request->filled('email')) {
+      $user->email = $request->email;
+    }
+    if ($request->filled('phone')) {
+      $user->phone = $request->phone;
+    }
+    if ($request->filled('whatsapp')) {
+      $user->whatsapp = $request->whatsapp;
+    }
+    if ($request->filled('username')) {
+      $user->username = $request->username;
+    }
+
+    $user->save();
+
+    return back()->with('success', 'Profile updated successfully!');
   }
+
+
+  public function delete_account(Request $request)
+  {
+    $user = $request->user();
+
+    // 1️⃣ Validate password confirmation
+    $request->validate([
+      'password' => ['required'],
+    ]);
+
+    if (!Hash::check($request->password, $user->password)) {
+      return back()->withErrors([
+        'password' => 'The provided password is incorrect.'
+      ]);
+    }
+
+    if ($user->balance < 0) {
+      return back()->withErrors([
+        'error' => 'Cannot delete account: Your balance is negative. Please settle your dues first.'
+      ])->withInput();
+    }
+
+    // 2️⃣ Logout before deleting
+    Auth::logout();
+
+    // 3️⃣ Delete user (Soft delete recommended)
+    $user->delete();
+
+    // 4️⃣ Invalidate session
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/')
+      ->with('success', 'Your account has been deleted successfully.');
+  }
+
+
+
+  public function change_password()
+  {
+    return view('auth.change_password');
+  }
+
+  public function change_password_update(Request $request)
+  {
+    $user = auth()->user();
+
+    $validated = $request->validate([
+      'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
+        if (! Hash::check($value, $user->password)) {
+          $fail('The current password is incorrect.');
+        }
+      }],
+      'password' => 'required|string|min:6|confirmed', // confirmed = checks password_confirmation field
+    ]);
+
+    $user->password = Hash::make($validated['password']);
+    $user->save();
+
+    // Optional: force logout other devices (good security practice)
+    Auth::logoutOtherDevices($validated['password']);
+
+    return back()->with('success', 'Password changed successfully!');
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   public function awards()
   {
@@ -294,76 +602,7 @@ class MainUser extends Controller
 
 
 
-  public function user_profile()
-  {
-    $user = DB::table('users')->where('id', auth()->user()->id)->first();
 
-    if (!$user) {
-      // Handle the case where the user with the given ID is not found
-      return redirect()->back()->with('error', 'User not found');
-    }
-
-    return view('user.profile', [
-      'user' => $user
-    ]);
-  }
-
-  public function update_user_profile(Request $request)
-  {
-    $request->validate([
-      'name'    => 'nullable|string|max:255',
-      'username' => 'required|string|min:3|max:30|regex:/^[A-Za-z0-9_.-]+$/|unique:users,username,' . auth()->id(),
-      'phone'   => 'required|string|max:20|unique:users,phone,' . auth()->id(),
-      'whatsapp' => 'nullable|string|max:20|unique:users,whatsapp,' . auth()->id(),
-      'email'   => 'nullable|email|max:255|unique:users,email,' . auth()->id(),
-      'pic'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB
-    ]);
-
-    $user = auth()->user();
-
-    // Handle avatar upload
-    if ($request->hasFile('pic')) {
-      // Delete old avatar if it exists
-      if ($user->pic) {
-        $oldPath = public_path('uploads/user/' . $user->pic);
-        if (file_exists($oldPath)) {
-          unlink($oldPath);
-        }
-      }
-
-      // Store the new file and get the path
-      $file = $request->file('pic');
-
-      // Option 1: Simple filename (recommended for most cases)
-      $filename = time() . '_' . $file->getClientOriginalName();
-      $path = $file->move(public_path('uploads/user'), $filename);
-      // → then $path would be full server path → you usually want relative path
-
-      // Most common & clean approach (using storage):
-      $user->pic = 'uploads/user/' . $filename;
-    }
-
-    // Update other fields (only if provided)
-    if ($request->filled('name')) {
-      $user->name = $request->name;
-    }
-    if ($request->filled('email')) {
-      $user->email = $request->email;
-    }
-    if ($request->filled('phone')) {
-      $user->phone = $request->phone;
-    }
-    if ($request->filled('whatsapp')) {
-      $user->whatsapp = $request->whatsapp;
-    }
-    if ($request->filled('username')) {
-      $user->username = $request->username;
-    }
-
-    $user->save();
-
-    return back()->with('success', 'Profile updated successfully!');
-  }
 
   public function checkUsernameProfile(Request $request)
   {
@@ -384,40 +623,7 @@ class MainUser extends Controller
     ]);
   }
 
-  public function delete_account(Request $request)
-  {
-    $user = $request->user();
 
-    // 1️⃣ Validate password confirmation
-    $request->validate([
-      'password' => ['required'],
-    ]);
-
-    if (!Hash::check($request->password, $user->password)) {
-      return back()->withErrors([
-        'password' => 'The provided password is incorrect.'
-      ]);
-    }
-
-    if ($user->balance < 0) {
-      return back()->withErrors([
-        'error' => 'Cannot delete account: Your balance is negative. Please settle your dues first.'
-      ])->withInput();
-    }
-
-    // 2️⃣ Logout before deleting
-    Auth::logout();
-
-    // 3️⃣ Delete user (Soft delete recommended)
-    $user->delete();
-
-    // 4️⃣ Invalidate session
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect('/')
-      ->with('success', 'Your account has been deleted successfully.');
-  }
 
   public function notifications()
   {
