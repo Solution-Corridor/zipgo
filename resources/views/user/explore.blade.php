@@ -16,28 +16,28 @@
   </style>
 </head>
 
-<body class="min-h-screen bg-[#0A0A0F]">
+<body class="min-h-screen bg-[#FDFBF7]">
 
-  <div class="mx-auto max-w-[420px] min-h-screen bg-[#0A0A0F] shadow-2xl shadow-black/50 relative">
+  <div class="mx-auto max-w-[420px] min-h-screen bg-[#FDFBF7] shadow-2xl shadow-black/5 relative">
 
     @include('user.includes.top_greetings')
 
     <div class="px-4 mt-2 mb-4">
-      <h1 class="text-xl font-bold text-white">Explore Services</h1>
-      <p class="text-xs text-gray-400 mt-1">Find the right professional for your needs</p>
+      <h1 class="text-xl font-bold text-[#2C1810]">Explore Services</h1>
+      <p class="text-xs text-[#6B5B50] mt-1">Find the right professional for your needs</p>
     </div>
 
     <div class="px-4 space-y-6">
       @foreach($exploreCategories as $cat)
       <div>
         <div class="flex items-center gap-2 mb-2">
-          <i data-lucide="{{ $cat->icon }}" class="w-5 h-5 text-emerald-400"></i>
-          <h2 class="text-base font-semibold text-white">{{ $cat->name }}</h2>
+          <i data-lucide="{{ $cat->icon }}" class="w-5 h-5 text-[#4ECDC4]"></i>
+          <h2 class="text-base font-semibold text-[#2C1810]">{{ $cat->name }}</h2>
         </div>
         <div class="grid grid-cols-2 gap-2">
           @foreach($cat->services as $service)
           <a href="{{ route('user.search.results') }}?query={{ urlencode($service) }}"
-            class="bg-gray-900/60 border border-gray-800 rounded-lg px-3 py-2 text-sm text-gray-300 hover:border-emerald-500/50 transition">
+            class="bg-white border border-[#EAE0D5] rounded-lg px-3 py-2 text-sm text-[#2C1810] hover:border-[#FF6B6B]/50 transition shadow-sm">
             {{ $service }}
           </a>
           @endforeach
@@ -48,9 +48,7 @@
 
     @include('user.includes.bottom_navigation')
 
-
   </div>
-  
-</body>
 
+</body>
 </html>

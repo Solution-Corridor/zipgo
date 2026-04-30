@@ -44,6 +44,11 @@ Route::group(['middleware' => 'checkUserRole'], function () {
 
 
 
+
+    
+
+
+
     Route::get('/awards', [MainUser::class, 'awards'])->name('awards');
     Route::get('/info', [MainUser::class, 'info'])->name('info');
     Route::get('/share-balance', [MainUser::class, 'shareBalance'])->name('share.balance');
@@ -56,9 +61,7 @@ Route::group(['middleware' => 'checkUserRole'], function () {
     Route::get('/my-tasks', [MainUser::class, 'sample'])->name('user.my_tasks');
     Route::get('/my-orders', [MainUser::class, 'sample'])->name('user.my_orders');
     Route::get('/withdraw-history', [MainUser::class, 'sample'])->name('user.withdraw_history');
-    Route::get('/my-complaints',  [MainUser::class, 'my_complaints'])->name('user.my_complaints');
-    Route::post('/complaints', [MainUser::class, 'complaint_store'])->name('user.complaints.store');
-    Route::get('/all-transactions', [MainUser::class, 'sample'])->name('user.all_transactions');
+
     Route::get('/download-app', [MainUser::class, 'download_app'])->name('download_app');
 
 

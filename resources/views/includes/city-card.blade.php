@@ -1,14 +1,23 @@
 @php
+$slugs = [
+    'narowal',
+    'sialkot',
+    'sheikhupura',
+    'gujrat',
+    'daska',
+    'pasrur',
+    'lahore',
+    'gujranwala',
+    'karachi',
+    'faisalabad',
+    'rawalpindi',
+    'peshawar'
+];
+
 $cities = App\Models\City::where('is_active', 1)
-->whereIn('slug', [
-'karachi',
-'lahore',
-'faisalabad',
-'rawalpindi',
-'gujranwala',
-'peshawar'
-])
-->get();
+    ->whereIn('slug', $slugs)
+    ->orderByRaw("FIELD(slug, '" . implode("','", $slugs) . "')")
+    ->get();
 @endphp
 
 <style>

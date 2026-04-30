@@ -21,17 +21,45 @@ class MainUser extends Controller
 {
   public function user_dashboard()
   {
-    // 1. Categories for horizontal scroll
-    $categories = [
-      (object) ['name' => 'Plumber', 'icon' => 'droplet', 'color' => 'blue'],
-      (object) ['name' => 'Electrician', 'icon' => 'zap', 'color' => 'yellow'],
-      (object) ['name' => 'Carpenter', 'icon' => 'hammer', 'color' => 'amber'],
-      (object) ['name' => 'AC Repair', 'icon' => 'snowflake', 'color' => 'cyan'],
-      (object) ['name' => 'Painter', 'icon' => 'palette', 'color' => 'purple'],
-      (object) ['name' => 'Cleaner', 'icon' => 'spray-can', 'color' => 'green'],
-      (object) ['name' => 'Electrician', 'icon' => 'plug', 'color' => 'orange'],
-      (object) ['name' => 'Plumber', 'icon' => 'wrench', 'color' => 'teal'],
+    $prioritySlugs = [
+      'plumbing',                 // Plumbing
+      'ac-repair-installation',  // AC repair & installation
+      'carpenter',               // Carpenter
+      'painter',                 // Painter
+      'pest-control',            // Pest control
+      'appliance-repair',        // Appliance repair
+      'water-tank-cleaning',     // Water tank cleaning
+      'ironing-service',         // Ironing service (covers laundry)
     ];
+
+    // 2. Fetch all active services
+    $allServices = Service::where('is_active', 1)->get();
+
+    // 3. Separate priority services (in the defined order)
+    $priorityServices = collect();
+    foreach ($prioritySlugs as $slug) {
+      $service = $allServices->firstWhere('slug', $slug);
+      if ($service) {
+        $priorityServices->push($service);
+      }
+    }
+
+    // 4. Get the remaining services (exclude any that are in priority list)
+    $otherServices = $allServices->reject(function ($service) use ($prioritySlugs) {
+      return in_array($service->slug, $prioritySlugs);
+    })->sortBy('name'); // sort remaining alphabetically (or by id)
+
+    // 5. Merge: priority first, then others
+    $services = $priorityServices->concat($otherServices);
+
+    // 6. Map extra fields (icon + color) as you were doing
+    $categories = $services->map(function ($service) {
+      return (object)[
+        'name'  => $service->name,
+        'icon'  => $this->getIcon($service->name),
+        'color' => $this->getColor($service->name),
+      ];
+    });
 
     // 2. Nearby professionals
     $nearbyProfessionals = [
@@ -93,6 +121,260 @@ class MainUser extends Controller
     // The top_greetings include already uses $user->name etc.
 
     return view('user.dashboard', compact('categories', 'nearbyProfessionals', 'packages'));
+  }
+
+  private function getIcon($name)
+  {
+    $name = strtolower($name);
+
+    return match (true) {
+      // Home & Repair
+      str_contains($name, 'plumb') => 'droplet',
+      str_contains($name, 'ac') => 'snowflake',
+      str_contains($name, 'carpenter') => 'hammer',
+      str_contains($name, 'paint') => 'palette',
+      str_contains($name, 'clean') => 'spray-can',
+      str_contains($name, 'repair') => 'wrench',
+      str_contains($name, 'design') => 'pen-tool',
+      str_contains($name, 'construction') => 'building',
+      str_contains($name, 'garden') => 'leaf',
+      str_contains($name, 'water tank') => 'droplet',
+      str_contains($name, 'electric') => 'zap',
+
+      // Beauty & Personal Care
+      str_contains($name, 'salon') || str_contains($name, 'hair') => 'scissors',
+      str_contains($name, 'makeup') => 'eye',
+      str_contains($name, 'bridal') => 'heart',
+      str_contains($name, 'skincare') || str_contains($name, 'facial') => 'sun',
+      str_contains($name, 'spa') || str_contains($name, 'massage') => 'heart',
+      str_contains($name, 'nail') => 'hand',
+      str_contains($name, 'mehndi') => 'feather',
+      str_contains($name, 'barber') || str_contains($name, 'grooming') => 'scissors',
+
+      // Medical & Health
+      str_contains($name, 'doctor') || str_contains($name, 'clinic') => 'stethoscope',
+      str_contains($name, 'specialist') => 'users',
+      str_contains($name, 'dentist') => 'smile',
+      str_contains($name, 'eye') => 'eye',
+      str_contains($name, 'diagnostic') || str_contains($name, 'lab') => 'flask',
+      str_contains($name, 'physiotherapy') => 'activity',
+      str_contains($name, 'nursing') => 'user-plus',
+      str_contains($name, 'ambulance') => 'truck',
+      str_contains($name, 'pharmacy') => 'plus-circle',
+      str_contains($name, 'mental') => 'brain',
+      str_contains($name, 'emergency') || str_contains($name, 'rescue') => 'alert-triangle',
+
+      // Education & Tutoring
+      str_contains($name, 'tutor') || str_contains($name, 'course') => 'book',
+      str_contains($name, 'online tutor') => 'monitor',
+      str_contains($name, 'coaching') => 'trending-up',
+      str_contains($name, 'language') => 'globe',
+      str_contains($name, 'computer course') => 'cpu',
+      str_contains($name, 'quran') => 'book-open',
+      str_contains($name, 'skill') => 'award',
+      str_contains($name, 'test preparation') => 'check-square',
+
+      // IT & Digital
+      str_contains($name, 'graphic') || str_contains($name, 'logo') => 'image',
+      str_contains($name, 'web') || str_contains($name, 'app') => 'code',
+      str_contains($name, 'seo') => 'trending-up',
+      str_contains($name, 'social media') => 'share-2',
+      str_contains($name, 'content writing') => 'edit-3',
+      str_contains($name, 'video editing') => 'video',
+      str_contains($name, 'virtual assistant') => 'headphones',
+      str_contains($name, 'data entry') => 'database',
+      str_contains($name, 'programming') => 'terminal',
+      str_contains($name, 'copywriting') => 'file-text',
+      str_contains($name, 'illustration') => 'pen-tool',
+      str_contains($name, 'consulting') => 'briefcase',
+
+      // Electronics Repair
+      str_contains($name, 'mobile repair') => 'smartphone',
+      str_contains($name, 'laptop repair') => 'laptop',
+      str_contains($name, 'computer repair') => 'cpu',
+      str_contains($name, 'tv repair') => 'monitor',
+      str_contains($name, 'fridge repair') => 'thermometer',
+      str_contains($name, 'washing machine') => 'droplet',
+      str_contains($name, 'generator') => 'zap',
+      str_contains($name, 'auto mechanic') => 'car',
+
+      // Finance & Legal
+      str_contains($name, 'account') || str_contains($name, 'tax') => 'calculator',
+      str_contains($name, 'legal') || str_contains($name, 'lawyer') => 'scale',
+      str_contains($name, 'hr') || str_contains($name, 'recruitment') => 'users',
+      str_contains($name, 'business registration') => 'file',
+      str_contains($name, 'bank') || str_contains($name, 'loan') || str_contains($name, 'insurance') => 'credit-card',
+      str_contains($name, 'investment') => 'trending-up',
+
+      // Transport & Logistics
+      str_contains($name, 'courier') || str_contains($name, 'delivery') => 'truck',
+      str_contains($name, 'movers') || str_contains($name, 'packers') => 'package',
+      str_contains($name, 'bike delivery') => 'bike',
+      str_contains($name, 'car rental') => 'car',
+      str_contains($name, 'truck rental') => 'truck',
+      str_contains($name, 'ride') => 'navigation',
+      str_contains($name, 'logistics') => 'archive',
+      str_contains($name, 'bus service') => 'bus',
+      str_contains($name, 'fuel') => 'droplet',
+
+      // Events & Entertainment
+      str_contains($name, 'catering') => 'utensils',
+      str_contains($name, 'wedding') => 'heart',
+      str_contains($name, 'photo') || str_contains($name, 'videography') => 'camera',
+      str_contains($name, 'decoration') => 'gift',
+      str_contains($name, 'dj') || str_contains($name, 'sound') => 'music',
+      str_contains($name, 'event hall') => 'map-pin',
+      str_contains($name, 'birthday') => 'cake',
+
+      // Security & Safety
+      str_contains($name, 'security') => 'shield',
+      str_contains($name, 'cctv') => 'camera',
+      str_contains($name, 'fire safety') => 'flame',
+      str_contains($name, 'locksmith') => 'lock',
+
+      // Professional & Creative
+      str_contains($name, 'translation') => 'globe',
+      str_contains($name, 'voice-over') => 'mic',
+      str_contains($name, 'printing') => 'printer',
+      str_contains($name, 'stationery') => 'clipboard',
+
+      // Pets
+      str_contains($name, 'pet') => 'paw',
+      str_contains($name, 'vet') => 'activity',
+
+      // Food & Home
+      str_contains($name, 'chef') || str_contains($name, 'bakery') => 'utensils',
+      str_contains($name, 'meal delivery') => 'coffee',
+
+      // Travel & Booking
+      str_contains($name, 'ticket') || str_contains($name, 'tour') || str_contains($name, 'travel') => 'map',
+      str_contains($name, 'visa') => 'passport',
+      str_contains($name, 'hotel') => 'home',
+
+      // Retail & Utilities
+      str_contains($name, 'shop') || str_contains($name, 'store') => 'shopping-bag',
+      str_contains($name, 'clothing') => 'shopping-bag',
+      str_contains($name, 'general store') => 'box',
+      str_contains($name, 'internet') => 'wifi',
+      str_contains($name, 'water supply') => 'droplet',
+      str_contains($name, 'gas') => 'flame',
+      str_contains($name, 'ironing') => 'sun',
+
+      // Default
+      default => 'tool',
+    };
+  }
+
+  private function getColor($name)
+  {
+    $name = strtolower($name);
+
+    return match (true) {
+      // Home & Repair
+      str_contains($name, 'plumb') => 'blue',
+      str_contains($name, 'ac') => 'cyan',
+      str_contains($name, 'carpenter') => 'amber',
+      str_contains($name, 'paint') => 'purple',
+      str_contains($name, 'clean') => 'green',
+      str_contains($name, 'repair') => 'orange',
+      str_contains($name, 'design') => 'fuchsia',
+      str_contains($name, 'construction') => 'gray',
+      str_contains($name, 'garden') => 'emerald',
+      str_contains($name, 'electric') => 'yellow',
+
+      // Beauty
+      str_contains($name, 'salon') || str_contains($name, 'hair') => 'pink',
+      str_contains($name, 'makeup') => 'rose',
+      str_contains($name, 'spa') || str_contains($name, 'massage') => 'teal',
+      str_contains($name, 'mehndi') => 'orange',
+      str_contains($name, 'barber') => 'slate',
+
+      // Medical
+      str_contains($name, 'doctor') || str_contains($name, 'clinic') => 'red',
+      str_contains($name, 'dentist') => 'sky',
+      str_contains($name, 'eye') => 'indigo',
+      str_contains($name, 'lab') => 'pink',
+      str_contains($name, 'nursing') => 'blue',
+      str_contains($name, 'ambulance') => 'red',
+      str_contains($name, 'pharmacy') => 'green',
+      str_contains($name, 'mental') => 'purple',
+      str_contains($name, 'emergency') || str_contains($name, 'rescue') => 'red',
+
+      // Education
+      str_contains($name, 'tutor') || str_contains($name, 'course') => 'indigo',
+      str_contains($name, 'coaching') => 'violet',
+      str_contains($name, 'language') => 'cyan',
+      str_contains($name, 'quran') => 'emerald',
+      str_contains($name, 'skill') => 'amber',
+
+      // IT & Digital
+      str_contains($name, 'graphic') || str_contains($name, 'logo') => 'purple',
+      str_contains($name, 'web') || str_contains($name, 'app') => 'blue',
+      str_contains($name, 'seo') || str_contains($name, 'marketing') => 'lime',
+      str_contains($name, 'video') => 'red',
+      str_contains($name, 'data') => 'slate',
+      str_contains($name, 'programming') => 'gray',
+
+      // Repair (electronics)
+      str_contains($name, 'mobile') || str_contains($name, 'laptop') || str_contains($name, 'computer') => 'gray',
+      str_contains($name, 'tv') => 'zinc',
+      str_contains($name, 'fridge') => 'cyan',
+      str_contains($name, 'washing machine') => 'blue',
+      str_contains($name, 'generator') => 'yellow',
+      str_contains($name, 'auto') => 'orange',
+
+      // Finance & Legal
+      str_contains($name, 'account') || str_contains($name, 'tax') => 'green',
+      str_contains($name, 'legal') || str_contains($name, 'lawyer') => 'slate',
+      str_contains($name, 'bank') || str_contains($name, 'loan') || str_contains($name, 'insurance') => 'teal',
+      str_contains($name, 'investment') => 'emerald',
+
+      // Transport
+      str_contains($name, 'delivery') || str_contains($name, 'courier') => 'orange',
+      str_contains($name, 'movers') => 'amber',
+      str_contains($name, 'rental') => 'blue',
+      str_contains($name, 'ride') => 'green',
+      str_contains($name, 'logistics') => 'slate',
+      str_contains($name, 'bus') => 'sky',
+      str_contains($name, 'fuel') => 'yellow',
+
+      // Events
+      str_contains($name, 'catering') => 'rose',
+      str_contains($name, 'wedding') => 'pink',
+      str_contains($name, 'photo') => 'purple',
+      str_contains($name, 'decoration') => 'fuchsia',
+      str_contains($name, 'dj') => 'indigo',
+      str_contains($name, 'event') => 'violet',
+      str_contains($name, 'birthday') => 'yellow',
+
+      // Security
+      str_contains($name, 'security') => 'gray',
+      str_contains($name, 'cctv') => 'slate',
+      str_contains($name, 'fire') => 'red',
+      str_contains($name, 'locksmith') => 'amber',
+
+      // Pets
+      str_contains($name, 'pet') => 'amber',
+      str_contains($name, 'vet') => 'green',
+
+      // Food
+      str_contains($name, 'chef') || str_contains($name, 'bakery') => 'orange',
+      str_contains($name, 'meal') => 'lime',
+
+      // Travel
+      str_contains($name, 'travel') || str_contains($name, 'tour') => 'sky',
+      str_contains($name, 'visa') => 'indigo',
+      str_contains($name, 'hotel') => 'blue',
+
+      // Retail & Utilities
+      str_contains($name, 'shop') || str_contains($name, 'store') => 'slate',
+      str_contains($name, 'internet') => 'cyan',
+      str_contains($name, 'water') => 'blue',
+      str_contains($name, 'gas') => 'orange',
+      str_contains($name, 'ironing') => 'gray',
+
+      default => 'slate',
+    };
   }
 
   public function explore()
@@ -516,75 +798,7 @@ class MainUser extends Controller
     return view('user.sample');
   }
 
-  public function my_complaints()
-  {
-    if (auth()->user()->is_complaint_allowed == 0) {
-      return redirect()->back()->with('error', 'You are not allowed to view complaints.');
-    }
 
-    $complaints = Complaint::where('user_id', auth()->id())
-      ->latest()
-      ->paginate(10);   // or ->get() if you prefer no pagination
-
-    return view('user.my_complaints', compact('complaints'));
-  }
-
-  public function complaint_store(Request $request)
-  {
-    $validated = $request->validate([
-      'subject' => 'required|string|max:120',
-      'detail'  => 'required|string|min:10',
-      'screenshot' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf|max:5120',
-    ]);
-
-    $userId = Auth::id();
-
-    // Check if user already has a pending complaint
-    $hasPendingComplaint = Complaint::where('user_id', $userId)
-      ->where('status', 'pending')
-      ->exists();
-
-    if ($hasPendingComplaint) {
-      return redirect()
-        ->route('my_complaints')
-        ->with('error', 'You already have a pending complaint. Please wait until it is resolved.');
-    }
-
-    // Check if user has a recently resolved complaint within the last 24 hours
-    $lastResolvedComplaint = Complaint::where('user_id', $userId)
-      ->where('status', 'resolved')
-      ->latest('resolved_at')
-      ->first();
-
-    if ($lastResolvedComplaint && $lastResolvedComplaint->resolved_at->diffInHours(now()) < 24) {
-      return redirect()
-        ->route('my_complaints')
-        ->with('error', 'You can only submit a new complaint after 24 hours from your last resolved complaint.');
-    }
-
-    if ($request->hasFile('screenshot')) {
-
-      // Store the new file and get the path
-      $file = $request->file('screenshot');
-
-      // Option 1: Simple filename (recommended for most cases)
-      $filename = time() . '_' . $file->getClientOriginalName();
-      $path = $file->move(public_path('uploads/complaints'), $filename);
-      // → then $path would be full server path → you usually want relative path
-    }
-
-    Complaint::create([
-      'user_id' => $userId,
-      'subject' => $validated['subject'],
-      'detail'  => $validated['detail'],
-      'screenshot' => isset($path) ? 'uploads/complaints/' . $filename : null,
-      'status'  => 'pending',
-    ]);
-
-    return redirect()
-      ->route('my_complaints')
-      ->with('success', 'Your complaint has been submitted successfully. We will review it soon.');
-  }
 
   public function download_app()
   {

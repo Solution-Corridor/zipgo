@@ -31,7 +31,7 @@ Route::post('saveRegister', [Welcome::class, 'saveRegister'])->name('saveRegiste
 Route::get('/login', [Welcome::class, 'login'])->name('login');
 Route::post('/postlogin', [Welcome::class, 'postLogin'])->name('postLogin');
 
-Route::get('/logout', [Welcome::class, 'logout'])->name('logout');
+Route::post('/logout', [Welcome::class, 'logout'])->name('logout');
 
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showRequestForm'])->middleware('guest')->name('password.request');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->middleware('guest')->name('password.email');
