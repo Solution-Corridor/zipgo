@@ -6,9 +6,9 @@
   <title>Profile</title>
 </head>
 
-<body class="min-h-screen bg-[#FDFBF7]">
+<body class="min-h-screen bg-[#e6e5e3]">
 
-  <div class="mx-auto max-w-[420px] min-h-screen bg-[#FDFBF7] shadow-2xl shadow-black/5 relative">
+  <div class="mx-auto max-w-[420px] min-h-screen bg-[#e6e5e3] shadow-2xl shadow-black/5 relative">
 
     @include('user.includes.top_greetings')
 

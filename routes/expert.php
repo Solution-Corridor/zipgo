@@ -24,7 +24,7 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
     Route::delete('/rates/{rate}', [ExpertRateController::class, 'destroy'])->name('expert.rates.destroy');
 
     Route::get('/profile', [ExpertMain::class, 'expert_profile'])->name('expert.profile');
-    Route::put('/update_profile', [ExpertMain::class, 'updateExpert'])->name('expert.profile.update');
+    Route::post('/update_profile', [ExpertMain::class, 'updateExpert'])->name('expert.profile.update');
 
 
 

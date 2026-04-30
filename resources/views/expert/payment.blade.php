@@ -10,14 +10,14 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            background: #0A0A0F;
+            background: #121826;
             font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
         }
         .gradient-primary {
-            background: linear-gradient(105deg, #8b5cf6 0%, #6366f1 100%);
+            background: linear-gradient(105deg, #F4A261 0%, #E08E3E 100%);
         }
         .glow {
-            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(139, 92, 246, 0.1);
+            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(244, 162, 97, 0.2);
         }
         .card-hover {
             transition: transform 0.1s ease, border-color 0.2s;
@@ -29,8 +29,8 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#0A0A0F] antialiased">
-    <div class="mx-auto max-w-[420px] min-h-screen bg-[#0A0A0F] shadow-2xl shadow-black/50 relative">
+<body class="min-h-screen bg-[#121826] antialiased">
+    <div class="mx-auto max-w-[420px] min-h-screen bg-[#121826] shadow-2xl shadow-black/50 relative">
         @include('expert.includes.top_greetings')
 
         <div class="px-4 pt-4 pb-28">
@@ -38,51 +38,50 @@
 
             <div class="mt-2 mb-6">
                 <div class="flex items-center gap-2 mb-3 px-1">
-                    <i data-lucide="credit-card" class="w-5 h-5 text-indigo-400"></i>
-                    <h3 class="text-indigo-200 font-semibold text-sm tracking-wide">PAYMENT VERIFICATION</h3>
-                    <div class="flex-1 h-px bg-gradient-to-r from-indigo-500/40 to-transparent"></div>
+                    <i data-lucide="credit-card" class="w-5 h-5 text-[#F4A261]"></i>
+                    <h3 class="text-[#F4A261] font-semibold text-sm tracking-wide">PAYMENT VERIFICATION</h3>
+                    <div class="flex-1 h-px bg-gradient-to-r from-[#F4A261]/40 to-transparent"></div>
                 </div>
 
-                <div class="rounded-xl overflow-hidden glow bg-gray-900/70 border border-gray-700/50 p-5">
+                <div class="rounded-xl overflow-hidden glow bg-[#1A2636] border border-[#2A3A5A] p-5">
                     <div class="text-center mb-6">
-                        <h2 class="text-xl font-bold text-slate-100">Expert Registration Fee</h2>
-                        <p class="text-slate-400 text-sm mt-1">Complete payment to activate your expert profile</p>
+                        <h2 class="text-xl font-bold text-white">Expert Registration Fee</h2>
+                        <p class="text-gray-400 text-sm mt-1">Complete payment to activate your expert profile</p>
                     </div>
 
-                    <div class="mb-6 text-center bg-slate-800/40 rounded-xl p-4 border border-white/5">
-                        <p class="text-slate-400 text-sm">Amount to pay</p>
-                        <p class="text-3xl font-bold text-indigo-400">
+                    <div class="mb-6 text-center bg-[#121826] rounded-xl p-4 border border-[#2A3A5A]">
+                        <p class="text-gray-400 text-sm">Amount to pay</p>
+                        <p class="text-3xl font-bold text-[#F4A261]">
                             Rs. {{ number_format(session('amount', 0), 0) }}
                         </p>
                     </div>
 
-                    
                     <form action="{{ route('expert.payment.process') }}" method="POST" id="paymentForm">
                         @csrf
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">Card Number *</label>
+                                <label class="block text-xs text-gray-400 mb-1">Card Number *</label>
                                 <input type="text" name="card_number" id="card_number" maxlength="19"
-                                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    class="w-full bg-[#121826] border border-[#2A3A5A] rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#F4A261] focus:border-transparent"
                                     placeholder="1234 5678 9012 3456" required>
                             </div>
                             <div class="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label class="block text-xs text-slate-400 mb-1">MM *</label>
+                                    <label class="block text-xs text-gray-400 mb-1">MM *</label>
                                     <input type="text" name="expiry_month" id="expiry_month" maxlength="2"
-                                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500"
+                                        class="w-full bg-[#121826] border border-[#2A3A5A] rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#F4A261]"
                                         placeholder="01" required>
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-slate-400 mb-1">YY *</label>
+                                    <label class="block text-xs text-gray-400 mb-1">YY *</label>
                                     <input type="text" name="expiry_year" id="expiry_year" maxlength="2"
-                                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500"
+                                        class="w-full bg-[#121826] border border-[#2A3A5A] rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#F4A261]"
                                         placeholder="25" required>
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-slate-400 mb-1">CVC *</label>
+                                    <label class="block text-xs text-gray-400 mb-1">CVC *</label>
                                     <input type="text" name="cvc" id="cvc" maxlength="3"
-                                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-indigo-500"
+                                        class="w-full bg-[#121826] border border-[#2A3A5A] rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-[#F4A261]"
                                         placeholder="123" required>
                                 </div>
                             </div>
@@ -91,13 +90,13 @@
                         <div id="errorMessage" class="hidden mt-4 p-3 bg-rose-900/40 border border-rose-700/50 rounded-lg text-rose-200 text-sm"></div>
 
                         <button type="submit" id="payButton"
-                            class="mt-6 w-full py-3.5 rounded-xl font-semibold text-white bg-indigo-700 hover:bg-indigo-600 shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            class="mt-6 w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#F4A261] to-[#E08E3E] hover:from-[#E08E3E] hover:to-[#D97706] shadow-lg shadow-[#F4A261]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <i data-lucide="lock" class="w-4 h-4"></i> Pay Rs. {{ number_format(session('amount', 0), 0) }}
                         </button>
                     </form>
 
                     <div class="mt-4 text-center">
-                        <a href="{{ route('expert_profile') }}" class="text-sm text-slate-400 hover:text-slate-300 transition inline-flex items-center gap-1">
+                        <a href="{{ route('expert.profile') }}" class="text-sm text-gray-400 hover:text-[#F4A261] transition inline-flex items-center gap-1">
                             <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to edit profile
                         </a>
                     </div>

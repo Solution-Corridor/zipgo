@@ -23,7 +23,7 @@ class CheckExpertRole
         }
 
         // 3. Exclude routes where expert profile creation/update is allowed
-        $excludedRoutes = ['expert_profile', 'expert_profile.update', 'expert.payment.page', 'expert.payment.process'];
+        $excludedRoutes = ['expert.profile', 'expert.profile.update', 'expert.payment.page', 'expert.payment.process'];
         if (in_array($request->route()->getName(), $excludedRoutes)) {
             return $next($request);
         }
@@ -34,7 +34,7 @@ class CheckExpertRole
 
         if (!$isApproved) {
             // Redirect to expert profile page to complete or verify
-            return redirect()->route('expert_profile')
+            return redirect()->route('expert.profile')
                 ->with('warning', 'Please complete your expert profile and wait for approval.');
         }
 

@@ -15,6 +15,7 @@ use App\Models\City;
 use App\Models\Service;
 use App\Models\ExpertDetail;
 use App\Models\Blog;
+use Illuminate\Support\Facades\File;
 
 
 class ExpertMain extends Controller
@@ -504,7 +505,7 @@ class ExpertMain extends Controller
 
     session()->forget(['pending_expert_id', 'amount']);
 
-    return redirect()->route('user_profile')->with('success', 'Payment successful! You are now an expert.');
+    return redirect()->route('expert.profile')->with('success', 'Payment successful! You are now an expert.');
   }
 
   private function validateLuhn($number)

@@ -17,10 +17,10 @@
   </style>
 </head>
 
-<body class="min-h-screen bg-[#FDFBF7]">
+<body class="min-h-screen bg-[#e6e5e3]">
 
   <!-- Mobile-like container -->
-  <div class="mx-auto max-w-[420px] min-h-screen bg-[#FDFBF7] shadow-2xl shadow-black/10 relative">
+  <div class="mx-auto max-w-[420px] min-h-screen bg-[#e6e5e3] shadow-2xl shadow-black/10 relative">
 
     <!-- Top Greeting -->
     @include('user.includes.top_greetings')

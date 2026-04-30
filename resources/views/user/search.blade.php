@@ -6,9 +6,9 @@
   <title>Find Services – Home Services</title>
 </head>
 
-<body class="min-h-screen bg-[#FDFBF7]">
+<body class="min-h-screen bg-[#e6e5e3]">
 
-  <div class="mx-auto max-w-[420px] min-h-screen bg-[#FDFBF7] relative">
+  <div class="mx-auto max-w-[420px] min-h-screen bg-[#e6e5e3] relative">
 
     @include('user.includes.top_greetings')
 
@@ -36,4 +36,5 @@
   </div>
 
 </body>
+
 </html>

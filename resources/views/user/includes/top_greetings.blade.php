@@ -15,7 +15,7 @@ $username = auth()->user()?->username ?? 'Guest';
 @endphp
 
 <!-- Sticky Top Greeting Header - Light & Friendly (Customer Version) -->
-<div class="sticky top-0 z-50 bg-[#FDFBF7]">
+<div class="sticky top-0 z-50 bg-[#e6e5e3]">
   <div class="flex items-center gap-4 
                 bg-gradient-to-r from-white via-[#FFF9F5] to-white
                 backdrop-blur-md 
@@ -90,7 +90,7 @@ $username = auth()->user()?->username ?? 'Guest';
           <div
             x-ref="dropdown"
             class="absolute right-4 top-20 w-[320px] max-w-[92vw] bg-white border border-[#EAE0D5] rounded-2xl shadow-xl shadow-black/10 overflow-hidden flex flex-col max-h-[70vh] z-[9999]">
-            <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#EAE0D5] bg-[#FDFBF7]">
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#EAE0D5] bg-[#e6e5e3]">
               <h3 class="text-sm font-semibold text-[#2C1810] tracking-wide">Notifications</h3>
               <button @click="open = false" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#EAE0D5] transition text-[#6B5B50] hover:text-[#2C1810]">✕</button>
             </div>
@@ -106,7 +106,7 @@ $username = auth()->user()?->username ?? 'Guest';
               @endforelse
               @endauth
             </div>
-            <div class="px-5 py-3.5 border-t border-[#EAE0D5] bg-[#FDFBF7]">
+            <div class="px-5 py-3.5 border-t border-[#EAE0D5] bg-[#e6e5e3]">
               <a href="/notifications" class="block text-center text-sm font-medium text-[#FF6B6B] hover:text-[#ff5252] transition">View all notifications →</a>
             </div>
           </div>
