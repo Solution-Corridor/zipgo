@@ -26,13 +26,13 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
     Route::get('/profile', [ExpertMain::class, 'expert_profile'])->name('expert.profile');
     Route::post('/update_profile', [ExpertMain::class, 'updateExpert'])->name('expert.profile.update');
 
+    Route::get('/expert-payment', [ExpertMain::class, 'showPaymentPage'])->name('expert.payment.page');
 
+    Route::post('/expert-payment/process', [ExpertMain::class, 'processPayment'])->name('expert.payment.process');
 
 
     Route::get('/my-complaints',  [ExpertMain::class, 'my_complaints'])->name('expert.my_complaints');
     Route::post('/complaints', [ExpertMain::class, 'complaint_store'])->name('expert.complaints.store');
 
-    Route::get('/expert-payment', [ExpertMain::class, 'showPaymentPage'])->name('expert.payment.page');
-    Route::post('/expert-payment/process', [ExpertMain::class, 'processPayment'])->name('expert.payment.process');
   });
 });

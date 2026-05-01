@@ -1,0 +1,1 @@
+ALTER TABLE `expert_details` ADD `amount_paid` INT(11) NULL AFTER `payment_status`;

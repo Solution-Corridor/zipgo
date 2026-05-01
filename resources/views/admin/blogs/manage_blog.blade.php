@@ -56,7 +56,7 @@ Manage Blogs
                           <img src="/assets/images/favicon.png" width="60">
                           @endif
                         </td>
-                        <td>{{ $blog->title }} </td>
+                        <td><a href="{{ route('blogs.show', $blog->slug) }}">{{ $blog->title }}</a></td>
                         <td>{{ Str::limit($blog->slug, 50) }} </td>
                         <td>
                           <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">

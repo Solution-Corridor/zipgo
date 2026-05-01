@@ -10,7 +10,7 @@
     background: #f5f5f5;
   }
 
-  .feature-desk-navbar {
+  .zipgo-navbar {
     background: linear-gradient(135deg, #1f2937, #111827);
     height: 60px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -25,7 +25,7 @@
     transition: height 0.3s ease;
   }
 
-  .feature-desk-logo {
+  .zipgo-login {
     width: 60px;
     margin: 0 10px;
     height: 32px;
@@ -268,18 +268,18 @@
       max-width: none;
     }
 
-    .feature-desk-navbar {
+    .zipgo-navbar {
       justify-content: space-between;
     }
   }
 
   @media (max-width: 480px) {
-    .feature-desk-navbar {
+    .zipgo-navbar {
       height: 56px;
       padding: 0 12px;
     }
 
-    .feature-desk-logo {
+    .zipgo-login {
       width: 80px;
       font-size: 13px;
     }
@@ -349,7 +349,7 @@
   }
 </style>
 
-<nav class="feature-desk-navbar">
+<nav class="zipgo-navbar">
   <div class="navbar-right">
     <div class="hamburger">
       <span></span><span></span><span></span>
@@ -378,7 +378,7 @@
 
   <div class="search-container">
     <form action="/search" method="GET" class="search-form" id="searchForm">
-      <input type="text" name="query" id="liveSearchInput" class="search-bar" placeholder="Search Feature Desk" autocomplete="off">
+      <input type="text" name="query" id="liveSearchInput" class="search-bar" placeholder="Search ZipGo" autocomplete="off">
     </form>
     <div class="search-icon"></div>
     <!-- Live search dropdown -->
@@ -386,8 +386,8 @@
   </div>
 
   <a href="/">
-    <div class="feature-desk-logo">
-      <img src="/assets/images/logo.png" alt="feature-desk-logo" title="Feature Desk Logo">
+    <div class="zipgo-login">
+      <img src="/assets/images/logo.png" alt="zipgo-logo" title="ZipGo Logo">
     </div>
   </a>
 

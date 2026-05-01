@@ -64,7 +64,7 @@ Add Blog
                       <div class="col-md-12">
                         <div class="form-group">
                           <label>Content (Detail) <span class="text-danger">*</span></label>
-                          <textarea name="detail" rows="10" class="form-control @error('detail') is-invalid @enderror" placeholder="Blog Content" required>{{ old('detail') }}</textarea>
+                          <textarea name="detail" id="editor" rows="10" class="form-control @error('detail') is-invalid @enderror" placeholder="Blog Content">{{ old('detail') }}</textarea>
                           @error('detail')<span class="invalid-feedback">{{ $message }}</span>@enderror
                         </div>
                       </div>
@@ -120,6 +120,21 @@ Add Blog
     @include('admin.includes.version')
   </div>
   @include('admin.includes.footer_links')
+  <!-- CKEditor 5 Classic CDN -->
+  <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      ClassicEditor
+        .create(document.querySelector('#editor'), {
+          toolbar: ['heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'insertTable', 'undo', 'redo', 'imageUpload'],
+          image: {
+            toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side']
+          }
+        })
+        .catch(error => console.error(error));
+    });
+  </script>
 </body>
 
 </html>

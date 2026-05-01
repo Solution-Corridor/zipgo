@@ -21,6 +21,7 @@ class ExpertDetail extends Model
     'nic_back_image',
     'selfie_image',
     'payment_status',
+    'amount_paid',
     'profile_status',
   ];
 

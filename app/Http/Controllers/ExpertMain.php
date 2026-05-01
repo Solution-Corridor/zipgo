@@ -466,10 +466,29 @@ class ExpertMain extends Controller
 
   public function showPaymentPage()
   {
-    $amount = session('amount', 0);
-    if (!$amount) {
-      return redirect()->back()->with('error', 'Invalid payment request.');
+    // Get the pending expert record ID from session (set in updateExpert)
+    $expertId = session('pending_expert_id');
+
+    if (!$expertId) {
+      return redirect()->route('expert.profile')->with('error', 'Invalid payment request. Please try again.');
     }
+
+    // Load expert detail with its related service
+    $expertDetail = \App\Models\ExpertDetail::with('service')->find($expertId);
+
+    if (!$expertDetail || $expertDetail->user_id != auth()->id()) {
+      return redirect()->route('expert.profile')->with('error', 'Expert record not found.');
+    }
+
+    $amount = $expertDetail->service->price ?? 0;
+
+    if ($amount <= 0) {
+      return redirect()->route('expert.profile')->with('error', 'Invalid service price. Contact support.');
+    }
+
+    // (Optional) store amount in session again for internal consistency, but not required for display
+    session(['amount' => $amount]);
+
     return view('expert.payment', compact('amount'));
   }
 
@@ -486,23 +505,45 @@ class ExpertMain extends Controller
       'cvc'          => 'required|string|size:3',
     ]);
 
-    // Validate card (Luhn, expiry) as before
+    // Luhn validation
     if (!$this->validateLuhn($request->card_number)) {
       return redirect()->back()->with('error', 'Invalid card number.');
     }
-    // ... expiry validation
+
+    // Expiry validation (example)
+    $month = $request->expiry_month;
+    $year  = $request->expiry_year;
+    $currentYear  = date('y');
+    $currentMonth = date('m');
+    if ($year < $currentYear || ($year == $currentYear && $month < $currentMonth)) {
+      return redirect()->back()->with('error', 'Card has expired.');
+    }
 
     $expertId = session('pending_expert_id');
     if (!$expertId) {
       return redirect()->back()->with('error', 'Session expired. Please start over.');
     }
 
-    // Update payment status to 1 (paid)
-    DB::table('expert_details')
-      ->where('id', $expertId)
-      ->where('user_id', auth()->id())
-      ->update(['payment_status' => 1, 'updated_at' => now()]);
+    // Retrieve the expert detail with service relation
+    $expertDetail = \App\Models\ExpertDetail::with('service')->find($expertId);
 
+    if (!$expertDetail || $expertDetail->user_id != auth()->id()) {
+      return redirect()->back()->with('error', 'Invalid expert record.');
+    }
+
+    $amount = $expertDetail->service->price ?? 0;
+
+    if ($amount <= 0) {
+      return redirect()->back()->with('error', 'Invalid payment amount.');
+    }
+
+    // Update payment details
+    $expertDetail->update([
+      'payment_status' => 'Paid',
+      'amount_paid'    => $amount,
+    ]);
+
+    // Clear session data
     session()->forget(['pending_expert_id', 'amount']);
 
     return redirect()->route('expert.profile')->with('success', 'Payment successful! You are now an expert.');

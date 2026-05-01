@@ -161,13 +161,10 @@ class Welcome extends Controller
           if ($attempts >= 3) {
             $user->update(['status' => 0]);
             session()->forget($attemptKey);
-
-            return redirect('/login')
-              ->with('error', 'Too many failed attempts. Account has been deactivated.');
+            return redirect('/login')->with('error', 'Too many failed attempts. Account has been deactivated.');
           }
 
           $remaining = 3 - $attempts;
-
           return back()
             ->withInput($request->only('username', 'phone', 'referred_by'))
             ->withErrors(['password' => 'Incorrect password.'])
@@ -182,15 +179,12 @@ class Welcome extends Controller
 
       // ─── Password correct ─── apply security checks
 
-      // Status checks
       if ($user->status == 0) {
-        return redirect('/login')
-          ->with('error', 'Account is inactive.');
+        return redirect('/login')->with('error', 'Account is inactive.');
       }
 
       if ($user->status == 2) {
-        return redirect('/login')
-          ->with('error', 'Account is suspended.');
+        return redirect('/login')->with('error', 'Account is suspended.');
       }
 
       // Single-device logout for non-admins
@@ -198,7 +192,7 @@ class Welcome extends Controller
         Auth::logoutOtherDevices($validated['password']);
       }
 
-      // Success → reset sensitive attempts if applicable
+      // Reset sensitive attempts if applicable
       if ($user->is_sensitive) {
         $attemptKey = 'login_attempts_sensitive_' . md5($validated['phone']);
         session()->forget($attemptKey);
@@ -208,10 +202,11 @@ class Welcome extends Controller
       Auth::login($user);
       $request->session()->regenerate();
 
-
-      return redirect()
-        ->route('user_dashboard')
-        ->with('success', 'Welcome back!');
+      // ✅ Redirect based on user type
+      if ($user->type == 2) {
+        return redirect()->route('expert.dashboard')->with('success', 'Welcome back!');
+      }
+      return redirect()->route('user.dashboard')->with('success', 'Welcome back!');
     }
 
     // ─── New user ─── enforce uniqueness and create
@@ -226,7 +221,7 @@ class Welcome extends Controller
       'phone'       => $validated['phone'],
       'password'    => Hash::make($validated['password']),
       'status'      => 1,
-      'type'        => $validated['user_type'] === 'expert' ? 2 : 1,
+      'type'        => $validated['user_type'] === 'expert' ? 2 : 1,  // expert=2, customer=1
       'city_id'     => $validated['city_id'],
       'referred_by' => $validated['referred_by'] ?? null,
       'balance'     => 300,
@@ -235,9 +230,11 @@ class Welcome extends Controller
     Auth::login($user);
     $request->session()->regenerate();
 
-    return redirect()
-      ->route('user_dashboard')
-      ->with('success', 'Registration successful! Welcome on board.');
+    // ✅ Redirect based on the newly created user's type
+    if ($user->type == 2) {
+      return redirect()->route('expert.dashboard')->with('success', 'Registration successful! Welcome on board.');
+    }
+    return redirect()->route('user.dashboard')->with('success', 'Registration successful! Welcome on board.');
   }
 
   public function checkUsername(Request $request)
@@ -329,6 +326,37 @@ class Welcome extends Controller
     return view('website.index', compact('services', 'experts'));
   }
 
+  public function search(Request $request)
+  {
+    $query = $request->input('query');
+
+    if (!$query) {
+      return redirect('/');
+    }
+
+    // Cities
+    $cities = City::where('name', 'LIKE', "%{$query}%")->get();
+
+    // Services
+    $services = Service::where('name', 'LIKE', "%{$query}%")->get();
+
+    // Experts = users with type 2 AND they have an expert_detail record
+    $experts = User::where('type', 2)
+      ->whereHas('expertDetail', function ($q) {
+        // Only those who have completed expert profile (optional)
+        // $q->where('profile_status', 1);
+      })
+      ->where(function ($q) use ($query) {
+        $q->where('name', 'LIKE', "%{$query}%")
+          ->orWhere('email', 'LIKE', "%{$query}%");
+      })
+      ->with('expertDetail') // load relation if needed in view
+      ->limit(20)
+      ->get();
+
+    return view('website.search_results', compact('query', 'cities', 'services', 'experts'));
+  }
+
   public function liveSearch(Request $request)
   {
     $query = $request->get('q', '');
@@ -359,6 +387,72 @@ class Welcome extends Controller
       'cities'   => $cities,
       'services' => $services,
       'experts'  => $experts,
+    ]);
+  }
+
+  public function areas()
+  {
+    // No cities passed – they will load via AJAX
+    return view('website.areas');
+  }
+
+  public function loadMoreAreas(Request $request)
+  {
+    $offset = $request->input('offset', 0);
+    $limit = 6;
+
+    // Use where() directly instead of scope
+    $cities = City::where('is_active', 1)
+      ->orderBy('name')
+      ->skip($offset)
+      ->take($limit)
+      ->get(['id', 'name', 'slug', 'pic', 'detail']);
+
+    $cities->transform(function ($city) {
+      $city->short_detail = Str::limit(strip_tags($city->detail ?? ''), 100);
+      return $city;
+    });
+
+    $total = City::where('is_active', 1)->count();
+    $hasMore = ($offset + $limit) < $total;
+
+    return response()->json([
+      'cities' => $cities,
+      'hasMore' => $hasMore,
+      'nextOffset' => $offset + $limit,
+    ]);
+  }
+
+  public function services()
+  {
+    return view('website.services'); // blade view for services
+  }
+
+  public function loadMoreServices(Request $request)
+  {
+    $offset = $request->input('offset', 0);
+    $limit = 6;
+
+    $services = Service::where('is_active', 1)
+      ->orderBy('name')
+      ->skip($offset)
+      ->take($limit)
+      ->get(['id', 'name', 'slug', 'pic', 'price', 'detail']);
+
+    // Add short_detail and formatted price for frontend
+    $services->transform(function ($service) {
+      $service->short_detail = Str::limit(strip_tags($service->detail ?? ''), 100);
+      $service->formatted_price = number_format($service->price, 2);
+      return $service;
+    });
+
+    $total = Service::where('is_active', 1)->count();
+    $hasMore = ($offset + $limit) < $total;
+
+    return response()->json([
+      'services' => $services,
+      'hasMore' => $hasMore,
+      'nextOffset' => $offset + $limit,
     ]);
   }
 
@@ -465,7 +559,7 @@ class Welcome extends Controller
 
 
 
-  
+
 
 
 
@@ -596,18 +690,18 @@ class Welcome extends Controller
     return view('auth.forgot_password');
   }
 
-  
-
-
-  
 
 
 
-  
 
 
 
-  
+
+
+
+
+
+
 
 
 
@@ -646,5 +740,5 @@ class Welcome extends Controller
 
 
 
-  
+
 }

@@ -353,6 +353,17 @@ $canEdit = ($expertData->profile_status == 2);
             </button>
           </div>
         </form>
+
+        <!-- Logout Button (added below the update form) -->
+        <div class="mt-6">
+          <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="w-full py-2.5 rounded-xl font-medium bg-transparent border border-[#F4A261] text-[#F4A261] hover:bg-[#F4A261]/10 transition active:scale-[0.98]">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </button>
+          </form>
+        </div>
+
       </div>
     </div>
 
@@ -401,9 +412,9 @@ $canEdit = ($expertData->profile_status == 2);
       });
     });
 
-    if (!{{ $canEdit ? 'true' : 'false' }}) {
+    @if(!$canEdit)
       $('#serviceSelect').prop('disabled', true).trigger('change');
-    }
+    @endif
   </script>
 
   <style>
@@ -427,4 +438,5 @@ $canEdit = ($expertData->profile_status == 2);
     }
   </style>
 </body>
+
 </html>

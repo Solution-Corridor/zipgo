@@ -8,12 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class City extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $fillable = ['name', 'slug', 'pic', 'detail', 'is_active'];
+    protected $fillable = ['name', 'slug', 'pic', 'detail', 'is_active'];
 
-  public function users()
-  {
-    return $this->hasMany(User::class, 'city_id');
-  }
+    // Add this scope
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'city_id');
+    }
 }
