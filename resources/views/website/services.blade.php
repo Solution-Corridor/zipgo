@@ -243,29 +243,30 @@
         }
 
         function appendServices(services) {
-            services.forEach(service => {
-                const serviceCard = document.createElement('a');
-                serviceCard.href = `/service/${service.slug}`; // matches your route in show()
-                serviceCard.className = 'service-card';
+    services.forEach(service => {
+        const serviceCard = document.createElement('a');
+        serviceCard.href = `/service/${service.slug}`;
+        serviceCard.className = 'service-card';
 
-                const imgHtml = service.pic 
-                    ? `<img src="/uploads/services/${service.pic}" class="service-img" alt="${service.name}" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23e5e7eb%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2255%22%20text-anchor%3D%22middle%22%20fill%3D%22%239ca3af%22%3E🔧%3C%2Ftext%3E%3C%2Fsvg%3E'">`
-                    : `<div class="service-img" style="background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
-                           <span style="font-size: 3rem;">🔧</span>
-                       </div>`;
+        const imgHtml = service.image_url
+            ? `<img src="${service.image_url}" class="service-img" alt="${service.name}" 
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23e5e7eb%22/%3E%3Ctext x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%239ca3af%22%3E🔧%3C/text%3E%3C/svg%3E'">`
+            : `<div class="service-img" style="background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
+                   <span style="font-size: 3rem;">🔧</span>
+               </div>`;
 
-                serviceCard.innerHTML = `
-                    ${imgHtml}
-                    <div class="service-content">
-                        <div class="service-name">${escapeHtml(service.name)}</div>
-                        <div class="service-price">PKR ${service.formatted_price}</div>
-                        <div class="service-detail">${escapeHtml(service.short_detail || 'Learn more about this service')}</div>
-                        <span class="btn-view">View Details →</span>
-                    </div>
-                `;
-                servicesGrid.appendChild(serviceCard);
-            });
-        }
+        serviceCard.innerHTML = `
+            ${imgHtml}
+            <div class="service-content">
+                <div class="service-name">${escapeHtml(service.name)}</div>
+                <div class="service-price">PKR ${service.formatted_price}</div>
+                <div class="service-detail">${escapeHtml(service.short_detail || 'Learn more about this service')}</div>
+                <span class="btn-view">View Details →</span>
+            </div>
+        `;
+        servicesGrid.appendChild(serviceCard);
+    });
+}
 
         function escapeHtml(str) {
             if (!str) return '';

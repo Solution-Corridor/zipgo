@@ -439,10 +439,23 @@ class Welcome extends Controller
       ->take($limit)
       ->get(['id', 'name', 'slug', 'pic', 'price', 'detail']);
 
-    // Add short_detail and formatted price for frontend
     $services->transform(function ($service) {
       $service->short_detail = Str::limit(strip_tags($service->detail ?? ''), 100);
       $service->formatted_price = number_format($service->price, 2);
+
+      // Fix image URL
+      if ($service->pic) {
+        // If pic already contains 'uploads/', use it directly
+        if (strpos($service->pic, 'uploads/') === 0) {
+          $service->image_url = asset($service->pic);
+        } else {
+          // Assume it's just a filename
+          $service->image_url = asset('uploads/services/' . $service->pic);
+        }
+      } else {
+        $service->image_url = null;
+      }
+
       return $service;
     });
 
