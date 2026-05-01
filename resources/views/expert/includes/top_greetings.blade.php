@@ -114,7 +114,7 @@ $username = auth()->user()?->username ?? 'Guest';
     </div>
 
     <!-- Support / Help Button (replaces old Plan/+) -->
-    <a href="tel:+919876543210" class="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#1A2A4A] to-[#2A5C8C]/80 flex items-center justify-center shadow-md shadow-black/30 active:scale-95 transition-all duration-200 ring-1 ring-[#2A3A5A] hover:ring-[#F4A261]/50">
+    <a href="tel:+971543041994" class="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#1A2A4A] to-[#2A5C8C]/80 flex items-center justify-center shadow-md shadow-black/30 active:scale-95 transition-all duration-200 ring-1 ring-[#2A3A5A] hover:ring-[#F4A261]/50">
       <i class="fas fa-headset text-[#F4A261] text-lg"></i>
     </a>
   </div>

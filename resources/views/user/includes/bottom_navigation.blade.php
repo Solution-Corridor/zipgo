@@ -1,3 +1,54 @@
+<style>
+    /* Floating WhatsApp Button - Mobile Friendly */
+.whatsapp-float {
+    box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.45),
+                0 4px 10px -2px rgba(0, 0, 0, 0.15);
+}
+
+.whatsapp-float:hover {
+    box-shadow: 0 15px 30px -8px rgba(37, 211, 102, 0.55);
+    transform: scale(1.12) !important;
+}
+
+/* Gentle bounce animation */
+@keyframes whatsappBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.whatsapp-float {
+    animation: whatsappBounce 3s ease-in-out infinite;
+}
+</style>
+<!-- Floating WhatsApp Button (Aligned with 420px container) -->
+<a href="https://wa.me/+971543041994?text=Hello%2C%20I%20need%20help%20with%20a%20service%20on%20ZipGo!" 
+   target="_blank"
+   class="fixed bottom-24 z-50 flex items-center justify-center w-14 h-14 
+          bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-2xl shadow-xl 
+          transition-all duration-300 hover:scale-110 active:scale-95 
+          group whatsapp-float"
+   style="right: calc(50% - 210px + 24px);">
+    
+    <i class="fab fa-whatsapp text-3xl"></i>
+    
+    <!-- Pulse Animation -->
+    <span class="absolute -top-1 -right-1 flex h-5 w-5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-5 w-5 bg-green-500"></span>
+    </span>
+</a>
+
+<!-- Optional Tooltip -->
+<div class="fixed bottom-40 z-50 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-xl 
+            opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 
+            whitespace-nowrap shadow-md hidden md:block"
+     style="right: calc(50% - 210px + 90px);">
+    Chat with us on WhatsApp
+</div>
+
+
+<div class="mx-4 mb-10">&nbsp;</div>
+
 <nav class="fixed bottom-0 left-0 right-0 z-50 pointer-events-none" style="max-width: 420px; margin-left: auto; margin-right: auto;">
     <div class="bg-white/95 backdrop-blur-xl rounded-t-3xl py-2 px-2 flex justify-between items-center border-t border-[#EAE0D5] shadow-lg shadow-black/5 pointer-events-auto">
 

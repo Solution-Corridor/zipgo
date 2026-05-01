@@ -3,43 +3,49 @@
 
 <head>
   <!-- Open Graph / Social Media -->
-  <meta property="og:title" content="ZipGo - Best Deals & Discounts in Pakistan">
-  <meta property="og:description" content="ZipGo offers the best online shopping experience in Pakistan with huge discounts, flash sales, and genuine products. Shop now and save big!">
+  <meta property="og:title" content="ZipGo - Book Local Services in Pakistan">
+  <meta property="og:description" content="ZipGo is Pakistan's trusted marketplace to book trusted professionals for all home, repair, cleaning, beauty &amp; other local services. Fast, reliable &amp; affordable.">
 
   @include('includes.header_links')
-  <title>ZipGo - Best Deals & Discounts in Pakistan</title>
-  <meta name="description" content="ZipGo offers the best online shopping experience in Pakistan with huge discounts, flash sales, and genuine products. Shop now and save big!">
-  <meta name="keywords" content="ZipGo, online shopping pakistan, discounts pakistan, flash sale, cheap products, best deals pakistan, ecommerce pakistan">
+  
+  <title>ZipGo - Book Trusted Local Services in Pakistan</title>
+  
+  <meta name="description" content="ZipGo is Pakistan's leading marketplace to instantly book verified professionals for Plumbing, Electrical, Cleaning, AC Repair, Beauty, Painting, and 100+ other home &amp; local services.">
+  
+  <meta name="keywords" content="ZipGo, book services pakistan, home services, plumbing service, electrician near me, cleaning service, ac repair, beauty services, hire professional, local services pakistan">
+
+  <!-- Structured Data - Organization -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "ZipGo",
       "url": "{{ url('/') }}",
-      "logo": "{{ asset('mk_assets/images/feature-desk-logo.png') }}",
-      "description": "ZipGo is Pakistan's leading online marketplace offering huge discounts and flash sales on genuine products.",
+      "logo": "{{ asset('assets/images/zipgo-logo.png') }}",
+      "description": "ZipGo is a leading online marketplace in Pakistan that connects customers with verified service providers for home, repair, cleaning, beauty and other local services.",
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+447412803448",
+        "telephone": "+971543041994",
         "contactType": "Customer Service",
         "areaServed": "PK",
         "availableLanguage": ["English", "Urdu"]
       },
       "sameAs": [
-        "https://www.facebook.com/FeaturedeskOfficial",
-        "https://www.instagram.com/featuredeskofficial",
-        "https://tiktok.com/@featuredeskofficial"
+        "https://www.facebook.com/zipgo",
+        "https://www.instagram.com/zipgo.pk",
+        "https://www.tiktok.com/@zipgo"
       ]
     }
   </script>
 
+  <!-- Structured Data - WebSite -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "url": "{{ url('/') }}",
-      "name": "Feature Desk",
-      "alternateName": "FeatureDesk",
+      "name": "ZipGo",
+      "alternateName": "ZipGo Pakistan",
       "potentialAction": {
         "@type": "SearchAction",
         "target": {

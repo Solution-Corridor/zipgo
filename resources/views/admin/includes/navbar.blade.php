@@ -9,11 +9,15 @@
     </li>
 
     <li class="nav-item d-none d-sm-inline-block">
-      <a href="/" class="nav-link btn btn-link"> <i class="fa fa-home"></i> Home</a>
+      <a href="/" class="nav-link btn btn-link" target="_blank"> <i class="fa fa-home"></i> Home</a>
     </li>
 
         <li class="nav-item d-none d-sm-inline-block">
-      <a href="{{ route('user.dashboard') }}" class="nav-link btn btn-link"> <i class="fas fa-tachometer-alt"></i> User Dashboard</a>
+      <a href="{{ route('user.dashboard') }}" target="_blank" class="nav-link btn btn-link"> <i class="fas fa-tachometer-alt"></i> User Dashboard</a>
+    </li>
+
+    <li class="nav-item d-none d-sm-inline-block">
+      <a href="{{ route('expert.dashboard') }}" target="_blank" class="nav-link btn btn-link"> <i class="fas fa-tachometer-alt"></i> Expert Dashboard</a>
     </li>
 
     

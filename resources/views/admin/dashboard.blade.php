@@ -229,7 +229,7 @@ Dashboard
           <!-- Stats Row - HORIZONTAL CARDS (icon left, very compact height) -->
           <div class="row stats-row">
             <!-- Users Card (icon + text inline) -->
-            <div class="col-md-4 col-sm-6 mb-3">
+            <div class="col-md-3 col-sm-6 mb-3">
               <div class="card card-users">
                 <div class="card-body">
                   <div class="stat-icon-left">
@@ -246,8 +246,25 @@ Dashboard
               </div>
             </div>
 
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="card card-experts">
+                <div class="card-body">
+                  <div class="stat-icon-left">
+                    <i class="fas fa-user-tie"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h6 class="stat-title">Total Experts</h6>
+                    <div class="stat-number">{{ $total_experts ?? 0 }}</div>
+                  </div>
+                </div>
+                <div class="card-footer stat-footer">
+                  <i class="fas fa-user-check"></i> <span>Verified experts</span>
+                </div>
+              </div>
+            </div>
+
             <!-- Services Card -->
-            <div class="col-md-4 col-sm-6 mb-3">
+            <div class="col-md-3 col-sm-6 mb-3">
               <div class="card card-services">
                 <div class="card-body">
                   <div class="stat-icon-left">
@@ -265,7 +282,7 @@ Dashboard
             </div>
 
             <!-- Cities Card -->
-            <div class="col-md-4 col-sm-6 mb-3">
+            <div class="col-md-3 col-sm-6 mb-3">
               <div class="card card-cities">
                 <div class="card-body">
                   <div class="stat-icon-left">
@@ -282,6 +299,37 @@ Dashboard
               </div>
             </div>
           </div>
+
+                    <!-- New Row: Pie Chart + Income Graph -->
+          <div class="row">
+            
+            <!-- Pie Chart - col-md-6 -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0"><i class="fas fa-chart-pie mr-2"></i> Services Distribution</h5>
+                </div>
+                <div class="card-body">
+                  <canvas id="pieChart" height="280"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Income Graph - col-md-6 -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0"><i class="fas fa-chart-line mr-2"></i> Monthly Income</h5>
+                </div>
+                <div class="card-body">
+                  <canvas id="incomeChart" height="280"></canvas>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+
         </div>
       </section>
     </div>
@@ -290,6 +338,106 @@ Dashboard
   </div>
 
   @include('admin.includes.footer_links')
+
+  <!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+$(document).ready(function() {
+
+    // === PIE CHART ===
+    var pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Plumbing', 'Electrical', 'Cleaning', 'AC Repair', 'Painting', 'Others'],
+            datasets: [{
+                data: [25, 20, 18, 15, 12, 10],
+                backgroundColor: [
+                    '#4f46e5',
+                    '#06b6d4',
+                    '#10b981',
+                    '#f59e0b',
+                    '#8b5cf6',
+                    '#ef4444'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+
+    // === INCOME LINE CHART (Dummy Data) ===
+    var incomeCtx = document.getElementById('incomeChart').getContext('2d');
+    new Chart(incomeCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Income (₹)',
+                data: [45000, 52000, 48000, 61000, 55000, 72000, 68000, 75000, 82000, 79000, 91000, 98000],
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#4f46e5',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ' ₹' + context.raw.toLocaleString('en-IN');
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + (value / 1000) + 'k';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+
 </body>
 
 </html>

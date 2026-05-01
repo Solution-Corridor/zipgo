@@ -32,10 +32,11 @@ class Admin extends Controller
   public function dashboard()
   {
     $total_users    = User::where('type', 1)->count();
+    $total_experts  = User::where('type', 2)->count();
     $total_services = Service::where('is_active', 1)->count();
     $total_cities   = City::where('is_active', 1)->count();
 
-    return view('admin.dashboard', compact('total_users', 'total_services', 'total_cities'));
+    return view('admin.dashboard', compact('total_users', 'total_experts', 'total_services', 'total_cities'));
   }
 
   public function experts(Request $request)
@@ -113,17 +114,12 @@ class Admin extends Controller
     return redirect()->back()->with('error', 'Rejection failed.');
   }
 
-  public function users()
-  {
-    $users = User::with('referrer')
-      ->withCount(['payments as active_plans_count' => function ($q) {
-        $q->where('status', 'approved');
-        $q->where('expires_at', '>=', now());   // if needed
-      }])
-      ->get();
+public function users()
+{
+    $users = User::get();
 
     return view('admin.users', compact('users'));
-  }
+}
 
   public function userDetails($id)
   {

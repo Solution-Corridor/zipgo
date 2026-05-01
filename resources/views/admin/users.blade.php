@@ -47,11 +47,6 @@ Users
                                                 <th>#</th>
                                                 <th>UserName</th>
                                                 <th>WhatsApp</th>
-                                                <th>Ref</th>
-                                                <th>Invested</th>
-                                                <th>Withdraws</th>
-                                                <th>Balance</th>
-                                                <th>Plans</th>
                                                 <th>Status</th>
                                                 <th>Since</th>
                                                 <th>Action</th>
@@ -72,41 +67,7 @@ Users
                                                     </a>
                                                     @endif
                                                 </td>
-                                                <td>
-                                                    @if ($u->referrer)
-                                                    <a target="_blank" href="{{ route('userDetails', $u->referrer->id) }}">
-                                                        {{ $u->referrer->username ?? '—' }}
-                                                        <small class="d-block text-muted">{{ $u->referrer->phone ?? '—' }}</small>
-                                                    </a>
-                                                    @else
-                                                    <span class="text-muted">—</span>
-                                                    @endif
-                                                </td>
-
-                                                <td>
-                                                    @php
-                                                    $total_invested = $u->payments()->where('status', 'approved')->sum('amount');
-                                                    @endphp
-                                                    {{ number_format($total_invested) }}
-                                                </td>
-
-                                                <td>
-                                                    @php
-                                                    $total_withdraw = $u->withdraws()->where('status', 'approved')->sum('amount');
-                                                    @endphp
-                                                    {{ number_format($total_withdraw) }}
-                                                </td>
-                                                <td>{{ number_format($u->balance ?? 0) }}</td>
-
-
-
-                                                <td>
-                                                    @if($u->active_plans_count > 0)
-                                                    <span class="badge bg-success">{{ $u->active_plans_count }}</span>
-                                                    @else
-                                                    <span class="badge bg-secondary">0</span>
-                                                    @endif
-                                                </td>
+                                                
 
                                                 <td>
                                                     @switch($u->status)

@@ -27,23 +27,10 @@
             <p>Dashboard</p>
           </a>
         </li>
+        
 
         <li class="nav-item">
-          <a href="{{ route('user.dashboard') }}" class="nav-link {{ request()->segment(1) == 'user-dashboard' ? 'active' : '' }}" target="_blank">
-            <i class="nav-icon fas fa-tachometer-alt"></i>
-            <p>User Dashboard</p>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="{{ route('expert.dashboard') }}" class="nav-link {{ request()->segment(1) == 'expert-dashboard' ? 'active' : '' }}" target="_blank">
-            <i class="nav-icon fas fa-tachometer-alt"></i>
-            <p>Expert Dashboard</p>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="{{ route('admin.experts') }}" class="nav-link {{ request()->segment(1) == 'experts' ? 'active' : '' }}">
+          <a href="{{ route('admin.experts') }}" class="nav-link {{ request()->segment(2) == 'experts' ? 'active' : '' }}">
             <i class="nav-icon fas fa-user-tie"></i>
             <p>Experts
               <span class="badge badge-warning right mr-3">{{ \App\Models\ExpertDetail::where('profile_status', 0)->count() }}</span>
@@ -52,21 +39,21 @@
         </li>
 
         <li class="nav-item">
-          <a href="{{ route('services.index') }}" class="nav-link {{ request()->segment(1) == 'services' ? 'active' : '' }}">
+          <a href="{{ route('services.index') }}" class="nav-link {{ request()->segment(2) == 'services' ? 'active' : '' }}">
             <i class="nav-icon fas fa-cogs"></i>
             <p>Services</p>
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="{{ route('cities.index') }}" class="nav-link {{ request()->segment(1) == 'cities' ? 'active' : '' }}">
+          <a href="{{ route('cities.index') }}" class="nav-link {{ request()->segment(2) == 'cities' ? 'active' : '' }}">
             <i class="nav-icon fas fa-city"></i>
             <p>Cities</p>
           </a>
         </li>
 
-        <li class="nav-item {{ in_array(request()->segment(1), ['add_blogs','blogs_list','edit_blog']) ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link {{ in_array(request()->segment(1), ['add_blogs','blogs_list','edit_blog']) ? 'active' : '' }}">
+        <li class="nav-item {{ in_array(request()->segment(2), ['add_blogs','blogs_list','edit_blog']) ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link {{ in_array(request()->segment(2), ['add_blogs','blogs_list','edit_blog']) ? 'active' : '' }}">
             <i class="nav-icon fa fa-blog"></i>
             <p>
               Blogs
@@ -78,13 +65,13 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="{{ route('blogs.add') }}" class="nav-link {{ request()->segment(1) == 'add_blogs' ? 'active' : '' }}">
+              <a href="{{ route('blogs.add') }}" class="nav-link {{ request()->segment(2) == 'add_blogs' ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Add Blog</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('blogs.list') }}" class="nav-link {{ request()->segment(1) == 'blogs_list' ? 'active' : '' }}">
+              <a href="{{ route('blogs.list') }}" class="nav-link {{ request()->segment(2) == 'blogs_list' ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Blogs Listing</p>
               </a>
@@ -102,7 +89,7 @@
         </li>
 
         <li class="nav-item">
-          <a href="{{ route('admin.users') }}" class="nav-link {{ in_array(request()->segment(1), ['users', 'user-details', 'edit_user']) ? 'active' : '' }}">
+          <a href="{{ route('admin.users') }}" class="nav-link {{ in_array(request()->segment(2), ['users', 'user-details', 'edit_user']) ? 'active' : '' }}">
             <i class="nav-icon fa fa-user"></i>
             <p>Users</p>
           </a>
