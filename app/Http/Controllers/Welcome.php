@@ -323,6 +323,9 @@ class Welcome extends Controller
   {
     $services = Service::where('is_active', 1)->orderBy('name')->get();
     $experts = ExpertDetail::with('user')->where('profile_status', 1)->get();
+    // echo '<pre>';
+    // print_r($experts->toArray());
+    // echo '</pre>';
     return view('website.index', compact('services', 'experts'));
   }
 
