@@ -377,6 +377,42 @@ class MainUser extends Controller
     };
   }
 
+  public function showRechargeForm()
+  {
+    return view('user.recharge');
+  }
+
+  // Process recharge (simulate payment)
+  public function rechargeProcess(Request $request)
+  {
+    return redirect()->route('user.dashboard')->with('success', 'Balance recharged successfully!');
+
+    $validated = $request->validate([
+      'amount' => 'required|numeric|min:50|max:50000',
+      'method' => 'required|in:easypaisa,jazzcash,bank_card',
+    ]);
+
+    // Additional validation based on payment method
+    if ($request->method === 'easypaisa' || $request->method === 'jazzcash') {
+      $request->validate([
+        'mobile_number' => 'required|digits:10|regex:/^[0-9]{10}$/',
+      ]);
+    } elseif ($request->method === 'bank_card') {
+      $request->validate([
+        'card_number' => 'required|digits:16',
+        'expiry_month' => 'required|digits:2|between:01,12',
+        'expiry_year'  => 'required|digits:2',
+        'cvv'          => 'required|digits:3',
+      ]);
+    }
+
+    $user = Auth::user();
+    $user->balance += $validated['amount'];
+    $user->save();
+
+    return redirect()->route('user.dashboard')->with('success', 'Balance recharged successfully!');
+  }
+
   public function explore()
   {
     // Dummy categories with sub‑services

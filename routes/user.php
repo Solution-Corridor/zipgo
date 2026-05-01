@@ -9,6 +9,9 @@ Route::group(['middleware' => 'checkUserRole'], function () {
 
     Route::get('/dashboard', [MainUser::class, 'user_dashboard'])->name('user.dashboard');
 
+    Route::get('/recharge', [MainUser::class, 'showRechargeForm'])->name('user.recharge');
+    Route::post('/recharge/process', [MainUser::class, 'rechargeProcess'])->name('user.recharge.process');
+
     Route::get('/explore', [MainUser::class, 'explore'])->name('user.explore');
 
     // Search / Find professionals
@@ -45,7 +48,7 @@ Route::group(['middleware' => 'checkUserRole'], function () {
 
 
 
-    
+
 
 
 

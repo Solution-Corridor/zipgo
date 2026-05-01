@@ -24,7 +24,19 @@
 
     <!-- Top Greeting -->
     @include('user.includes.top_greetings')
-
+    <!-- Balance Bar -->
+    <div class="mx-auto max-w-[420px] px-4 mt-2">
+      <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-4 shadow-lg flex justify-between items-center">
+        <div>
+          <p class="text-white/80 text-xs uppercase tracking-wide">Your Balance</p>
+          <p class="text-white text-2xl font-bold">Rs. {{ number_format(auth()->user()->balance ?? 0, 2) }}</p>
+        </div>
+        <a href="{{ route('user.recharge') }}"
+          class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold py-2 px-5 rounded-xl transition-all flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Recharge
+        </a>
+      </div>
+    </div>
     <!-- Search Bar -->
     <div class="px-4 mt-3 mb-4">
       <form action="{{ route('user.search.results') }}" method="GET" class="relative">
@@ -138,4 +150,5 @@
   </div> <!-- end mobile container -->
 
 </body>
+
 </html>

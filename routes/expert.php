@@ -10,6 +10,10 @@ use App\Http\Controllers\ExpertRateController;
 Route::group(['middleware' => 'checkExpertRole'], function () {
   Route::prefix('expert')->group(function () {
     Route::get('/dashboard', [ExpertMain::class, 'expert_dashboard'])->name('expert.dashboard');
+
+    Route::get('/recharge', [ExpertMain::class, 'showRechargeForm'])->name('expert.recharge');
+    Route::post('/recharge/process', [ExpertMain::class, 'rechargeProcess'])->name('expert.recharge.process');
+
     Route::get('/jobs', [ExpertMain::class, 'jobs'])->name('expert.jobs');
     Route::get('/jobs/{id}', [ExpertMain::class, 'jobs_show'])->name('expert.jobs.show');
     Route::post('/jobs/{id}/accept', [ExpertMain::class, 'jobs_accept'])->name('expert.jobs.accept');
@@ -33,6 +37,5 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
 
     Route::get('/my-complaints',  [ExpertMain::class, 'my_complaints'])->name('expert.my_complaints');
     Route::post('/complaints', [ExpertMain::class, 'complaint_store'])->name('expert.complaints.store');
-
   });
 });
