@@ -449,15 +449,9 @@ class MainUser extends Controller
 
   public function explore()
   {
-    // Dummy categories with sub‑services
-    $exploreCategories = [
-      (object) ['name' => 'Plumbing', 'icon' => 'droplet', 'services' => ['Tap repair', 'Pipe leakage', 'Water heater install']],
-      (object) ['name' => 'Electrical', 'icon' => 'zap', 'services' => ['Wiring', 'Fan repair', 'Switchboard fix']],
-      (object) ['name' => 'Carpentry', 'icon' => 'hammer', 'services' => ['Furniture assembly', 'Door repair', 'Cabinet making']],
-      (object) ['name' => 'Cleaning', 'icon' => 'spray-can', 'services' => ['Sofa cleaning', 'Bathroom scrub', 'Kitchen deep clean']],
-    ];
+    $services = Service::where('is_active', 1)->orderBy('name')->get();
 
-    return view('user.explore', compact('exploreCategories'));
+    return view('user.explore', compact('services'));
   }
 
   public function search()
@@ -467,18 +461,16 @@ class MainUser extends Controller
     return view('user.search', compact('popularSearches'));
   }
 
-  public function search_results(Request $request)
-  {
-    $query = $request->input('query');
-    // Dummy results
-    $results = [
-      (object) ['name' => 'Rajesh Plumber', 'rating' => 4.9, 'distance' => '0.8 km', 'price' => 299, 'expertise' => 'Leakage & Installation'],
-      (object) ['name' => 'Elite Electricians', 'rating' => 4.8, 'distance' => '1.2 km', 'price' => 399, 'expertise' => 'Wiring & Repairs'],
-      (object) ['name' => 'CoolAir AC', 'rating' => 4.7, 'distance' => '2.0 km', 'price' => 499, 'expertise' => 'Gas refill, Service'],
-    ];
+public function search_results($service_id)
+{
+    $service = Service::findOrFail($service_id);
 
-    return view('user.search-results', compact('query', 'results'));
-  }
+    $experts = ExpertDetail::where('service_id', $service_id)
+        ->with(['user', 'service'])
+        ->get();
+
+    return view('user.search-results', compact('service', 'experts'));
+}
 
 
 

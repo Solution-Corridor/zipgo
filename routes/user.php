@@ -16,7 +16,9 @@ Route::group(['middleware' => 'checkUserRole'], function () {
 
     // Search / Find professionals
     Route::get('/search', [MainUser::class, 'search'])->name('user.search');
-    Route::get('/search/results', [MainUser::class, 'search_results'])->name('user.search.results');
+// Search Results by Service
+Route::get('/search/results/{service_id}', [MainUser::class, 'search_results'])
+     ->name('user.search.results');
 
     Route::get('/services', [MainUser::class, 'services'])->name('user.services');
     Route::get('/expert/{id}', [MainUser::class, 'expertDetail'])->name('user.expert_detail');

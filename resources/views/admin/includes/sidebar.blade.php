@@ -80,7 +80,7 @@
         </li>
 
         <li class="nav-item">
-          <a href="{{ route('all_complaints') }}" class="nav-link {{ request()->segment(1) == 'all-complaints' ? 'active' : '' }}">
+          <a href="{{ route('all_complaints') }}" class="nav-link {{ request()->segment(2) == 'all-complaints' ? 'active' : '' }}">
             <i class="nav-icon fas fa-exclamation-triangle"></i>
             <p>
               Complaints

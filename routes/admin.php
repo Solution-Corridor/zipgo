@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin;
-use App\Http\Controllers\Complaint;
+use App\Http\Controllers\ComplaintController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\ServiceController;
@@ -41,11 +41,11 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::post('/cities/{id}/toggle-active', [CityController::class, 'toggleActive'])->name('cities.toggleActive');
 
 
-    Route::get('/all-complaints', [Complaint::class, 'complaints'])->name('all_complaints');
-    Route::post('/complaint-update', [Complaint::class, 'update'])
+    Route::get('/all-complaints', [ComplaintController::class, 'complaints'])->name('all_complaints');
+    Route::post('/complaint-update', [ComplaintController::class, 'update'])
       ->name('admin.complaints.update');
-    Route::delete('/complaints/{complaint}', [Complaint::class, 'destroy'])->name('admin.complaints.destroy');
-    Route::get('/finish-complaints', [Complaint::class, 'finishComplaints'])->name('finish.complaints');
+    Route::delete('/complaints/{complaint}', [ComplaintController::class, 'destroy'])->name('admin.complaints.destroy');
+    Route::get('/finish-complaints', [ComplaintController::class, 'finishComplaints'])->name('finish.complaints');
 
     // Users Management
     Route::get('/users', [Admin::class, 'users'])->name('admin.users');
