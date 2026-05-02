@@ -192,11 +192,18 @@
     @endisset
 
     @if(isset($experts) && $experts->count() > 0)
-    <div class="experts-grid">
-      @foreach($experts as $expert)
-     @include('includes.experts_card')
-      @endforeach
+      <!-- Experts Section -->
+  <section class="container-fluid">
+    <div class="products-grid-sm">
+      <section class="expert-section">
+        <div class="experts-grid">
+          @foreach ($experts as $expert)
+          @include('includes.experts_card')
+          @endforeach
+        </div>
+      </section>
     </div>
+  </section>
     @else
     <div class="empty-state">
       <span style="font-size: 3rem;">🔍</span>

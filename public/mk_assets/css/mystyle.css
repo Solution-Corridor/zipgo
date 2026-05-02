@@ -1,4 +1,178 @@
+.expert-section {
+    padding: 2rem 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
 
+  .section-title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2rem;
+  }
+
+  .experts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .expert-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #eef2f6;
+    transition: 0.3s;
+  }
+
+  .expert-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .expert-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .expert-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .service-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .expert-info {
+    padding: 1rem;
+  }
+
+  .expert-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin: 4px 0;
+  }
+
+  .rating {
+    color: #f59e0b;
+  }
+
+  .experience {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+  }
+
+  .location {
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    color: #475569;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn {
+    flex: 1;
+    text-align: center;
+    padding: 6px 0;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    text-decoration: none;
+    color: #fff;
+  }
+
+  .btn-call { background: #10b981; }
+  .btn-whatsapp { background: #25D366; }
+  .btn-profile { background: #1e293b; }
+
+  /* MOBILE FIX */
+  @media (max-width: 768px) {
+    .experts-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.7rem;
+    }
+
+    .expert-card {
+      border-radius: 12px;
+    }
+
+    .expert-img-wrapper {
+      aspect-ratio: 1 / 0.75; /* shorter image */
+    }
+
+    .expert-info {
+      padding: 0.6rem;
+    }
+
+    .expert-name {
+      font-size: 0.9rem;
+      line-height: 1.2;
+    }
+
+    .meta-row {
+      flex-direction: row;
+      font-size: 0.7rem;
+      margin: 2px 0;
+    }
+
+    .location {
+      font-size: 0.65rem;
+      margin-bottom: 5px;
+    }
+
+    .expert-info > * {
+      margin-bottom: 3px;
+    }
+
+    .btn {
+      padding: 4px 0;
+      font-size: 0.65rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .expert-section {
+      padding: 1rem;
+    }
+
+    .expert-name {
+      font-size: 0.8rem;
+    }
+
+    .btn span {
+      display: none;
+    }
+
+    .btn i {
+      font-size: 0.9rem;
+    }
+
+    .rating span {
+      display: none;
+    }
+  }
 
 /* counter area */
 .counter-area {

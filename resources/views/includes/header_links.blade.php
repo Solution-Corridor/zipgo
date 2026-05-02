@@ -1,14 +1,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="author" content="Feature Desk">
-<meta name="publisher" content="Feature Desk">
+<meta name="author" content="ZipGo">
+<meta name="publisher" content="ZipGo">
 <meta name="robots" content="index, follow">
 <meta name="format-detection" content="telephone=no">
 
 
 <meta property="og:image" content="/assets/images/logo.png">
-<meta property="og:url" content="https://www.featuredesk.site">
+<meta property="og:url" content="https://www.zipgo.online">
 <meta property="og:type" content="website">
 
 <link rel="canonical" href="{{url()->full()}}" />
