@@ -55,7 +55,7 @@ class MainUser extends Controller
 
     // ------------------- 2. Dynamic Nearby Professionals -------------------
     $user = Auth::user();
-    $limit = 10;
+    $limit = 6;
     $nearbyProfessionals = collect();
 
     if ($user && $user->city_id) {
@@ -79,7 +79,7 @@ class MainUser extends Controller
         $needed = $limit - $nearbyProfessionals->count();
         $newbyExperts = ExpertDetail::where('profile_status', 1)
           ->whereNotIn('id', $collectedIds)
-          ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1)->whereNotNull('name'))
+          ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1))
           ->with(['user.city', 'service', 'rates'])
           ->orderBy('created_at', 'desc')
           ->take($needed)
@@ -94,7 +94,7 @@ class MainUser extends Controller
         $needed = $limit - $nearbyProfessionals->count();
         $anyExperts = ExpertDetail::where('profile_status', 1)
           ->whereNotIn('id', $collectedIds)
-          ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1)->whereNotNull('name'))
+          ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1))
           ->with(['user.city', 'service', 'rates'])
           ->inRandomOrder()
           ->take($needed)
@@ -105,39 +105,31 @@ class MainUser extends Controller
     } else {
       // No logged-in user or no city → latest 10 approved experts
       $nearbyProfessionals = ExpertDetail::where('profile_status', 1)
-        ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1)->whereNotNull('name'))
+        ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1))
         ->with(['user.city', 'service', 'rates'])
         ->orderBy('created_at', 'desc')
         ->take($limit)
         ->get();
     }
 
-    // Transform each expert (null-safe)
+    // Transform each expert (now using full_name)
     $nearbyProfessionals = $nearbyProfessionals->map(function ($expert) {
-      $user = $expert->user; // guaranteed to exist because of whereHas
+      $user = $expert->user;
       $service = $expert->service;
 
-      // User name fallback (just in case)
-      $userName = $user->username ?? 'Professional';
+      // Use full_name from expert_details if available, else user.name/username
+      $displayName = $expert->full_name ?? $user->name ?? $user->username ?? 'Professional';
 
-      // Average price from expert_rates
       $price = $expert->rates->isNotEmpty() ? round($expert->rates->avg('rate')) : 0;
-
-      // Rating placeholder
       $rating = 4.5;
-
-      // City name
       $cityName = $user->city ? $user->city->name : 'Unknown City';
-
-      // Selfie image URL (adjust if needed)
       $selfieImage = $expert->selfie_image ? asset($expert->selfie_image) : null;
-
-      // Fallback avatar initials & color (now safe)
-      $avatarInitial = strtoupper(substr($userName, 0, 1));
-      $avatarColor = $this->getAvatarColor($userName);
+      $avatarInitial = strtoupper(substr($displayName, 0, 1));
+      $avatarColor = $this->getAvatarColor($displayName);
 
       return (object)[
-        'name'         => $userName,
+        'id'           => $expert->id,
+        'name'         => $displayName,
         'profession'   => $service ? $service->name : 'Service Professional',
         'rating'       => $rating,
         'distance'     => $cityName,
@@ -486,6 +478,75 @@ class MainUser extends Controller
     ];
 
     return view('user.search-results', compact('query', 'results'));
+  }
+
+
+
+  public function services()
+  {
+    $user = Auth::user();
+    $query = ExpertDetail::where('profile_status', 1)
+      ->whereHas('user', function ($q) {
+        $q->where('type', 2)->where('status', 1);
+      })
+      ->with(['user.city', 'service', 'rates']);
+
+    // Optional: sort by same city first for logged-in user
+    if ($user && $user->city_id) {
+      // We'll use a raw order by to put same city on top
+      $query->orderByRaw("(SELECT city_id FROM users WHERE users.id = expert_details.user_id) = ? DESC", [$user->city_id]);
+    }
+    $experts = $query->orderBy('created_at', 'desc')->paginate(12); // 12 per page
+
+    // Transform each expert (same as dashboard mapping)
+    $experts->getCollection()->transform(function ($expert) use ($user) {
+      $userModel = $expert->user;
+      $service = $expert->service;
+      $displayName = $expert->full_name ?? $userModel->name ?? $userModel->username ?? 'Professional';
+      $price = $expert->rates->isNotEmpty() ? round($expert->rates->avg('rate')) : 0;
+      $rating = 4.5; // placeholder
+      $cityName = $userModel->city ? $userModel->city->name : 'Unknown City';
+      $selfieImage = $expert->selfie_image ? asset($expert->selfie_image) : null;
+      $avatarInitial = strtoupper(substr($displayName, 0, 1));
+      $avatarColor = $this->getAvatarColor($displayName);
+
+      return (object)[
+        'id'           => $expert->id,
+        'name'         => $displayName,
+        'profession'   => $service ? $service->name : 'Service Professional',
+        'rating'       => $rating,
+        'distance'     => $cityName,
+        'price'        => $price,
+        'selfie_image' => $selfieImage,
+        'avatar'       => $avatarInitial,
+        'avatar_color' => $avatarColor,
+      ];
+    });
+
+    return view('user.services', compact('experts'));
+  }
+
+  public function expertDetail($id)
+  {
+    $expert = ExpertDetail::where('profile_status', 1)
+      ->whereHas('user', function ($q) {
+        $q->where('type', 2)->where('status', 1);
+      })
+      ->with(['user.city', 'service', 'rates'])
+      ->findOrFail($id);
+
+    $userModel = $expert->user;
+    $service = $expert->service;
+    $displayName = $expert->full_name ?? $userModel->name ?? $userModel->username ?? 'Professional';
+    $price = $expert->rates->isNotEmpty() ? round($expert->rates->avg('rate')) : 0;
+    $rating = 4.5;
+    $cityName = $userModel->city ? $userModel->city->name : 'Unknown City';
+    $selfieImage = $expert->selfie_image ? asset($expert->selfie_image) : null;
+
+    // You might want to show all rates, reviews, etc.
+    $rates = $expert->rates; // collection of ExpertRate
+
+    return view('user.expert_detail', compact('expert', 'displayName', 'price', 'rating', 'cityName', 'selfieImage', 'rates', 'service'));
   }
 
   public function bookings()

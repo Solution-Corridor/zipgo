@@ -66,33 +66,34 @@
     <div class="px-4 mb-5">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-sm font-semibold text-[#2C1810]">Nearby Professionals</h3>
-        <a href="{{ route('user.search') }}" class="text-xs text-[#FF6B6B] hover:text-[#ff5252]">View all</a>
+        <a href="{{ route('user.services') }}" class="text-xs text-[#FF6B6B] hover:text-[#ff5252]">View all</a>
       </div>
       <div class="space-y-3">
         @foreach($nearbyProfessionals as $pro)
-        <div class="bg-white border border-[#EAE0D5] rounded-xl p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition">
-          {{-- Profile image (selfie) or fallback initials --}}
-          @if($pro->selfie_image)
-          <img src="{{ $pro->selfie_image }}" alt="{{ $pro->name }}" class="w-12 h-12 rounded-full object-cover">
-          @else
-          <div class="w-12 h-12 rounded-full bg-{{ $pro->avatar_color }}-100 flex items-center justify-center text-{{ $pro->avatar_color }}-600 font-bold">
-            {{ $pro->avatar }}
-          </div>
-          @endif
+        <a href="{{ route('user.expert_detail', $pro->id) }}" class="block">
+          <div class="bg-white border border-[#EAE0D5] rounded-xl p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition">
+            {{-- Profile image (selfie) or fallback initials --}}
+            @if($pro->selfie_image)
+            <img src="{{ $pro->selfie_image }}" alt="{{ $pro->name }}" class="w-12 h-12 rounded-full object-cover">
+            @else
+            <div class="w-12 h-12 rounded-full bg-{{ $pro->avatar_color }}-100 flex items-center justify-center text-{{ $pro->avatar_color }}-600 font-bold">
+              {{ $pro->avatar }}
+            </div>
+            @endif
 
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <p class="font-semibold text-[#2C1810] text-sm">{{ $pro->name }}</p>
-              <span class="text-[10px] bg-[#FF6B6B]/10 text-[#FF6B6B] px-1.5 py-0.5 rounded-full">{{ $pro->profession }}</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mt-0.5">
+                <span class="text-xs text-[#6B5B50]"><i data-lucide="star" class="w-3 h-3 inline text-[#FFE66D] fill-[#FFE66D]"></i> {{ $pro->rating }}</span>
+                <span class="text-xs text-[#6B5B50]"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> {{ $pro->distance }}</span>
+              </div>
+              <p class="text-xs text-[#6B5B50] mt-1">Starting from Rs. {{ $pro->price }}</p>
             </div>
-            <div class="flex items-center gap-3 mt-0.5">
-              <span class="text-xs text-[#6B5B50]"><i data-lucide="star" class="w-3 h-3 inline text-[#FFE66D] fill-[#FFE66D]"></i> {{ $pro->rating }}</span>
-              <span class="text-xs text-[#6B5B50]"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> {{ $pro->distance }}</span>
+
+            <div class="text-xs font-small text-[#FF6B6B] bg-[#FF6B6B]/10 px-1 py-1 rounded-lg" style="word-break: break-word; white-space: normal; max-width: 110px; text-align: center;">
+              {{ $pro->profession }}
             </div>
-            <p class="text-xs text-[#6B5B50] mt-1">Starting from Rs. {{ $pro->price }}</p>
           </div>
-          <a href="#" class="bg-[#FF6B6B]/10 hover:bg-[#FF6B6B]/20 px-3 py-1.5 rounded-lg text-xs font-medium text-[#FF6B6B] transition">Book</a>
-        </div>
+        </a>
         @endforeach
       </div>
     </div>

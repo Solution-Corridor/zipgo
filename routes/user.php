@@ -18,6 +18,8 @@ Route::group(['middleware' => 'checkUserRole'], function () {
     Route::get('/search', [MainUser::class, 'search'])->name('user.search');
     Route::get('/search/results', [MainUser::class, 'search_results'])->name('user.search.results');
 
+    Route::get('/services', [MainUser::class, 'services'])->name('user.services');
+    Route::get('/expert/{id}', [MainUser::class, 'expertDetail'])->name('user.expert_detail');
     // Bookings (my service requests)
     Route::get('/bookings', [MainUser::class, 'bookings'])->name('user.bookings');
     Route::get('/bookings/{id}', [MainUser::class, 'booking_show'])->name('bookings.show');
