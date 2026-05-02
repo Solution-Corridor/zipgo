@@ -87,6 +87,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                             </td>
                             <td>{{ $expert->service_name ?? 'Not assigned' }}</td>
                             <td>
+                              <strong>Full Name:</strong> {{ $expert->full_name ?? '—' }}<br>
                               <strong>NIC #:</strong> {{ $expert->nic_number ?? '—' }}<br>
                               <strong>Expiry:</strong> {{ $expert->nic_expiry ? \Carbon\Carbon::parse($expert->nic_expiry)->format('d M Y') : '—' }}
                             </td>
@@ -150,6 +151,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                             <th>Documents</th>
                             <th>Payment Status</th>
                             <th>Verified On</th>
+                            <th>Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -162,6 +164,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                             </td>
                             <td>{{ $expert->service_name ?? 'Not assigned' }}</td>
                             <td>
+                              <strong>Full Name:</strong> {{ $expert->full_name ?? '—' }}<br>
                               <strong>NIC #:</strong> {{ $expert->nic_number ?? '—' }}<br>
                               <strong>Expiry:</strong> {{ $expert->nic_expiry ? \Carbon\Carbon::parse($expert->nic_expiry)->format('d M Y') : '—' }}
                             </td>
@@ -182,6 +185,25 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                               </span>
                             </td>
                             <td>{{ \Carbon\Carbon::parse($expert->updated_at)->format('d M Y h:i A') }}</td>
+                            <td>
+                              <div class="d-flex gap-2">
+                                <form action="{{ route('admin.experts.verify', $expert->id) }}" method="POST"
+                                  onsubmit="return confirm('Verify this expert? Their profile will become active.')">
+                                  @csrf
+                                  <button type="submit" class="btn btn-success btn-sm mr-1">
+                                    <i class="fa fa-check"></i>
+                                  </button>
+                                </form>
+
+                                <form action="{{ route('admin.experts.reject', $expert->id) }}" method="POST"
+                                  onsubmit="return confirm('Reject this expert? Their profile will be marked as rejected.')">
+                                  @csrf
+                                  <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-times"></i>
+                                  </button>
+                                </form>
+                              </div>
+                            </td>
                           </tr>
                           @empty
                           <tr>
@@ -206,6 +228,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                             <th>Documents</th>
                             <th>Payment Status</th>
                             <th>Rejected On</th>
+                            <th>Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -218,6 +241,7 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                             </td>
                             <td>{{ $expert->service_name ?? 'Not assigned' }}</td>
                             <td>
+                              <strong>Full Name:</strong> {{ $expert->full_name ?? '—' }}<br>
                               <strong>NIC #:</strong> {{ $expert->nic_number ?? '—' }}<br>
                               <strong>Expiry:</strong> {{ $expert->nic_expiry ? \Carbon\Carbon::parse($expert->nic_expiry)->format('d M Y') : '—' }}
                             </td>
@@ -238,6 +262,25 @@ $experts = $currentTab === 'pending' ? $pendingExperts : $verifiedExperts;
                               </span>
                             </td>
                             <td>{{ \Carbon\Carbon::parse($expert->updated_at)->format('d M Y h:i A') }}</td>
+                            <td>
+                              <div class="d-flex gap-2">
+                                <form action="{{ route('admin.experts.verify', $expert->id) }}" method="POST"
+                                  onsubmit="return confirm('Verify this expert? Their profile will become active.')">
+                                  @csrf
+                                  <button type="submit" class="btn btn-success btn-sm mr-1">
+                                    <i class="fa fa-check"></i>
+                                  </button>
+                                </form>
+
+                                <form action="{{ route('admin.experts.reject', $expert->id) }}" method="POST"
+                                  onsubmit="return confirm('Reject this expert? Their profile will be marked as rejected.')">
+                                  @csrf
+                                  <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-times"></i>
+                                  </button>
+                                </form>
+                              </div>
+                            </td>
                           </tr>
                           @empty
                           <tr>

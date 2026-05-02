@@ -10,7 +10,7 @@
 
   <div class="expert-info">
     <div class="expert-name">
-      {{ $expert['user']['name'] ?? 'N/A' }}
+      {{ $expert['full_name'] ?? 'N/A' }}
     </div>
 
     <div class="meta-row">
@@ -18,7 +18,7 @@
         <i class="fas fa-star"></i> 4.8
       </div>
       <div class="experience">
-        {{ $expert['experience'] ?? 'N/A' }} yrs
+        &nbsp;
       </div>
     </div>
 

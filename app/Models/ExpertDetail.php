@@ -15,6 +15,7 @@ class ExpertDetail extends Model
   protected $fillable = [
     'user_id',
     'service_id',
+    'full_name',
     'nic_number',
     'nic_expiry',
     'nic_front_image',

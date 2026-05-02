@@ -194,42 +194,7 @@
     @if(isset($experts) && $experts->count() > 0)
     <div class="experts-grid">
       @foreach($experts as $expert)
-      @php
-      // $expert is an ExpertDetail model (from expert_details table)
-      $user = $expert->user;
-      $name = $user->name ?? 'Expert';
-      $email = $user->email ?? '—';
-      $phone = $expert->phone ?? '—';
-      $nic = $expert->nic_number ?? '—';
-      $expYears = $expert->experience_years ?? 'N/A';
-      $rating = $expert->rating ?? 0;
-      $avatar = $user->avatar ?? null;
-      @endphp
-      <div class="expert-card">
-        <div class="card-avatar">
-          @if($avatar)
-          <img src="{{ $avatar }}" alt="{{ $name }}">
-          @else
-          {{ strtoupper(substr($name, 0, 1)) }}
-          @endif
-        </div>
-        <div class="expert-name">{{ $name }}</div>
-        <div class="expert-nic">NIC: {{ $nic }}</div>
-
-        <div class="info-row">
-          <i>📧</i> <span>{{ $email }}</span>
-        </div>
-        <div class="info-row">
-          <i>📞</i> <span>{{ $phone }}</span>
-        </div>
-
-        <div class="meta-row">
-          <div class="rating">⭐ {{ number_format($rating, 1) }}</div>
-          <div>📅 {{ $expYears }} yrs</div>
-        </div>
-
-        <a href="/expert/{{ $user->id }}" class="btn-view">View Profile →</a>
-      </div>
+     @include('includes.experts_card')
       @endforeach
     </div>
     @else

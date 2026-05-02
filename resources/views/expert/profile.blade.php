@@ -281,6 +281,13 @@ $canEdit = ($expertData->profile_status == 2);
                 <h4 class="text-sm font-semibold text-[#F4A261]">NIC & Verification</h4>
               </div>
               <div class="space-y-4">
+
+              <div>
+                  <label class="block text-xs text-slate-400 mb-1">Full Name *</label>
+                  <input type="text" name="full_name" value="{{ old('full_name', $expertData->full_name ?? '') }}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-[#F4A261] focus:border-transparent" placeholder="Full Name" {{ $canEdit ? '' : 'disabled' }}>
+                  @error('full_name')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
                 <div>
                   <label class="block text-xs text-slate-400 mb-1">NIC Number *</label>
                   <input type="text" name="nic_number" value="{{ old('nic_number', $expertData->nic_number ?? '') }}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:ring-2 focus:ring-[#F4A261] focus:border-transparent" placeholder="CNIC / NIC number" {{ $canEdit ? '' : 'disabled' }}>

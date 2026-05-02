@@ -273,7 +273,7 @@
                     <div class="service-content">
                         <div class="service-name">${escapeHtml(service.name)}</div>
                         <div class="service-detail">${escapeHtml(service.short_detail || 'Learn more about this service')}</div>
-                        <a href="/service/${service.slug}/experts" class="btn-experts">See Experts →</a>
+                        <a href="/service/${service.slug}" class="btn-experts">See Experts →</a>
                     </div>
                 `;
                 servicesGrid.appendChild(card);

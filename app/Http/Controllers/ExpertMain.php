@@ -302,6 +302,7 @@ class ExpertMain extends Controller
     // 1. Validate inputs – on failure, redirects back with old input automatically
     $validated = $request->validate([
       'service_id'     => 'required|exists:services,id',
+      'full_name'      => 'required|string|max:255',
       'nic_number'     => 'required|string|max:50',
       'nic_expiry'     => 'required|date',
       'nic_front'      => 'required|image|max:2048',
@@ -329,6 +330,7 @@ class ExpertMain extends Controller
     $data = [
       'user_id'        => $userId,
       'service_id'     => $request->service_id,
+      'full_name'      => $request->full_name,
       'nic_number'     => $request->nic_number,
       'nic_expiry'     => $request->nic_expiry,
       'payment_status' => 'Pending',   // ENUM value
