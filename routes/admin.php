@@ -29,7 +29,8 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
     Route::post('/services/{id}/toggle-active', [ServiceController::class, 'toggleActive'])->name('services.toggleActive');
-
+    Route::post('/services/toggle-priority', [ServiceController::class, 'togglePriority'])
+      ->name('services.togglePriority');
 
     Route::get('/cities', [CityController::class, 'index'])->name('cities.index');
     Route::get('/cities/create', [CityController::class, 'create'])->name('cities.create');

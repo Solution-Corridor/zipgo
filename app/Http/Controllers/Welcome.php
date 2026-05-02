@@ -321,12 +321,17 @@ class Welcome extends Controller
 
   public function index()
   {
-    $services = Service::where('is_active', 1)->orderBy('name')->get();
+    $priority_services = Service::where('is_active', 1)
+      ->where('is_priority', 1)
+      ->orderBy('name')
+      ->get();
+
+    $services = Service::where('is_active', 1)
+      ->where('is_priority', 0)
+      ->orderBy('name')
+      ->get();
     $experts = ExpertDetail::with('user')->where('profile_status', 1)->get();
-    // echo '<pre>';
-    // print_r($experts->toArray());
-    // echo '</pre>';
-    return view('website.index', compact('services', 'experts'));
+    return view('website.index', compact('priority_services', 'services', 'experts'));
   }
 
   public function search(Request $request)
@@ -514,13 +519,13 @@ class Welcome extends Controller
   }
 
   public function expert_detail($id)
-{
+  {
     $expert = ExpertDetail::with(['user', 'rates'])
-        ->where('id', $id)
-        ->firstOrFail();
+      ->where('id', $id)
+      ->firstOrFail();
 
     return view('website.expert-detail', compact('expert'));
-}
+  }
 
   //edit blog
   public function edit_blogs($blog_id)

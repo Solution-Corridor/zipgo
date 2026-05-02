@@ -1,1 +1,5 @@
 ALTER TABLE `expert_details` ADD `amount_paid` INT(11) NULL AFTER `payment_status`;
+
+
+ALTER TABLE services 
+ADD COLUMN is_priority TINYINT(1) DEFAULT 0 AFTER pic;

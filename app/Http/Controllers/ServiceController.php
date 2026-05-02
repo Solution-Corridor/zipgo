@@ -27,12 +27,15 @@ class ServiceController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'name'      => 'required|string|max:255',
-      'slug'      => 'required|string|unique:services,slug',
-      'price'     => 'required|numeric|min:0',
-      'detail'    => 'nullable|string',
-      'picture'   => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
+      'name'        => 'required|string|max:255',
+      'slug'        => 'required|string|unique:services,slug',
+      'price'       => 'required|numeric|min:0',
+      'detail'      => 'nullable|string',
+      'picture'     => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
+      'is_priority' => 'nullable|boolean',
     ]);
+
+    $is_priority = $request->has('is_priority') ? 1 : 0;
 
     // Handle image upload
     $picPath = null;
@@ -44,11 +47,12 @@ class ServiceController extends Controller
     }
 
     Service::create([
-      'name'   => $request->name,
-      'slug'   => $request->slug,
-      'pic'    => $picPath,
-      'price'  => $request->price,
-      'detail' => $request->detail,
+      'name'        => $request->name,
+      'slug'        => $request->slug,
+      'pic'         => $picPath,
+      'price'       => $request->price,
+      'detail'      => $request->detail,
+      'is_priority' => $is_priority,
     ]);
 
     return redirect()->route('services.index')
@@ -68,18 +72,22 @@ class ServiceController extends Controller
     $service = Service::findOrFail($id);
 
     $request->validate([
-      'name'      => 'required|string|max:255',
-      'slug'      => 'required|string|unique:services,slug,' . $service->id,
-      'price'     => 'required|numeric|min:0',
-      'detail'    => 'nullable|string',
-      'picture'   => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+      'name'        => 'required|string|max:255',
+      'slug'        => 'required|string|unique:services,slug,' . $service->id,
+      'price'       => 'required|numeric|min:0',
+      'detail'      => 'nullable|string',
+      'picture'     => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+      'is_priority' => 'nullable|boolean',
     ]);
 
+    $is_priority = $request->has('is_priority') ? 1 : 0;
+
     $data = [
-      'name'   => $request->name,
-      'slug'   => $request->slug,
-      'price'  => $request->price,
-      'detail' => $request->detail,
+      'name'        => $request->name,
+      'slug'        => $request->slug,
+      'price'       => $request->price,
+      'detail'      => $request->detail,
+      'is_priority' => $is_priority,
     ];
 
     // Handle image update
@@ -88,9 +96,11 @@ class ServiceController extends Controller
       if ($service->pic && file_exists(public_path($service->pic))) {
         unlink(public_path($service->pic));
       }
+
       $file = $request->file('picture');
       $filename = time() . '_' . $file->getClientOriginalName();
       $file->move(public_path('uploads/services'), $filename);
+
       $data['pic'] = 'uploads/services/' . $filename;
     }
 
@@ -128,5 +138,18 @@ class ServiceController extends Controller
 
     // Or redirect back
     return redirect()->back()->with('success', 'Status updated.');
+  }
+
+  public function togglePriority(Request $request)
+  {
+    $service = Service::findOrFail($request->id);
+
+    $service->is_priority = $request->is_priority;
+    $service->save();
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Priority updated successfully'
+    ]);
   }
 }
