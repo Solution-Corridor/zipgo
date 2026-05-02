@@ -330,7 +330,7 @@ class Welcome extends Controller
       ->where('is_priority', 0)
       ->orderBy('name')
       ->get();
-    $experts = ExpertDetail::with('user')->where('profile_status', 1)->get();
+    $experts = ExpertDetail::with('user')->where('profile_status', 1)->limit(6)->get();
     return view('website.index', compact('priority_services', 'services', 'experts'));
   }
 
