@@ -123,7 +123,10 @@ public function users()
 
   public function userDetails($id)
   {
-    $user = User::with('referrer')->find($id);
+    
+    $user = User::with([
+        'expertDetail.rates', // nested relation
+    ])->findOrFail($id);
 
     if (!$user) {
       return redirect()->back()->with('error', 'User not found');
@@ -202,13 +205,13 @@ public function users()
       'phone'        => 'required|string|max:100',
       'whatsapp'     => 'required|string|max:100',
       'email'        => 'nullable|email|max:100',
-      'referred_by'  => 'nullable|integer|exists:users,id',
+      
       'balance'      => 'required|numeric',
       'type'         => 'required|in:0,1',
       'status'       => 'required|in:0,1',
       'pic'          => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
       'password'     => 'nullable|min:6',
-      'is_fd'        => 'required|in:0,1',
+      
     ]);
 
     // ────────────────────────────────────────────────
@@ -222,7 +225,7 @@ public function users()
       $file = $request->file('pic');
       $filename = time() . '_' . $file->getClientOriginalName();
       $file->move(public_path('uploads/user'), $filename);
-      $validated['pic'] = $filename;
+      $validated['pic'] = 'uploads/user/' . $filename;
     }
 
     // ────────────────────────────────────────────────
@@ -238,7 +241,7 @@ public function users()
 
     $user->update($validated);
 
-    return redirect()->route('users')->with('success', 'User updated successfully');
+    return redirect()->route('admin.users')->with('success', 'User updated successfully');
   }
 
 

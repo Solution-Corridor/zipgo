@@ -47,6 +47,7 @@ Users
                                                 <th>#</th>
                                                 <th>UserName</th>
                                                 <th>WhatsApp</th>
+                                                <th>Type</th>
                                                 <th>Status</th>
                                                 <th>Since</th>
                                                 <th>Action</th>
@@ -67,7 +68,19 @@ Users
                                                     </a>
                                                     @endif
                                                 </td>
-                                                
+                                                <td>
+                                                    @switch($u->type)
+                                                        @case(0)
+                                                            <span class="badge bg-secondary">User</span>
+                                                            @break
+                                                        @case(1)
+                                                            <span class="badge bg-primary">Admin</span>
+                                                            @break
+                                                        @case(2)
+                                                            <span class="badge bg-info">Expert</span>
+                                                            @break
+                                                    @endswitch
+                                                </td>
 
                                                 <td>
                                                     @switch($u->status)

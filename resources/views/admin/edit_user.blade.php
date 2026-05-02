@@ -97,14 +97,7 @@ Edit User
                         </div>
                       </div>
 
-                      <!-- Referred By -->
-                      <div class="col-md-3">
-                        <div class="form-group">
-                          <label>Referred By (User ID)</label>
-                          <input type="number" name="referred_by" class="form-control"
-                            value="{{ old('referred_by', $user->referred_by) }}" placeholder="Optional">
-                        </div>
-                      </div>
+                      
 
                       <!-- Balance -->
                       <div class="col-md-3">
@@ -122,6 +115,7 @@ Edit User
                           <select name="type" class="form-control" required>
                             <option value="0" {{ $user->type == '0' ? 'selected' : '' }}>Admin</option>
                             <option value="1" {{ $user->type == '1' ? 'selected' : '' }}>User</option>
+                            <option value="2" {{ $user->type == '2' ? 'selected' : '' }}>Expert</option>
                           </select>
                         </div>
                       </div>
@@ -137,16 +131,7 @@ Edit User
                         </div>
                       </div>
 
-                      <div class="col-md-3">
-                        <div class="form-group">
-                          <label>Fixed Deposit <span class="text-danger">*</span></label>
-                          <select name="is_fd" class="form-control" required>
-                            <option value="1" {{ $user->is_fd == 1 ? 'selected' : '' }}>Yes</option>
-                            <option value="0" {{ $user->is_fd == 0 ? 'selected' : '' }}>No</option>
-                          </select>
-                        </div>
-                      </div>
-
+                      
                       <!-- Profile Picture -->
                       <div class="col-md-12 mt-3">
                         <div class="row">
