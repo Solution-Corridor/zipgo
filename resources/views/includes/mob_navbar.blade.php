@@ -61,12 +61,12 @@
         Admin Dashboard
       </a>
 
-      <a href="{{ route('user_dashboard') }}"
+      <a href="{{ route('user.dashboard') }}"
         class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">
         User Dashboard
       </a>
 
-      <a href="{{ route('expert_dashboard') }}"
+      <a href="{{ route('expert.dashboard') }}"
         class="flex items-center gap-4 text-white/80 hover:text-primary transition-colors p-3 rounded-lg hover:bg-white/5">
         Expert Dashboard
       </a>

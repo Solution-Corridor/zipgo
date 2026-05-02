@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App;
-use Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Models\User;
@@ -16,43 +15,36 @@ use App\Models\Service;
 use App\Models\ExpertDetail;
 use App\Models\Blog;
 
-
 class MainUser extends Controller
 {
   public function user_dashboard()
   {
+    // ------------------- 1. Service Categories (priority order) -------------------
     $prioritySlugs = [
-      'plumbing',                 // Plumbing
-      'ac-repair-installation',  // AC repair & installation
-      'carpenter',               // Carpenter
-      'painter',                 // Painter
-      'pest-control',            // Pest control
-      'appliance-repair',        // Appliance repair
-      'water-tank-cleaning',     // Water tank cleaning
-      'ironing-service',         // Ironing service (covers laundry)
+      'plumbing',
+      'ac-repair-installation',
+      'carpenter',
+      'painter',
+      'pest-control',
+      'appliance-repair',
+      'water-tank-cleaning',
+      'ironing-service',
     ];
 
-    // 2. Fetch all active services
     $allServices = Service::where('is_active', 1)->get();
 
-    // 3. Separate priority services (in the defined order)
     $priorityServices = collect();
     foreach ($prioritySlugs as $slug) {
       $service = $allServices->firstWhere('slug', $slug);
-      if ($service) {
-        $priorityServices->push($service);
-      }
+      if ($service) $priorityServices->push($service);
     }
 
-    // 4. Get the remaining services (exclude any that are in priority list)
     $otherServices = $allServices->reject(function ($service) use ($prioritySlugs) {
       return in_array($service->slug, $prioritySlugs);
-    })->sortBy('name'); // sort remaining alphabetically (or by id)
+    })->sortBy('name');
 
-    // 5. Merge: priority first, then others
     $services = $priorityServices->concat($otherServices);
 
-    // 6. Map extra fields (icon + color) as you were doing
     $categories = $services->map(function ($service) {
       return (object)[
         'name'  => $service->name,
@@ -61,66 +53,117 @@ class MainUser extends Controller
       ];
     });
 
-    // 2. Nearby professionals
-    $nearbyProfessionals = [
-      (object) [
-        'name' => 'Ramesh K.',
-        'profession' => 'Plumber',
-        'rating' => 4.9,
-        'distance' => '1.2 km',
-        'price' => 299,
-        'avatar' => 'R',
-        'avatar_color' => 'blue'
-      ],
-      (object) [
-        'name' => 'Sunil E.',
-        'profession' => 'Electrician',
-        'rating' => 4.8,
-        'distance' => '3.0 km',
-        'price' => 399,
-        'avatar' => 'S',
-        'avatar_color' => 'yellow'
-      ],
-      (object) [
-        'name' => 'Mohan C.',
-        'profession' => 'Carpenter',
-        'rating' => 4.7,
-        'distance' => '2.5 km',
-        'price' => 499,
-        'avatar' => 'M',
-        'avatar_color' => 'amber'
-      ],
-    ];
+    // ------------------- 2. Dynamic Nearby Professionals -------------------
+    $user = Auth::user();
+    $limit = 10;
+    $nearbyProfessionals = collect();
 
-    // 3. Service packages
+    if ($user && $user->city_id) {
+      // Stage 1: same city, newest first
+      $sameCityExperts = ExpertDetail::where('profile_status', 1)
+        ->whereHas('user', function ($query) use ($user) {
+          $query->where('type', 2)
+            ->where('city_id', $user->city_id)
+            ->where('status', 1);
+        })
+        ->with(['user.city', 'service', 'rates'])
+        ->orderBy('created_at', 'desc')
+        ->take($limit)
+        ->get();
+
+      $collectedIds = $sameCityExperts->pluck('id')->toArray();
+      $nearbyProfessionals = $sameCityExperts;
+
+      // Stage 2: newest from any city (newbies)
+      if ($nearbyProfessionals->count() < $limit) {
+        $needed = $limit - $nearbyProfessionals->count();
+        $newbyExperts = ExpertDetail::where('profile_status', 1)
+          ->whereNotIn('id', $collectedIds)
+          ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1)->whereNotNull('name'))
+          ->with(['user.city', 'service', 'rates'])
+          ->orderBy('created_at', 'desc')
+          ->take($needed)
+          ->get();
+
+        $nearbyProfessionals = $nearbyProfessionals->concat($newbyExperts);
+        $collectedIds = array_merge($collectedIds, $newbyExperts->pluck('id')->toArray());
+      }
+
+      // Stage 3: any remaining approved experts
+      if ($nearbyProfessionals->count() < $limit) {
+        $needed = $limit - $nearbyProfessionals->count();
+        $anyExperts = ExpertDetail::where('profile_status', 1)
+          ->whereNotIn('id', $collectedIds)
+          ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1)->whereNotNull('name'))
+          ->with(['user.city', 'service', 'rates'])
+          ->inRandomOrder()
+          ->take($needed)
+          ->get();
+
+        $nearbyProfessionals = $nearbyProfessionals->concat($anyExperts);
+      }
+    } else {
+      // No logged-in user or no city → latest 10 approved experts
+      $nearbyProfessionals = ExpertDetail::where('profile_status', 1)
+        ->whereHas('user', fn($q) => $q->where('type', 2)->where('status', 1)->whereNotNull('name'))
+        ->with(['user.city', 'service', 'rates'])
+        ->orderBy('created_at', 'desc')
+        ->take($limit)
+        ->get();
+    }
+
+    // Transform each expert (null-safe)
+    $nearbyProfessionals = $nearbyProfessionals->map(function ($expert) {
+      $user = $expert->user; // guaranteed to exist because of whereHas
+      $service = $expert->service;
+
+      // User name fallback (just in case)
+      $userName = $user->username ?? 'Professional';
+
+      // Average price from expert_rates
+      $price = $expert->rates->isNotEmpty() ? round($expert->rates->avg('rate')) : 0;
+
+      // Rating placeholder
+      $rating = 4.5;
+
+      // City name
+      $cityName = $user->city ? $user->city->name : 'Unknown City';
+
+      // Selfie image URL (adjust if needed)
+      $selfieImage = $expert->selfie_image ? asset($expert->selfie_image) : null;
+
+      // Fallback avatar initials & color (now safe)
+      $avatarInitial = strtoupper(substr($userName, 0, 1));
+      $avatarColor = $this->getAvatarColor($userName);
+
+      return (object)[
+        'name'         => $userName,
+        'profession'   => $service ? $service->name : 'Service Professional',
+        'rating'       => $rating,
+        'distance'     => $cityName,
+        'price'        => $price,
+        'selfie_image' => $selfieImage,
+        'avatar'       => $avatarInitial,
+        'avatar_color' => $avatarColor,
+      ];
+    });
+
+    // ------------------- 3. Static Service Packages -------------------
     $packages = [
-      (object) [
-        'title' => 'Plumbing Maintenance',
-        'discount' => '20% OFF',
-        'price' => 999,
-        'description' => 'Includes inspection + 2 repairs',
-        'icon' => 'gift'
-      ],
-      (object) [
-        'title' => 'Full Home Electrification',
-        'discount' => '15% OFF',
-        'price' => 2499,
-        'description' => 'Wiring + 10 points + safety check',
-        'icon' => 'gift'
-      ],
-      (object) [
-        'title' => 'AC Service & Repair',
-        'discount' => '10% OFF',
-        'price' => 1499,
-        'description' => 'Gas refill + cleaning + check',
-        'icon' => 'gift'
-      ],
+      (object) ['title' => 'Plumbing Maintenance',      'discount' => '20% OFF', 'price' => 999,  'description' => 'Includes inspection + 2 repairs',      'icon' => 'gift'],
+      (object) ['title' => 'Full Home Electrification', 'discount' => '15% OFF', 'price' => 2499, 'description' => 'Wiring + 10 points + safety check',    'icon' => 'gift'],
+      (object) ['title' => 'AC Service & Repair',       'discount' => '10% OFF', 'price' => 1499, 'description' => 'Gas refill + cleaning + check',       'icon' => 'gift'],
     ];
-
-    // You can also add a welcome message for top_greetings (optional)
-    // The top_greetings include already uses $user->name etc.
 
     return view('user.dashboard', compact('categories', 'nearbyProfessionals', 'packages'));
+  }
+
+  // ------------------- Helper Methods -------------------
+  private function getAvatarColor(string $name): string
+  {
+    $colors = ['blue', 'yellow', 'amber', 'green', 'red', 'purple', 'pink', 'indigo'];
+    $index = abs(crc32($name)) % count($colors);
+    return $colors[$index];
   }
 
   private function getIcon($name)
@@ -260,7 +303,6 @@ class MainUser extends Controller
       str_contains($name, 'gas') => 'flame',
       str_contains($name, 'ironing') => 'sun',
 
-      // Default
       default => 'tool',
     };
   }

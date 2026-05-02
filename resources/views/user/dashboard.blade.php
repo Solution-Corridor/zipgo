@@ -71,9 +71,15 @@
       <div class="space-y-3">
         @foreach($nearbyProfessionals as $pro)
         <div class="bg-white border border-[#EAE0D5] rounded-xl p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition">
+          {{-- Profile image (selfie) or fallback initials --}}
+          @if($pro->selfie_image)
+          <img src="{{ $pro->selfie_image }}" alt="{{ $pro->name }}" class="w-12 h-12 rounded-full object-cover">
+          @else
           <div class="w-12 h-12 rounded-full bg-{{ $pro->avatar_color }}-100 flex items-center justify-center text-{{ $pro->avatar_color }}-600 font-bold">
             {{ $pro->avatar }}
           </div>
+          @endif
+
           <div class="flex-1">
             <div class="flex items-center gap-2">
               <p class="font-semibold text-[#2C1810] text-sm">{{ $pro->name }}</p>
