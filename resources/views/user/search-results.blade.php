@@ -48,7 +48,7 @@
             </p>
           </div>
 
-          <a href="#" 
+          <a href="{{ route('user.expert_detail', ['id' => $pro->id]) }}" 
              class="bg-[#FF6B6B] hover:bg-[#ff5252] text-white px-5 py-2 rounded-xl text-sm font-medium transition">
             Profile
           </a>
