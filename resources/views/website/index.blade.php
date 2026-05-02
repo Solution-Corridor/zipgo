@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -59,251 +59,369 @@
 
   <!-- Additional Styles for new horizontal service cards -->
   <style>
-    /* Existing styles (kept unchanged) */
-    .services-flex {
-      display: flex;
-      flex-direction: row;
-      gap: 0px;
-      justify-content: space-evenly;
-    }
+/* ===== FULL CSS FOR THE PAGE WITH HEIGHT FIX AND DESKTOP CENTERING ===== */
 
-    /* Section */
-    .services-section {
-      margin: 0 auto;
-      padding: 20px;
-      margin-top: 50px;
-      background: #0f2027;
-      background: linear-gradient(0deg, #0f2027 0%, #2c5364 100%);
-      height: 300px;
-    }
+/* ===== BASE & UTILITY STYLES ===== */
 
-    /* Header (Category + View All) */
-    .services-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+/* Section base - fixed height issue */
+.services-section {
+  margin: 0 auto;
+  padding: 20px;
+  margin-top: 50px;
+  background: #0f2027;
+  background: linear-gradient(0deg, #0f2027 0%, #2c5364 100%);
+  min-height: auto;        /* FIX: removed fixed min-height to avoid excess space */
+  height: auto;
+}
 
-    .services-header h2 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #fff;
-    }
+/* Header (Category + View All) */
+.services-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
-    @media (max-width: 480px) {
-      .services-header h2 {
-        font-size: 17px;
-      }
+.services-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+}
 
-      .view-all-btn {
-        padding: 4px 12px !important;
-        font-size: 10px !important;
-      }
-    }
+@media (max-width: 480px) {
+  .services-header h2 {
+    font-size: 17px;
+  }
+  .view-all-btn {
+    padding: 4px 12px !important;
+    font-size: 10px !important;
+  }
+}
 
-    .view-all-btn {
-      background: linear-gradient(135deg, #ff5722, #BD8802);
-      color: #fff;
-      box-shadow: 0 15px 25px rgba(238, 39, 55, 0.3);
-      border: none;
-      padding: 8px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.3s ease,
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
-      will-change: transform, box-shadow;
-    }
+.view-all-btn {
+  background: linear-gradient(135deg, #ff5722, #BD8802);
+  color: #fff;
+  box-shadow: 0 15px 25px rgba(238, 39, 55, 0.3);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform, box-shadow;
+}
 
-    .view-all-btn:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 30px rgba(238, 39, 55, 0.5);
-    }
+.view-all-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px rgba(238, 39, 55, 0.5);
+}
 
-    /* Category Item */
-    .services-item {
-      flex: 0 0 auto;
-      width: 140px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
+/* Horizontal scrolling services-flex - mobile first (left aligned, scrollable) */
+.services-flex {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 2px;     /* FIX: reduced bottom padding to minimize empty space */
+  margin-bottom: 0;
+  height: auto;            /* FIX: remove fixed height */
+}
 
-    .services-item:hover {
-      transform: translateY(-4px);
-    }
+/* Custom scrollbar styling */
+.services-flex::-webkit-scrollbar {
+  height: 5px;
+}
 
-    .services-img {
-      width: 120px;
-      height: 120px;
-      overflow: hidden;
-      border-radius: 10px;
-      margin: 0 auto 12px;
-      border: 4px solid #fff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+.services-flex::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
 
-    .services-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+.services-flex::-webkit-scrollbar-thumb {
+  background: #ff5722;
+  border-radius: 10px;
+}
 
-    .services-item p {
-      font-size: 14px;
-      color: #fff;
-      font-weight: 500;
-    }
+/* Category Item */
+.services-item {
+  flex: 0 0 auto;
+  width: 140px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin-bottom: 0;
+}
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .services-item {
-        width: 110px;
-      }
+.services-item:hover {
+  transform: translateY(-4px);
+}
 
-      .services-img {
-        width: 90px;
-        height: 90px;
-      }
-    }
+.services-img {
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+  border-radius: 10px;
+  margin: 0 auto 12px;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-    /* ===== NEW STYLES FOR HORIZONTAL SERVICE CARDS (image left + name) ===== */
-    .all-services-section {
-      background: #f8fafc;
-    }
+.services-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-    .section-heading {
-      font-size: 28px;
-      font-weight: 700;
-      color: #0f2027;
-      position: relative;
-      display: inline-block;
-      margin-bottom: 1.5rem;
-      letter-spacing: -0.3px;
-    }
+.services-item p {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 0;
+  line-height: 1.3;
+}
 
-    .section-heading:after {
-      content: '';
-      display: block;
-      width: 60px;
-      height: 4px;
-      background: linear-gradient(90deg, #ff5722, #bd8802);
-      border-radius: 4px;
-      margin-top: 8px;
-    }
+/* Tablet adjustments */
+@media (max-width: 768px) {
+  .services-item {
+    width: 110px;
+  }
+  .services-img {
+    width: 90px;
+    height: 90px;
+  }
+  .services-flex {
+    gap: 16px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+  }
+}
 
-    /* Horizontal card styling */
-    .service-horizontal-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 12px 16px;
-      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-      border: 1px solid #eef2f6;
-      height: 100%;
-      cursor: pointer;
-    }
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .services-item {
+    width: 95px;
+  }
+  .services-img {
+    width: 75px;
+    height: 75px;
+  }
+  .services-item p {
+    font-size: 12px;
+  }
+  .services-flex {
+    gap: 12px;
+    padding-bottom: 2px;
+  }
+  .services-section {
+    padding: 16px;
+  }
+}
 
-    .service-horizontal-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
-      border-color: #ffd1c0;
-      background: #ffffff;
-    }
+/* ===== DESKTOP CENTERING (min-width: 992px) ===== */
+@media (min-width: 992px) {
+  .services-flex {
+    /* Switch to grid layout for perfect centering and wrapping */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 160px));
+    justify-content: center;
+    gap: 24px;
+    overflow-x: visible;   /* No horizontal scroll on desktop */
+    padding-bottom: 0;
+  }
 
-    .service-img-left {
-      width: 64px;
-      height: 64px;
-      flex-shrink: 0;
-      border-radius: 18px;
-      overflow: hidden;
-      background: #f1f5f9;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
+  /* Remove fixed width from items – grid controls sizing */
+  .services-item {
+    width: auto;
+    flex: none;
+  }
 
-    .service-img-left img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.2s ease;
-    }
+  .services-img {
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-    .service-horizontal-card:hover .service-img-left img {
-      transform: scale(1.02);
-    }
+  /* Optional: larger container padding for better look */
+  .services-section {
+    padding: 30px 40px;
+  }
+}
 
-    .service-info-right {
-      flex: 1;
-    }
+/* Large desktop (optional: increase max card width) */
+@media (min-width: 1400px) {
+  .services-flex {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 180px));
+    gap: 30px;
+  }
+}
 
-    .service-info-right .service-name {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #1e293b;
-      margin: 0 0 4px 0;
-      line-height: 1.3;
-      transition: color 0.2s;
-    }
+/* ===== NEW STYLES FOR HORIZONTAL SERVICE CARDS (image left + name) ===== */
+.all-services-section {
+  background: #f8fafc;
+}
 
-    .service-horizontal-card:hover .service-name {
-      color: #ff5722;
-    }
+.section-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f2027;
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.3px;
+}
 
-    /* subtle service meta (optional, only name shown as requested) */
-    .service-category-badge {
-      font-size: 0.7rem;
-      color: #5b6e8c;
-      background: #f1f5f9;
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
+.section-heading:after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #ff5722, #bd8802);
+  border-radius: 4px;
+  margin-top: 8px;
+}
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .service-img-left {
-        width: 54px;
-        height: 54px;
-        border-radius: 14px;
-      }
+/* Horizontal card styling */
+.service-horizontal-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eef2f6;
+  height: 100%;
+  cursor: pointer;
+}
 
-      .service-info-right .service-name {
-        font-size: 0.9rem;
-      }
+.service-horizontal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+  border-color: #ffd1c0;
+  background: #ffffff;
+}
 
-      .service-horizontal-card {
-        padding: 10px 12px;
-        gap: 10px;
-      }
-    }
+.service-img-left {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f1f5f9;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
 
-    @media (max-width: 576px) {
-      .service-img-left {
-        width: 48px;
-        height: 48px;
-      }
+.service-img-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
 
-      .service-info-right .service-name {
-        font-size: 0.85rem;
-      }
-    }
+.service-horizontal-card:hover .service-img-left img {
+  transform: scale(1.02);
+}
 
-    /* link reset */
-    .service-card-link {
-      text-decoration: none;
-      display: block;
-      height: 100%;
-    }
+.service-info-right {
+  flex: 1;
+}
 
-    /* grid spacing */
-    .all-services-section .row.g-4 {
-      --bs-gutter-y: 1.5rem;
-    }
+.service-info-right .service-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+  transition: color 0.2s;
+}
+
+.service-horizontal-card:hover .service-name {
+  color: #ff5722;
+}
+
+/* subtle service meta (optional) */
+.service-category-badge {
+  font-size: 0.7rem;
+  color: #5b6e8c;
+  background: #f1f5f9;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+/* link reset */
+.service-card-link {
+  text-decoration: none;
+  display: block;
+  height: 100%;
+}
+
+/* grid spacing */
+.all-services-section .row.g-4 {
+  --bs-gutter-y: 1.5rem;
+}
+
+/* Responsive adjustments for service cards */
+@media (max-width: 768px) {
+  .service-img-left {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+  }
+  .service-info-right .service-name {
+    font-size: 0.9rem;
+  }
+  .service-horizontal-card {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .service-img-left {
+    border-radius: 5px;
+  }
+}
+
+@media (max-width: 576px) {
+  .service-img-left {
+    width: 48px;
+    height: 48px;
+  }
+  .service-info-right .service-name {
+    font-size: 0.85rem;
+  }
+}
+
+/* Additional utility classes (experts section, footer, etc.) */
+.experts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Ensure any leftover spacing issues are fixed */
+.services-section:after,
+.services-flex:after {
+  display: none;
+}
   </style>
 
 </head>
@@ -313,13 +431,14 @@
   @include('includes.navbar')
   <!-- Navbar End -->
 
-  <!-- FIRST SERVICES SECTION (priority services, horizontal scroll style) -->
+  <!-- FIRST SERVICES SECTION (priority services, horizontal scroll style) - FIXED for mobile -->
   <section class="services-section">
     <div class="services-header">
-      <h1 class="text-light">Explore The Services</h1>
+      <h1 class="text-light fs-3">Explore The Services</h1>
       <a href="/services"><button class="view-all-btn">View More</button></a>
     </div>
 
+    <!-- services-flex now scrolls horizontally on mobile, and displays properly on desktop -->
     <div class="services-flex">
       @foreach ($priority_services as $service)
       <div class="services-item">
@@ -344,11 +463,11 @@
       <div class="row mb-3">
         <div class="col-12">
           <h2 class="section-heading">All Professional Services</h2>
-          <p class="text-muted mt-2">Discover trusted experts for every need — from home repairs to beauty & wellness</p>
+          <p class="text-muted">Discover trusted experts for every need — from home repairs to beauty & wellness</p>
         </div>
       </div>
 
-      <div class="row g-4">
+      <div class="row g-2">
         @forelse($services ?? [] as $service)
         <div class="col-12 col-sm-6 col-md-3">
           <a href="/service/{{ $service->slug }}" class="service-card-link">
@@ -411,6 +530,13 @@
           }
         });
       });
+
+      // Optional: Add smooth scroll hint to services-flex for better UX (if needed)
+      const servicesFlex = document.querySelector('.services-flex');
+      if (servicesFlex && window.innerWidth <= 768) {
+        // add a subtle indicator that it's scrollable (better UX)
+        servicesFlex.setAttribute('aria-label', 'Horizontal scrollable services');
+      }
     });
   </script>
 </body>
