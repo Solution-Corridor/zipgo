@@ -17,9 +17,7 @@
       <div class="rating">
         <i class="fas fa-star"></i> 4.8
       </div>
-      <div class="experience">
-        &nbsp;
-      </div>
+      
     </div>
 
     <div class="location">
