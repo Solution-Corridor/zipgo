@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ $blog->title }} | Feature Desk Blog</title>
+  <title>{{ $blog->title }} | ZipGo Blog</title>
   <meta name="description" content="{{ $blog->short_description }}">
   <meta name="keywords" content="{{ $blog->keywords }}">
   @if($blog->page_schema)

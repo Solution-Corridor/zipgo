@@ -21,21 +21,15 @@
 }
 </style>
 <!-- Floating WhatsApp Button (Aligned with 420px container) -->
+<!-- Simple WhatsApp Floating Button -->
 <a href="https://wa.me/+971543041994?text=Hello%2C%20I%20need%20help%20with%20a%20service%20on%20ZipGo!" 
    target="_blank"
-   class="fixed bottom-24 z-50 flex items-center justify-center w-14 h-14 
-          bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-2xl shadow-xl 
-          transition-all duration-300 hover:scale-110 active:scale-95 
-          group whatsapp-float"
+   class="fixed bottom-24 z-50 flex items-center justify-center w-12 h-12 
+          bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-2xl shadow-lg 
+          transition-colors duration-200"
    style="right: calc(50% - 210px + 24px);">
     
     <i class="fab fa-whatsapp text-3xl"></i>
-    
-    <!-- Pulse Animation -->
-    <span class="absolute -top-1 -right-1 flex h-5 w-5">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-5 w-5 bg-green-500"></span>
-    </span>
 </a>
 
 <!-- Optional Tooltip -->

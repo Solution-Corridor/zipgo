@@ -30,7 +30,7 @@
       <div class="bg-gradient-to-r from-[#F4A261] to-[#E08E3E] rounded-2xl p-4 shadow-lg flex justify-between items-center">
         <div>
           <p class="text-white/80 text-xs uppercase tracking-wide">Your Balance</p>
-          <p class="text-white text-2xl font-bold">Rs. {{ number_format(auth()->user()->balance ?? 0, 2) }}</p>
+          <p class="text-white text-2xl font-bold">Rs. {{ number_format(auth()->user()->balance ?? 0, 0) }}</p>
         </div>
         <a href="{{ route('expert.recharge') }}" 
            class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold py-2 px-5 rounded-xl transition-all flex items-center gap-2">

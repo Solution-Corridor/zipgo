@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dr. Ahmed Raza - Expert Profile | Feature Desk</title>
-  <meta name="description" content="Profile of Dr. Ahmed Raza, a verified cardiologist with 12+ years experience.">
+  <title>{{ $expert->full_name }} - Expert Profile | ZipGo</title>
+  <meta name="description" content="Profile of {{ $expert->full_name }}, a verified ZipGo expert. View experience, specialties, service rates, and contact information. Book appointments with confidence.">
   @include('includes.header_links')
   <style>
     /* Expert Detail Page Styles */
@@ -334,23 +334,22 @@
       <!-- Header -->
       <div class="profile-header">
         <div class="profile-image">
-          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Dr. Ahmed Raza">
+          <img src="/{{$expert['selfie_image']}}" alt="{{ $expert->full_name }}">
         </div>
         <div class="profile-info">
-          <div class="expert-name">Dr. Ahmed Raza</div>
-          <div class="expert-badge"><i class="fas fa-heartbeat"></i> Cardiologist</div>
+          <div class="expert-name">{{ $expert->full_name }}</div>
+          <div class="expert-badge"><i class="fas fa-heartbeat"></i> {{ $expert['service']['name'] ?? 'Service' }}</div>
           <div class="expert-meta">
-            <div class="meta-item"><i class="fas fa-calendar-alt"></i> 12 years experience</div>
-            <div class="meta-item"><i class="fas fa-map-marker-alt"></i> Lahore, Pakistan</div>
+            <!-- <div class="meta-item"><i class="fas fa-calendar-alt"></i> 12 years experience</div> -->
+            <div class="meta-item"><i class="fas fa-map-marker-alt"></i> {{ $expert['user']['city']['name'] ?? 'Unknown' }}</div>
             <div class="rating-large">
               <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
               <span>4.8 (124 reviews)</span>
             </div>
           </div>
           <div class="contact-buttons">
-            <a href="tel:+923001234567" class="btn-contact btn-call"><i class="fas fa-phone-alt"></i> Call Now</a>
-            <a href="https://wa.me/923001234567" class="btn-contact btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-            <a href="#" class="btn-contact btn-message"><i class="fas fa-envelope"></i> Send Message</a>
+            <a href="tel:{{ $expert['user']['phone'] }}" class="btn-contact btn-call"><i class="fas fa-phone-alt"></i> Call Now</a>
+            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $expert['user']['whatsapp']) }}" class="btn-contact btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>            
           </div>
         </div>
       </div>
@@ -359,78 +358,33 @@
       <div class="profile-details">
         <div class="left-column">
           <div class="detail-section">
-            <h3><i class="fas fa-user-circle"></i> About Dr. Ahmed Raza</h3>
-            <p>Dr. Ahmed Raza is a highly skilled cardiologist with over 12 years of experience in diagnosing and treating heart conditions. He is known for his patient‑centered approach and has successfully performed hundreds of procedures. He is verified and trusted by Feature Desk.</p>
+            <h3><i class="fas fa-user-circle"></i> About {{ $expert->full_name }}</h3>
+            <p>{{ $expert->bio ?? 'No bio available.' }}</p>
           </div>
 
           <!-- NEW: Detailed Service Rates Section with Images -->
           <div class="detail-section">
             <h3><i class="fas fa-hand-holding-usd"></i> Service Rates & Packages</h3>
             <div class="service-rates-grid">
+              @foreach($expert->rates as $rate)              
               
-              <!-- Dummy Service 1 -->
               <div class="rate-card">
                 <div class="rate-image">
-                  <img src="https://placehold.co/400x400/eef2ff/3b82f6?text=ECG" alt="ECG Test">
+                  <img src="/uploads/expert-rates/{{ $rate->image }}" alt="{{ $rate->name }}">
                 </div>
                 <div class="rate-details">
                   <div class="rate-title">
-                    ECG (Electrocardiogram)
-                    <span class="rate-price">Rs. 1,500</span>
+                    {{ $rate->name }}
+                    <span class="rate-price">Rs. {{ number_format($rate->rate, 0) }}</span>
                   </div>
                   <div class="rate-desc">
-                    Detailed ECG analysis with immediate report. Includes basic consultation.
+                    {{ $rate->description ?? 'No description available.' }}
                   </div>
                 </div>
               </div>
+               @endforeach
 
-              <!-- Dummy Service 2 -->
-              <div class="rate-card">
-                <div class="rate-image">
-                  <img src="https://placehold.co/400x400/fef9c3/ca8a04?text=Echo" alt="Echocardiography">
-                </div>
-                <div class="rate-details">
-                  <div class="rate-title">
-                    Echocardiography
-                    <span class="rate-price">Rs. 4,500</span>
-                  </div>
-                  <div class="rate-desc">
-                    Complete heart ultrasound, 2D echo with colour Doppler. Printed report included.
-                  </div>
-                </div>
-              </div>
 
-              <!-- Dummy Service 3 -->
-              <div class="rate-card">
-                <div class="rate-image">
-                  <img src="https://placehold.co/400x400/dcfce7/15803d?text=Stress" alt="Stress Test">
-                </div>
-                <div class="rate-details">
-                  <div class="rate-title">
-                    Treadmill Stress Test (TMT)
-                    <span class="rate-price">Rs. 3,200</span>
-                  </div>
-                  <div class="rate-desc">
-                    Monitored exercise test to evaluate heart performance under stress.
-                  </div>
-                </div>
-              </div>
-
-              <!-- Dummy Service 4 -->
-              <div class="rate-card">
-                <div class="rate-image">
-                  <img src="https://placehold.co/400x400/fee2e2/b91c1c?text=Consult" alt="Consultation">
-                </div>
-                <div class="rate-details">
-                  <div class="rate-title">
-                    Cardiology Consultation
-                    <span class="rate-price">Rs. 2,500</span>
-                  </div>
-                  <div class="rate-desc">
-                    In‑depth consultation, medical history review, and treatment plan (30‑45 mins).
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -460,25 +414,11 @@
             <ul class="info-list">
               <li><strong>NIC Verified:</strong> ✅ Yes</li>
               <li><strong>Profile Status:</strong> Active</li>
-              <li><strong>Member Since:</strong> March 2021</li>
+              <li><strong>Member Since:</strong> {{ $expert->created_at->format('F Y') }}</li>
               <li><strong>Response Rate:</strong> 98%</li>
             </ul>
-          </div>
-          <div class="sidebar-card">
-            <h4><i class="fas fa-tools"></i> Specialties</h4>
-            <div class="service-list">
-              <div class="service-item"><i class="fas fa-heartbeat"></i> Preventive Cardiology</div>
-              <div class="service-item"><i class="fas fa-stethoscope"></i> Interventional Cardiology</div>
-              <div class="service-item"><i class="fas fa-chart-line"></i> Cardiac Rehabilitation</div>
-            </div>
-          </div>
-          <div class="sidebar-card">
-            <h4><i class="fas fa-share-alt"></i> Share Profile</h4>
-            <div style="display: flex; gap: 0.8rem;">
-              <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" class="btn-contact btn-call" style="background:#1877f2; padding:0.4rem 1rem;">Facebook</a>
-              <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}" class="btn-contact btn-whatsapp" style="background:#1da1f2; padding:0.4rem 1rem;">Twitter</a>
-            </div>
-          </div>
+          </div>         
+          
         </div>
       </div>
     </div>

@@ -149,7 +149,7 @@
               © <script>
                 document.write(new Date().getFullYear())
               </script>
-              Feature Desk.
+              ZipGo.
             </p>
           </div>
         </div>

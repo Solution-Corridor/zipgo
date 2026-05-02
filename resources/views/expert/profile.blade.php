@@ -299,56 +299,80 @@ $canEdit = ($expertData->profile_status == 2);
                   @error('nic_expiry')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
 
-                <!-- NIC Front with preview -->
-                <div>
-                  <label class="block text-xs text-slate-400 mb-1">NIC Front Image</label>
-                  <div class="flex items-center gap-3 flex-wrap">
-                    <input type="file" name="nic_front" id="nic_front_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-[#F4A261]/20 file:text-[#F4A261] hover:file:bg-[#F4A261]/30 cursor-pointer" {{ $canEdit ? '' : 'disabled' }}>
-                    <div id="nic_front_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex items-center justify-center">
-                      @if(!empty($expertData->nic_front_image))
-                      <img src="/{{ $expertData->nic_front_image }}" class="w-full h-full object-cover" alt="Front NIC">
-                      @else
-                      <i data-lucide="image" class="w-5 h-5 text-gray-500"></i>
-                      @endif
-                    </div>
-                  </div>
-                  @if(!empty($expertData->nic_front_image))<p class="text-[11px] text-slate-500 mt-1">Current: {{ basename($expertData->nic_front_image) }}</p>@endif
-                  @error('nic_front')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
-                </div>
+<!-- NIC Front with preview -->
+<div>
+  <label class="block text-xs text-slate-400 mb-1">NIC Front Image</label>
+  <div class="flex items-center gap-3 flex-nowrap">
+    <input 
+      type="file" 
+      name="nic_front" 
+      id="nic_front_input" 
+      class="flex-1 min-w-0 text-slate-400 text-sm 
+             file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 
+             file:text-sm file:bg-[#F4A261]/20 file:text-[#F4A261] 
+             hover:file:bg-[#F4A261]/30 cursor-pointer" 
+      {{ $canEdit ? '' : 'disabled' }}
+    >
+    <div id="nic_front_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex-shrink-0 flex items-center justify-center">
+      @if(!empty($expertData->nic_front_image))
+        <img src="/{{ $expertData->nic_front_image }}" class="w-full h-full object-cover" alt="Front NIC">
+      @else
+        <i data-lucide="image" class="w-5 h-5 text-gray-500"></i>
+      @endif
+    </div>
+  </div>
+  @error('nic_front')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+</div>
 
-                <!-- NIC Back with preview -->
-                <div>
-                  <label class="block text-xs text-slate-400 mb-1">NIC Back Image</label>
-                  <div class="flex items-center gap-3 flex-wrap">
-                    <input type="file" name="nic_back" id="nic_back_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-[#F4A261]/20 file:text-[#F4A261]" {{ $canEdit ? '' : 'disabled' }}>
-                    <div id="nic_back_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex items-center justify-center">
-                      @if(!empty($expertData->nic_back_image))
-                      <img src="/{{ $expertData->nic_back_image }}" class="w-full h-full object-cover" alt="Back NIC">
-                      @else
-                      <i data-lucide="image" class="w-5 h-5 text-gray-500"></i>
-                      @endif
-                    </div>
-                  </div>
-                  @if(!empty($expertData->nic_back_image))<p class="text-[11px] text-slate-500 mt-1">Current: {{ basename($expertData->nic_back_image) }}</p>@endif
-                  @error('nic_back')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
-                </div>
+<!-- NIC Back with preview -->
+<div>
+  <label class="block text-xs text-slate-400 mb-1">NIC Back Image</label>
+  <div class="flex items-center gap-3 flex-nowrap">
+    <input 
+      type="file" 
+      name="nic_back" 
+      id="nic_back_input" 
+      class="flex-1 min-w-0 text-slate-400 text-sm 
+             file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 
+             file:text-sm file:bg-[#F4A261]/20 file:text-[#F4A261] 
+             hover:file:bg-[#F4A261]/30 cursor-pointer" 
+      {{ $canEdit ? '' : 'disabled' }}
+    >
+    <div id="nic_back_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex-shrink-0 flex items-center justify-center">
+      @if(!empty($expertData->nic_back_image))
+        <img src="/{{ $expertData->nic_back_image }}" class="w-full h-full object-cover" alt="Back NIC">
+      @else
+        <i data-lucide="image" class="w-5 h-5 text-gray-500"></i>
+      @endif
+    </div>
+  </div>  
+  @error('nic_back')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+</div>
 
-                <!-- Selfie with NIC preview -->
-                <div>
-                  <label class="block text-xs text-slate-400 mb-1">Selfie with NIC</label>
-                  <div class="flex items-center gap-3 flex-wrap">
-                    <input type="file" name="selfie" id="selfie_input" class="text-slate-400 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-[#F4A261]/20 file:text-[#F4A261]" {{ $canEdit ? '' : 'disabled' }}>
-                    <div id="selfie_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex items-center justify-center">
-                      @if(!empty($expertData->selfie_image))
-                      <img src="/{{ $expertData->selfie_image }}" class="w-full h-full object-cover" alt="Selfie">
-                      @else
-                      <i data-lucide="camera" class="w-5 h-5 text-gray-500"></i>
-                      @endif
-                    </div>
-                  </div>
-                  @if(!empty($expertData->selfie_image))<p class="text-[11px] text-slate-500 mt-1">Current: {{ basename($expertData->selfie_image) }}</p>@endif
-                  @error('selfie')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
-                </div>
+<!-- Selfie with NIC preview -->
+<div>
+  <label class="block text-xs text-slate-400 mb-1">Selfie with NIC</label>
+  <div class="flex items-center gap-3 flex-nowrap">
+    <input 
+      type="file" 
+      name="selfie" 
+      id="selfie_input" 
+      class="flex-1 min-w-0 text-slate-400 text-sm 
+             file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 
+             file:text-sm file:bg-[#F4A261]/20 file:text-[#F4A261] 
+             hover:file:bg-[#F4A261]/30 cursor-pointer" 
+      {{ $canEdit ? '' : 'disabled' }}
+    >
+    <div id="selfie_preview_container" class="relative w-12 h-12 rounded-lg border border-dashed border-gray-600 overflow-hidden bg-slate-900 flex-shrink-0 flex items-center justify-center">
+      @if(!empty($expertData->selfie_image))
+        <img src="/{{ $expertData->selfie_image }}" class="w-full h-full object-cover" alt="Selfie">
+      @else
+        <i data-lucide="camera" class="w-5 h-5 text-gray-500"></i>
+      @endif
+    </div>
+  </div> 
+  @error('selfie')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+</div>
               </div>
             </div>
 

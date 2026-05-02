@@ -21,21 +21,15 @@
 }
 </style>
 <!-- Floating WhatsApp Button (Aligned with 420px container) -->
+<!-- Simple WhatsApp Floating Button -->
 <a href="https://wa.me/+971543041994?text=Hello%2C%20I%20need%20help%20with%20a%20service%20on%20ZipGo!" 
    target="_blank"
-   class="fixed bottom-24 z-50 flex items-center justify-center w-14 h-14 
-          bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-2xl shadow-xl 
-          transition-all duration-300 hover:scale-110 active:scale-95 
-          group whatsapp-float"
+   class="fixed bottom-24 z-50 flex items-center justify-center w-12 h-12 
+          bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-2xl shadow-lg 
+          transition-colors duration-200"
    style="right: calc(50% - 210px + 24px);">
     
     <i class="fab fa-whatsapp text-3xl"></i>
-    
-    <!-- Pulse Animation -->
-    <span class="absolute -top-1 -right-1 flex h-5 w-5">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-5 w-5 bg-green-500"></span>
-    </span>
 </a>
 
 <!-- Optional Tooltip -->
@@ -50,26 +44,39 @@
 <div class="mx-4 mb-10">&nbsp;</div>
 
 <!-- Expert Bottom Navigation (Navy/Gold, uniform, no special button) -->
+<!-- Expert Bottom Navigation -->
 <nav class="fixed bottom-0 left-0 right-0 z-50 pointer-events-none" style="max-width: 420px; margin-left: auto; margin-right: auto;">
-    <div class="bg-[#0B1C3F]/95 backdrop-blur-xl rounded-t-3xl py-2 px-2 flex justify-between items-center border-t border-[#2A3A5A]/50 shadow-2xl shadow-black/50 pointer-events-auto">
+    <div class="bg-[#0B1C3F]/95 backdrop-blur-xl rounded-t-3xl py-2 px-2 flex justify-between items-center border-t border-[#2A3A5A]/50 shadow-2xl shadow-black/50 pointer-events-auto relative">
         @php $currentRoute = request()->route()->getName(); @endphp
 
+        <!-- Home -->
         <a href="{{ route('expert.dashboard') }}" class="nav-item flex flex-col items-center justify-center flex-1 py-2 group @if($currentRoute == 'expert.dashboard') active @endif">
             <i data-lucide="home" class="w-5 h-5 transition-all group-hover:scale-110"></i>
             <span class="text-[10px] mt-1 font-medium">Home</span>
         </a>
+
+        <!-- Jobs -->
         <a href="{{ route('expert.jobs') }}" class="nav-item flex flex-col items-center justify-center flex-1 py-2 group @if($currentRoute == 'expert.jobs' || str_starts_with($currentRoute, 'expert.jobs.')) active @endif">
             <i data-lucide="briefcase" class="w-5 h-5 transition-all group-hover:scale-110"></i>
             <span class="text-[10px] mt-1 font-medium">Jobs</span>
         </a>
-        <a href="{{ route('expert.earnings') }}" class="nav-item flex flex-col items-center justify-center flex-1 py-2 group @if($currentRoute == 'expert.earnings') active @endif">
-            <i data-lucide="wallet" class="w-5 h-5 transition-all group-hover:scale-110"></i>
-            <span class="text-[10px] mt-1 font-medium">Earnings</span>
+
+        <!-- EARNINGS - Smaller Big Button -->
+        <a href="{{ route('expert.earnings') }}" 
+           class="nav-item big-earning-btn flex flex-col items-center justify-center -mt-6 z-10 @if($currentRoute == 'expert.earnings') active @endif">
+            <div class="bg-gradient-to-br from-[#F4A261] to-[#E08E3E] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl shadow-[#F4A261]/50 border-4 border-[#0B1C3F] transition-all active:scale-95">
+                <i data-lucide="wallet" class="w-7 h-7 text-white"></i>
+            </div>
+            <span class="text-[10px] mt-1 font-semibold text-[#F4A261]">Earnings</span>
         </a>
+
+        <!-- Rates -->
         <a href="{{ route('expert.rates') }}" class="nav-item flex flex-col items-center justify-center flex-1 py-2 group @if($currentRoute == 'expert.rates' || str_starts_with($currentRoute, 'expert.rates.')) active @endif">
             <i data-lucide="credit-card" class="w-5 h-5 transition-all group-hover:scale-110"></i>
-            <span class="text-[10px] mt-1 font-medium">Rates</span>
+            <span class="text-[10px] mt-1 font-medium">Menu</span>
         </a>
+
+        <!-- Profile -->
         <a href="{{ route('expert.profile') }}" class="nav-item flex flex-col items-center justify-center flex-1 py-2 group @if($currentRoute == 'expert.profile') active @endif">
             <i data-lucide="user" class="w-5 h-5 transition-all group-hover:scale-110"></i>
             <span class="text-[10px] mt-1 font-medium">Profile</span>
@@ -78,6 +85,43 @@
 </nav>
 
 <style>
+    .big-earning-btn {
+        position: relative;
+    }
+
+    .big-earning-btn .w-16.h-16 {
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .big-earning-btn:hover .w-16.h-16 {
+        transform: scale(1.12) rotate(8deg);
+    }
+
+    .big-earning-btn.active .w-16.h-16 {
+        box-shadow: 0 0 20px rgba(244, 162, 97, 0.6);
+        transform: scale(1.08);
+    }
+
+    /* Adjust spacing for the raised button */
+    .nav-item:not(.big-earning-btn) {
+        padding-top: 12px;
+    }
+
+    /* Keep your existing nav styles */
+    .nav-item {
+        color: #8A9BB5;
+        transition: all 0.2s ease;
+    }
+
+    .nav-item.active i {
+        color: #F4A261;
+        stroke: #F4A261;
+    }
+
+    .nav-item.active span {
+        color: #F4A261;
+    }
+
     .nav-item {
         position: relative;
         color: #8A9BB5; /* muted blue-gray */

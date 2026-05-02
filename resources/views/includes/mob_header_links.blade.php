@@ -44,8 +44,8 @@
 
 <link rel="stylesheet" type="text/css" href="/assets_new/themes/lightneon/output.css">
 
-<meta name="description" content="Feature Desk – Smart working Plans with Daily Updates. Select a plan that suits you, track your progress, and manage withdrawals easily. Start your journey today.">
-<meta name="keywords" content="working platform, daily updates, online plans, earning opportunities, referral system, secure platform, Feature Desk">
+<meta name="description" content="ZipGo – Smart working Plans with Daily Updates. Select a plan that suits you, track your progress, and manage withdrawals easily. Start your journey today.">
+<meta name="keywords" content="working platform, daily updates, online plans, earning opportunities, referral system, secure platform, ZipGo">
 
 <link rel="shortcut icon" href="/assets/images/favicon.png" type="image/x-icon">
 <link rel="apple-touch-icon" href="/assets/images/logo.png">
@@ -53,15 +53,15 @@
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Feature Desk">
+<meta name="apple-mobile-web-app-title" content="ZipGo">
 
-<meta itemprop="name" content="Feature Desk – Smart working Platform">
-<meta itemprop="description" content="Feature Desk – Choose smart plans and see daily updates. Pick your option, follow your progress, and handle withdrawals with ease.">
+<meta itemprop="name" content="ZipGo – Smart working Platform">
+<meta itemprop="description" content="ZipGo – Choose smart plans and see daily updates. Pick your option, follow your progress, and handle withdrawals with ease.">
 <meta itemprop="image" content="/assets/images/logo.png">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Feature Desk – Smart Plans, Daily Updates">
-<meta property="og:description" content="Discover smart plans with Feature Desk. Select your option, keep track of updates, and manage everything securely. Get started and take control today.">
+<meta property="og:title" content="ZipGo – Smart Plans, Daily Updates">
+<meta property="og:description" content="Discover smart plans with ZipGo. Select your option, keep track of updates, and manage everything securely. Get started and take control today.">
 <meta property="og:image" content="/assets/images/logo.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:url" content="{{ env('APP_URL') }}">

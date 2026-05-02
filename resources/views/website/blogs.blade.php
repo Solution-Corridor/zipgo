@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog - Feature Desk</title>
-  <meta name="description" content="Read latest articles, tips, and news from Feature Desk">
+  <title>Blog - ZipGo</title>
+  <meta name="description" content="Read latest articles, tips, and news from ZipGo">
   @include('includes.header_links')
   <style>
     .blog-page {
@@ -117,7 +117,7 @@
   <div class="blog-page mt-5">
     <div class="page-header">
       <h1>Our Blog</h1>
-      <p>Insights, tips, and updates from Feature Desk</p>
+      <p>Insights, tips, and updates from ZipGo</p>
     </div>
 
     @if($blogs->count())

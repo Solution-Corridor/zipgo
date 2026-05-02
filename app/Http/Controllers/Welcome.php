@@ -514,77 +514,13 @@ class Welcome extends Controller
   }
 
   public function expert_detail($id)
-  {
-    return view('website.expert-detail');
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+{
+    $expert = ExpertDetail::with(['user', 'rates'])
+        ->where('id', $id)
+        ->firstOrFail();
+
+    return view('website.expert-detail', compact('expert'));
+}
 
   //edit blog
   public function edit_blogs($blog_id)

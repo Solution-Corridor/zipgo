@@ -3,7 +3,7 @@
 
 <head>
     @include('includes.header_links')
-    <title>Privacy Policy & Terms of Use - Feature Desk</title>
+    <title>Privacy Policy & Terms of Use - ZipGo</title>
 </head>
 
 <body class="body body5 bg-[#0A0A0F] text-white">
@@ -26,7 +26,7 @@
                     <div class="w-24 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-6"></div>
                     
                     <p class="text-white/60">
-                        Please read these documents carefully. They govern your access to and use of Feature Desk services.
+                        Please read these documents carefully. They govern your access to and use of ZipGo services.
                     </p>
                 </div>
 
@@ -38,7 +38,7 @@
 
                         <div class="space-y-6 text-white/80 text-sm leading-relaxed prose prose-invert max-w-none">
                             <p>
-                                Feature Desk ("we", "us", "our") respects your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our investment platform, or engage with our services.
+                                ZipGo ("we", "us", "our") respects your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our investment platform, or engage with our services.
                             </p>
 
                             <h4 class="text-lg font-semibold text-white">1. Information We Collect</h4>
@@ -80,7 +80,7 @@
 
                         <div class="space-y-6 text-white/80 text-sm leading-relaxed prose prose-invert max-w-none">
                             <p>
-                                These Terms of Use ("Terms") govern your access to and use of Feature Desk website, platform, investment plans and related services ("Services"). By accessing or using the Services, you agree to these Terms.
+                                These Terms of Use ("Terms") govern your access to and use of ZipGo website, platform, investment plans and related services ("Services"). By accessing or using the Services, you agree to these Terms.
                             </p>
 
                             <h4 class="text-lg font-semibold text-white">1. Eligibility</h4>
@@ -112,7 +112,7 @@
 
                             <h4 class="text-lg font-semibold text-white">7. Limitation of Liability</h4>
                             <p class="text-amber-300 font-medium">
-                                To the maximum extent permitted by law, Feature Desk shall not be liable for any indirect, incidental, consequential, punitive damages, or loss of profits.
+                                To the maximum extent permitted by law, ZipGo shall not be liable for any indirect, incidental, consequential, punitive damages, or loss of profits.
                             </p>
 
                             <h4 class="text-lg font-semibold text-white">8. Governing Law & Disputes</h4>
