@@ -441,8 +441,10 @@ class Welcome extends Controller
     $offset = $request->input('offset', 0);
     $limit = 6;
 
+    // Priority first (is_priority = 1), then the rest, both ordered by slug (or name)
     $services = Service::where('is_active', 1)
-      ->orderBy('name')
+      ->orderBy('is_priority', 'desc')
+      // ->orderBy('slug')
       ->skip($offset)
       ->take($limit)
       ->get(['id', 'name', 'slug', 'pic', 'price', 'detail']);
@@ -453,11 +455,9 @@ class Welcome extends Controller
 
       // Fix image URL
       if ($service->pic) {
-        // If pic already contains 'uploads/', use it directly
         if (strpos($service->pic, 'uploads/') === 0) {
           $service->image_url = asset($service->pic);
         } else {
-          // Assume it's just a filename
           $service->image_url = asset('uploads/services/' . $service->pic);
         }
       } else {
@@ -472,7 +472,7 @@ class Welcome extends Controller
 
     return response()->json([
       'services' => $services,
-      'hasMore' => $hasMore,
+      'hasMore'  => $hasMore,
       'nextOffset' => $offset + $limit,
     ]);
   }
