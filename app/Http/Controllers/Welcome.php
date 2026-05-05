@@ -16,13 +16,14 @@ use App\Models\City;
 use App\Models\Service;
 use App\Models\ExpertDetail;
 use App\Models\Blog;
+use App\Models\SubService;
 
 
 class Welcome extends Controller
 {
 
-public function liveLocation()
-{
+  public function liveLocation()
+  {
     $user = Auth::user();
     // echo '<pre>';
     // print_r($user);
@@ -30,54 +31,54 @@ public function liveLocation()
     // exit;
 
     if (!$user) {
-        return response()->json(['error' => 'Unauthenticated'], 401);
+      return response()->json(['error' => 'Unauthenticated'], 401);
     }
 
     $ip = request()->ip();
 
     // Handle localhost / development
     if (in_array($ip, ['127.0.0.1', '::1'])) {
-        $ip = '8.8.8.8';
+      $ip = '8.8.8.8';
     }
 
     $cacheKey = 'user-location-' . $ip;
 
     $location = cache()->remember($cacheKey, now()->addHours(8), function () use ($ip) {
 
-        $response = Http::timeout(10)
-            ->get("http://ip-api.com/json/{$ip}?fields=status,message,lat,lon,city,country,regionName,timezone");
+      $response = Http::timeout(10)
+        ->get("http://ip-api.com/json/{$ip}?fields=status,message,lat,lon,city,country,regionName,timezone");
 
-        if ($response->successful()) {
-            $data = $response->json();
+      if ($response->successful()) {
+        $data = $response->json();
 
-            if (($data['status'] ?? '') === 'success') {
-                return [
-                    'ip'       => $ip,
-                    'lat'      => $data['lat'] ?? null,
-                    'lng'      => $data['lon'] ?? null,
-                    'city'     => $data['city'] ?? null,
-                    'country'  => $data['country'] ?? null,
-                    'region'   => $data['regionName'] ?? null,
-                    'timezone' => $data['timezone'] ?? null,
-                ];
-            }
+        if (($data['status'] ?? '') === 'success') {
+          return [
+            'ip'       => $ip,
+            'lat'      => $data['lat'] ?? null,
+            'lng'      => $data['lon'] ?? null,
+            'city'     => $data['city'] ?? null,
+            'country'  => $data['country'] ?? null,
+            'region'   => $data['regionName'] ?? null,
+            'timezone' => $data['timezone'] ?? null,
+          ];
         }
+      }
 
-        return [
-            'ip' => $ip,
-            'lat' => null,
-            'lng' => null,
-            'city' => null,
-            'country' => null,
-            'region' => null,
-            'timezone' => null,
-        ];
+      return [
+        'ip' => $ip,
+        'lat' => null,
+        'lng' => null,
+        'city' => null,
+        'country' => null,
+        'region' => null,
+        'timezone' => null,
+      ];
     });
 
     // ✅ SAVE TO DATABASE
     DB::table('user_locations')->updateOrInsert(
-    ['user_id' => $user->id], // condition (unique key)
-    [
+      ['user_id' => $user->id], // condition (unique key)
+      [
         'ip'       => $location['ip'] ?? null,
         'lat'      => $location['lat'] ?? null,
         'lng'      => $location['lng'] ?? null,
@@ -87,11 +88,11 @@ public function liveLocation()
         'timezone' => $location['timezone'] ?? null,
         'updated_at' => now(),
         'created_at' => now(), // only used on insert
-    ]
-);
+      ]
+    );
 
     return response()->json($location);
-}
+  }
 
   // ================================== AUTH SYSTEM ==========================
   public function register()
@@ -403,6 +404,7 @@ public function liveLocation()
       ->where('is_priority', 0)
       ->orderBy('name')
       ->get();
+
     $experts = ExpertDetail::with('user')->where('profile_status', 1)->limit(6)->get();
     return view('website.index', compact('priority_services', 'services', 'experts'));
   }
@@ -551,28 +553,17 @@ public function liveLocation()
   }
 
 
-  public function show($slug)
+  public function show_subservices($slug)
   {
-    // Service check
-    $service = Service::with('experts.user')
-      ->where('slug', $slug)
-      ->first();
+    $service = Service::where('slug', $slug)->first();
     if ($service) {
-      return view('website.show-experts', compact('service'));
-    }
-
-    // City check
-    $city = City::where('slug', $slug)->first();
-    if ($city) {
-      $experts = ExpertDetail::with('user')
-        ->whereHas('user', function ($q) use ($city) {
-          $q->where('city_id', $city->id);
-        })
+      $subServices = SubService::where('service_id', $service->id)
+        ->orderBy('is_priority', 'desc')
+        ->orderBy('id', 'desc')
         ->get();
-      return view('website.show-experts', compact('city', 'experts'));
-    }
 
-    abort(404);
+      return view('website.show-subservices', compact('service', 'subServices'));
+    }
   }
 
   public function blogs()

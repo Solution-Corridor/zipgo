@@ -47,7 +47,9 @@ class MainUser extends Controller
 
     $categories = $services->map(function ($service) {
       return (object)[
+        'id'  => $service->id,
         'name'  => $service->name,
+        'slug'  => $service->slug,
         'icon'  => $this->getIcon($service->name),
         'color' => $this->getColor($service->name),
       ];
@@ -472,17 +474,16 @@ class MainUser extends Controller
     return view('user.search-results', compact('service', 'experts'));
   }
 
-  public function search_service($service_id)
+  public function search_service($slug)
   {
-    $service = Service::findOrFail($service_id);
+    $service = Service::where('slug', $slug)->firstOrFail();
 
-    $experts = ExpertDetail::where('service_id', $service_id)
+    $experts = ExpertDetail::where('service_id', $service->id)
       ->with(['user', 'service'])
       ->get();
 
     return view('user.search-results', compact('service', 'experts'));
   }
-
 
 
   public function services()
@@ -532,8 +533,8 @@ class MainUser extends Controller
   public function expertDetail($id)
   {
     $expert = ExpertDetail::where('profile_status', 1)
-    ->whereHas('user', function ($q) {
-      $q->where('type', 2)->where('status', 1);
+      ->whereHas('user', function ($q) {
+        $q->where('type', 2)->where('status', 1);
       })
       ->with(['user.city', 'service', 'rates'])
       ->findOrFail($id);

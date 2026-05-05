@@ -52,10 +52,13 @@
       <h3 class="text-sm font-semibold text-[#2C1810] mb-2">Browse by Service</h3>
       <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         @foreach($categories as $cat)
-        <a href="{{ route('user.search.results') }}?category={{ urlencode($cat->name) }}" class="flex flex-col items-center min-w-[70px]">
+        <a href="{{ route('user.service', $cat->slug) }}"
+          class="flex flex-col items-center min-w-[70px]">
+
           <div class="w-14 h-14 rounded-2xl bg-white/80 border border-[#EAE0D5] flex items-center justify-center mb-1 hover:border-[#FF6B6B]/50 transition group shadow-sm">
             <i data-lucide="{{ $cat->icon }}" class="w-6 h-6 text-[#4ECDC4]"></i>
           </div>
+
           <span class="text-[11px] text-[#6B5B50]">{{ $cat->name }}</span>
         </a>
         @endforeach

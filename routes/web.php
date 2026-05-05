@@ -54,7 +54,7 @@ Route::get('/city/{slug}', [Welcome::class, 'show'])->name('cities.show');
 
 Route::get('/services', [Welcome::class, 'services'])->name('services');
 Route::get('/services/load-more', [Welcome::class, 'loadMoreServices'])->name('services.load-more');
-Route::get('/service/{slug}', [Welcome::class, 'show'])->name('services.show');
+Route::get('/service/{slug}', [Welcome::class, 'show_subservices'])->name('services.show');
 
 Route::get('/blogs', [Welcome::class, 'blogs'])->name('blogs');
 Route::get('/blog/{slug}', [Welcome::class, 'blog_detail'])->name('blogs.show');
