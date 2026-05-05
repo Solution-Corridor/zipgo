@@ -396,8 +396,8 @@ class Welcome extends Controller
   public function index()
   {
     $priority_services = Service::where('is_active', 1)
-      ->where('is_priority', 1)
-      ->orderBy('name')
+      ->where('is_priority', '!=', 0)
+      ->orderBy('is_priority', 'asc')
       ->get();
 
     $services = Service::where('is_active', 1)

@@ -3,17 +3,13 @@
 @section('title')
 Manage Services
 @endsection
-<!-- Start top links -->
 @include('admin.includes.headlinks')
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
   <div class="wrapper">
-    <!-- Start navbar -->
     @include('admin.includes.navbar')
-    <!-- end navbar -->
-
-    <!-- Start Sidebar -->
     @include('admin.includes.sidebar')
+
     <div class="content-wrapper">
       <div class="content-header">
         <div class="container-fluid">
@@ -35,7 +31,7 @@ Manage Services
               <div class="card">
                 <div class="card-header bg-light">All Services</div>
                 <div class="card-body">
-                  @include('admin.includes.success') <!-- your existing success partial -->
+                  @include('admin.includes.success')
 
                   <table class="table table-bordered table-striped example1" id="example1">
                     <thead>
@@ -46,7 +42,7 @@ Manage Services
                         <th>Slug</th>
                         <th>Price (Rs.)</th>
                         <th>Status</th>
-                        <th>Show on Top</th>
+                        <th>Show on Top</th>   {{-- column header kept as original --}}
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -69,15 +65,13 @@ Manage Services
                           </div>
                         </td>
                         <td>
-                          <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                            <input type="checkbox"
-                              class="custom-control-input toggle-priority"
-                              id="prioritySwitch{{ $service->id }}"
-                              data-id="{{ $service->id }}"
-                              {{ $service->is_priority ? 'checked' : '' }}>
-
-                            <label class="custom-control-label" for="prioritySwitch{{ $service->id }}"></label>
-                          </div>
+                          {{-- Display is_priority number only (no editing) --}}
+                          @if($service->is_priority)
+                            <span class="badge badge-info">{{ $service->is_priority }}</span>
+                            <small class="text-muted d-block">(lower = higher)</small>
+                          @else
+                            <span class="text-muted">—</span>
+                          @endif
                         </td>
                         <td>
                           <a href="{{ route('services.edit', $service->id) }}" class="btn btn-sm btn-warning">Edit</a>
@@ -89,13 +83,11 @@ Manage Services
                       </tr>
                       @empty
                       <tr>
-                        <td colspan="7" class="text-center">No services found.</td>
+                        <td colspan="8" class="text-center">No services found.</td>
                       </tr>
                       @endforelse
                     </tbody>
                   </table>
-
-
                 </div>
               </div>
             </div>
@@ -103,15 +95,13 @@ Manage Services
         </div>
       </section>
     </div>
+
     @include('admin.includes.version')
-    <!------ end Footer -->
-
   </div>
-  <!-- ./wrapper -->
-  <!------ Start Footer links-->
-  @include('admin.includes.footer_links')
-  <!------ end Footer links -->
 
+  @include('admin.includes.footer_links')
+
+  {{-- Only status toggle script – is_priority is read-only --}}
   <script>
     $(document).ready(function() {
       $('.toggle-status').click(function() {
@@ -140,42 +130,5 @@ Manage Services
       });
     });
   </script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-
-      document.querySelectorAll('.toggle-priority').forEach(function(toggle) {
-        toggle.addEventListener('change', function() {
-
-          let serviceId = this.getAttribute('data-id');
-          let status = this.checked ? 1 : 0;
-
-          fetch("{{ route('services.togglePriority') }}", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-              },
-              body: JSON.stringify({
-                id: serviceId,
-                is_priority: status
-              })
-            })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                console.log('Priority updated');
-              }
-            })
-            .catch(error => {
-              alert('Something went wrong!');
-            });
-
-        });
-      });
-
-    });
-  </script>
 </body>
-
 </html>

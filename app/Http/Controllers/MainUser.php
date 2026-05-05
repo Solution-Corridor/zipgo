@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\City;
 use App\Models\Service;
+use App\Models\SubService;
 use App\Models\ExpertDetail;
 use App\Models\Blog;
 
@@ -19,35 +20,16 @@ class MainUser extends Controller
 {
   public function user_dashboard()
   {
-    // ------------------- 1. Service Categories (priority order) -------------------
-    $prioritySlugs = [
-      'plumbing',
-      'ac-repair-installation',
-      'carpenter',
-      'painter',
-      'pest-control',
-      'appliance-repair',
-      'water-tank-cleaning',
-      'ironing-service',
-    ];
-
-    $allServices = Service::where('is_active', 1)->get();
-
-    $priorityServices = collect();
-    foreach ($prioritySlugs as $slug) {
-      $service = $allServices->firstWhere('slug', $slug);
-      if ($service) $priorityServices->push($service);
-    }
-
-    $otherServices = $allServices->reject(function ($service) use ($prioritySlugs) {
-      return in_array($service->slug, $prioritySlugs);
-    })->sortBy('name');
-
-    $services = $priorityServices->concat($otherServices);
+    // ------------------- 1. Service Categories (ordered by is_priority DESC, then name) -------------------
+    $services = Service::where('is_active', 1)
+      ->orderByRaw('is_priority = 0') // pushes 0 to bottom
+      ->orderBy('is_priority', 'asc') // 1,2,3...
+      // ->orderBy('name', 'asc')        
+      ->get();
 
     $categories = $services->map(function ($service) {
       return (object)[
-        'id'  => $service->id,
+        'id'    => $service->id,
         'name'  => $service->name,
         'slug'  => $service->slug,
         'icon'  => $this->getIcon($service->name),
@@ -474,15 +456,16 @@ class MainUser extends Controller
     return view('user.search-results', compact('service', 'experts'));
   }
 
-  public function search_service($slug)
+  public function sub_service($slug)
   {
     $service = Service::where('slug', $slug)->firstOrFail();
 
-    $experts = ExpertDetail::where('service_id', $service->id)
-      ->with(['user', 'service'])
+    $subServices = SubService::where('service_id', $service->id)
+      ->orderBy('is_priority', 'desc')
+      ->orderBy('id', 'desc')
       ->get();
 
-    return view('user.search-results', compact('service', 'experts'));
+    return view('user.sub_service', compact('service', 'subServices'));
   }
 
 

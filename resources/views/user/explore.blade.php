@@ -69,7 +69,7 @@
     <div class="px-4 space-y-1" id="servicesContainer"> <!-- Reduced spacing between cards -->
 
       @foreach($services as $service)
-      <a href="{{ route('user.search.service', ['service_id' => $service->id]) }}"
+      <a href="{{ route('user.service', ['slug' => $service->slug]) }}"
         class="service-card bg-white border border-[#EAE0D5] rounded-xl flex items-center px-3 py-2 gap-3 hover:border-[#FF6B6B]/70 transition"
         data-search="{{ strtolower($service->name . ' ' . ($service->description ?? '')) }}">
 
