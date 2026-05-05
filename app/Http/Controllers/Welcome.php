@@ -516,10 +516,10 @@ class Welcome extends Controller
     $offset = $request->input('offset', 0);
     $limit = 6;
 
-    // Priority first (is_priority = 1), then the rest, both ordered by slug (or name)
     $services = Service::where('is_active', 1)
-      ->orderBy('is_priority', 'desc')
-      // ->orderBy('slug')
+      ->orderByRaw('is_priority = 0') // ✅ push 0 to bottom
+      ->orderBy('is_priority', 'asc') // ✅ 1,2,3,4...
+      ->orderBy('name', 'asc')        // optional (or slug)
       ->skip($offset)
       ->take($limit)
       ->get(['id', 'name', 'slug', 'pic', 'price', 'detail']);
@@ -546,8 +546,8 @@ class Welcome extends Controller
     $hasMore = ($offset + $limit) < $total;
 
     return response()->json([
-      'services' => $services,
-      'hasMore'  => $hasMore,
+      'services'   => $services,
+      'hasMore'    => $hasMore,
       'nextOffset' => $offset + $limit,
     ]);
   }

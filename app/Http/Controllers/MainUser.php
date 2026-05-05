@@ -433,7 +433,11 @@ class MainUser extends Controller
 
   public function explore()
   {
-    $services = Service::where('is_active', 1)->orderBy('name')->get();
+    $services = Service::where('is_active', 1)
+      ->orderByRaw('is_priority = 0') // ✅ push 0 to bottom
+      ->orderBy('is_priority', 'asc') // ✅ 1 → 2 → 3 → ...
+      ->orderBy('name', 'asc')        // optional fallback
+      ->get();
 
     return view('user.explore', compact('services'));
   }
