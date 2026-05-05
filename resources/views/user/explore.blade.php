@@ -58,10 +58,10 @@
     <div class="px-4 mb-5 relative">
       <div class="relative">
         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B5B50] text-lg">🔍</span>
-        <input 
-          type="text" 
+        <input
+          type="text"
           id="serviceSearch"
-          placeholder="Search services..." 
+          placeholder="Search services..."
           class="search-input text-black placeholder:text-gray-400 focus:text-black">
       </div>
     </div>
@@ -69,7 +69,7 @@
     <div class="px-4 space-y-1" id="servicesContainer"> <!-- Reduced spacing between cards -->
 
       @foreach($services as $service)
-      <a href="{{ route('user.search.results', ['id' => $service->id]) }}"
+      <a href="{{ route('user.search.service', ['service_id' => $service->id]) }}"
         class="service-card bg-white border border-[#EAE0D5] rounded-xl flex items-center px-3 py-2 gap-3 hover:border-[#FF6B6B]/70 transition"
         data-search="{{ strtolower($service->name . ' ' . ($service->description ?? '')) }}">
 
@@ -133,4 +133,5 @@
   </script>
 
 </body>
+
 </html>

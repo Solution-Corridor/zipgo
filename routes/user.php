@@ -12,13 +12,14 @@ Route::group(['middleware' => 'checkUserRole'], function () {
     Route::get('/recharge', [MainUser::class, 'showRechargeForm'])->name('user.recharge');
     Route::post('/recharge/process', [MainUser::class, 'rechargeProcess'])->name('user.recharge.process');
 
-    Route::get('/explore', [MainUser::class, 'explore'])->name('user.explore');
 
     // Search / Find professionals
     Route::get('/search', [MainUser::class, 'search'])->name('user.search');
-// Search Results by Service
-Route::get('/search/results/{service_id}', [MainUser::class, 'search_results'])
-     ->name('user.search.results');
+    Route::get('/search/results', [MainUser::class, 'search_results'])->name('user.search.results');
+
+    // Search Results by Service
+    Route::get('/explore', [MainUser::class, 'explore'])->name('user.explore');
+    Route::get('/search/results/{service_id}', [MainUser::class, 'search_service'])->name('user.search.service');
 
     Route::get('/services', [MainUser::class, 'services'])->name('user.services');
     Route::get('/expert/{id}', [MainUser::class, 'expertDetail'])->name('user.expert_detail');

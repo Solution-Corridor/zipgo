@@ -46,6 +46,13 @@
         </li>
 
         <li class="nav-item">
+          <a href="{{ route('sub-services.index') }}" class="nav-link {{ request()->segment(2) == 'sub-services' ? 'active' : '' }}">
+            <i class="nav-icon fas fa-sitemap"></i>
+            <p>Sub Services</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
           <a href="{{ route('cities.index') }}" class="nav-link {{ request()->segment(2) == 'cities' ? 'active' : '' }}">
             <i class="nav-icon fas fa-city"></i>
             <p>Cities</p>

@@ -461,16 +461,27 @@ class MainUser extends Controller
     return view('user.search', compact('popularSearches'));
   }
 
-public function search_results($service_id)
-{
+  public function search_results()
+  {
+    $service = Service::findOrFail(5);
+
+    $experts = ExpertDetail::where('service_id', 5)
+      ->with(['user', 'service'])
+      ->get();
+
+    return view('user.search-results', compact('service', 'experts'));
+  }
+
+  public function search_service($service_id)
+  {
     $service = Service::findOrFail($service_id);
 
     $experts = ExpertDetail::where('service_id', $service_id)
-        ->with(['user', 'service'])
-        ->get();
+      ->with(['user', 'service'])
+      ->get();
 
     return view('user.search-results', compact('service', 'experts'));
-}
+  }
 
 
 
@@ -521,8 +532,8 @@ public function search_results($service_id)
   public function expertDetail($id)
   {
     $expert = ExpertDetail::where('profile_status', 1)
-      ->whereHas('user', function ($q) {
-        $q->where('type', 2)->where('status', 1);
+    ->whereHas('user', function ($q) {
+      $q->where('type', 2)->where('status', 1);
       })
       ->with(['user.city', 'service', 'rates'])
       ->findOrFail($id);
@@ -530,13 +541,17 @@ public function search_results($service_id)
     $userModel = $expert->user;
     $service = $expert->service;
     $displayName = $expert->full_name ?? $userModel->name ?? $userModel->username ?? 'Professional';
-    $price = $expert->rates->isNotEmpty() ? round($expert->rates->avg('rate')) : 0;
-    $rating = 4.5;
+
+    // Starting price = lowest rate from menu
+    $price = $expert->rates->isNotEmpty() ? $expert->rates->min('rate') : 0;
+
     $cityName = $userModel->city ? $userModel->city->name : 'Unknown City';
     $selfieImage = $expert->selfie_image ? asset($expert->selfie_image) : null;
 
-    // You might want to show all rates, reviews, etc.
-    $rates = $expert->rates; // collection of ExpertRate
+    $rates = $expert->rates;
+
+    // No rating table, so set to 0 (or remove from view)
+    $rating = 0;
 
     return view('user.expert_detail', compact('expert', 'displayName', 'price', 'rating', 'cityName', 'selfieImage', 'rates', 'service'));
   }

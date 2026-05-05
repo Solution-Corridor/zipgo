@@ -63,31 +63,49 @@
         {{-- Basic Info --}}
         <div class="p-5 space-y-4 border-b border-[#EAE0D5]">
           <div class="flex justify-between">
-            <span class="text-[#6B5B50] flex items-center gap-1"><i data-lucide="star" class="w-4 h-4"></i> Rating</span>
-            <span class="font-semibold">{{ $rating }} / 5</span>
+            <span class="text-[#6B5B50] flex items-center gap-1"><i data-lucide="star" class="w-4 h-4"></i> {{ $rating }} / 5</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-[#6B5B50] flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> City</span>
-            <span class="font-semibold">{{ $cityName }}</span>
+            <span class="text-[#6B5B50] flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> {{ $cityName }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-[#6B5B50] flex items-center gap-1"><i data-lucide="credit-card" class="w-4 h-4"></i> Starting Price</span>
-            <span class="font-semibold">Rs. {{ $price }}</span>
+            <span class="text-[#6B5B50] flex items-center gap-1"><i data-lucide="credit-card" class="w-4 h-4"></i> Rs. {{ $price }}</span>
           </div>
         </div>
 
-        {{-- Service Rates (if any) --}}
+        {{-- Service Rates / Menu --}}
         @if($rates->count())
         <div class="p-5 border-b border-[#EAE0D5]">
-          <h3 class="font-semibold text-[#2C1810] mb-3 flex items-center gap-1"><i data-lucide="clipboard-list" class="w-4 h-4"></i> Service Rates</h3>
-          <ul class="space-y-2">
+          <h3 class="font-semibold text-[#2C1810] mb-3 flex items-center gap-1">
+            <i data-lucide="utensils-crossed" class="w-4 h-4"></i> Menu & Rates
+          </h3>
+          <div class="space-y-3">
             @foreach($rates as $rate)
-            <li class="flex justify-between text-sm">
-              <span class="text-[#6B5B50]">{{ $rate->service_name }}</span>
-              <span class="font-medium">Rs. {{ $rate->rate }}</span>
-            </li>
+            <div class="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-0">
+              @if($rate->image)
+              <img src="{{ asset('uploads/expert-rates/' . $rate->image) }}" alt="{{ $rate->service_name }}" class="w-12 h-12 rounded-lg object-cover">
+              @else
+              <div class="w-12 h-12 rounded-lg bg-[#FF6B6B]/10 flex items-center justify-center">
+                <i data-lucide="coffee" class="w-6 h-6 text-[#FF6B6B]"></i>
+              </div>
+              @endif
+              <div class="flex-1">
+                <div class="flex justify-between items-baseline">
+                  <h4 class="font-medium text-[#2C1810]">{{ $rate->service_name }}</h4>
+                  <span class="text-[#FF6B6B] font-bold">Rs. {{ number_format($rate->rate, 2) }}</span>
+                </div>
+                @if($rate->description)
+                <p class="text-xs text-[#6B5B50] mt-1">{{ $rate->description }}</p>
+                @endif
+              </div>
+            </div>
             @endforeach
-          </ul>
+          </div>
+        </div>
+        @else
+        <div class="p-5 border-b border-[#EAE0D5] text-center text-[#6B5B50]">
+          <i data-lucide="receipt" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+          <p class="text-sm">No rate information available.</p>
         </div>
         @endif
 

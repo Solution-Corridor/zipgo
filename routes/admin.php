@@ -6,6 +6,7 @@ use App\Http\Controllers\ComplaintController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SubServiceController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ExpertRateController;
@@ -31,6 +32,17 @@ Route::group(['middleware' => 'checkAdminRole'], function () {
     Route::post('/services/{id}/toggle-active', [ServiceController::class, 'toggleActive'])->name('services.toggleActive');
     Route::post('/services/toggle-priority', [ServiceController::class, 'togglePriority'])
       ->name('services.togglePriority');
+
+    Route::resource('sub-services', SubServiceController::class)->names([
+      'index'   => 'sub-services.index',
+      'create'  => 'sub-services.create',
+      'store'   => 'sub-services.store',
+      'edit'    => 'sub-services.edit',
+      'update'  => 'sub-services.update',
+      'destroy' => 'sub-services.destroy',
+    ]);
+    Route::post('/sub-services/toggle-priority', [SubServiceController::class, 'togglePriority'])
+      ->name('sub-services.togglePriority');
 
     Route::get('/cities', [CityController::class, 'index'])->name('cities.index');
     Route::get('/cities/create', [CityController::class, 'create'])->name('cities.create');

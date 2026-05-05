@@ -3,3 +3,25 @@ ALTER TABLE `expert_details` ADD `amount_paid` INT(11) NULL AFTER `payment_statu
 
 ALTER TABLE services 
 ADD COLUMN is_priority TINYINT(1) DEFAULT 0 AFTER pic;
+
+
+
+CREATE TABLE `sub_services` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `service_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `image` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sub_services_slug_unique` (`slug`),
+  KEY `sub_services_service_id_foreign` (`service_id`),
+  CONSTRAINT `sub_services_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `sub_services` ADD `is_priority` INT(11) NOT NULL DEFAULT '0' AFTER `is_active`;
