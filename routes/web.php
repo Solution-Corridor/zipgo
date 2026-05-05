@@ -23,7 +23,7 @@ Route::get('/clear-cache', function () {
   return "Cache, Views, Logs, Routes, Config, and Session have been cleared!";
 });
 
-
+Route::get('/live-location', [Welcome::class, 'liveLocation'])->name('live.location');
 
 Route::get('/register', [Welcome::class, 'register'])->name('register');
 Route::post('saveRegister', [Welcome::class, 'saveRegister'])->name('saveRegister');

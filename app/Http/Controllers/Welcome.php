@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use App;
 use Hash;
 use Illuminate\Support\Str;
@@ -19,6 +20,78 @@ use App\Models\Blog;
 
 class Welcome extends Controller
 {
+
+public function liveLocation()
+{
+    $user = Auth::user();
+    // echo '<pre>';
+    // print_r($user);
+    // echo '</pre>';
+    // exit;
+
+    if (!$user) {
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+
+    $ip = request()->ip();
+
+    // Handle localhost / development
+    if (in_array($ip, ['127.0.0.1', '::1'])) {
+        $ip = '8.8.8.8';
+    }
+
+    $cacheKey = 'user-location-' . $ip;
+
+    $location = cache()->remember($cacheKey, now()->addHours(8), function () use ($ip) {
+
+        $response = Http::timeout(10)
+            ->get("http://ip-api.com/json/{$ip}?fields=status,message,lat,lon,city,country,regionName,timezone");
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            if (($data['status'] ?? '') === 'success') {
+                return [
+                    'ip'       => $ip,
+                    'lat'      => $data['lat'] ?? null,
+                    'lng'      => $data['lon'] ?? null,
+                    'city'     => $data['city'] ?? null,
+                    'country'  => $data['country'] ?? null,
+                    'region'   => $data['regionName'] ?? null,
+                    'timezone' => $data['timezone'] ?? null,
+                ];
+            }
+        }
+
+        return [
+            'ip' => $ip,
+            'lat' => null,
+            'lng' => null,
+            'city' => null,
+            'country' => null,
+            'region' => null,
+            'timezone' => null,
+        ];
+    });
+
+    // ✅ SAVE TO DATABASE
+    DB::table('user_locations')->updateOrInsert(
+    ['user_id' => $user->id], // condition (unique key)
+    [
+        'ip'       => $location['ip'] ?? null,
+        'lat'      => $location['lat'] ?? null,
+        'lng'      => $location['lng'] ?? null,
+        'city'     => $location['city'] ?? null,
+        'country'  => $location['country'] ?? null,
+        'region'   => $location['region'] ?? null,
+        'timezone' => $location['timezone'] ?? null,
+        'updated_at' => now(),
+        'created_at' => now(), // only used on insert
+    ]
+);
+
+    return response()->json($location);
+}
 
   // ================================== AUTH SYSTEM ==========================
   public function register()

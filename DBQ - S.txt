@@ -1,1 +1,22 @@
-ALTER TABLE `expert_details` ADD `full_name` VARCHAR(255) NOT NULL AFTER `service_id`;
+ALTER TABLE user_locations 
+ADD UNIQUE KEY unique_user (user_id);
+
+CREATE TABLE user_locations (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+
+    ip VARCHAR(45) NULL,          -- supports IPv4 + IPv6
+    lat DECIMAL(10,7) NULL,       -- precision for GPS
+    lng DECIMAL(10,7) NULL,
+
+    city VARCHAR(100) NULL,
+    country VARCHAR(100) NULL,
+    region VARCHAR(100) NULL,
+    timezone VARCHAR(100) NULL,
+
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_user_id (user_id),
+    INDEX idx_lat_lng (lat, lng)
+);
