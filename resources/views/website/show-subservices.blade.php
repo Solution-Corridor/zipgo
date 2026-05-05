@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ $service->name }} - Sub Services</title>
   @include('includes.header_links')
-  <style>
+<style>
     body {
       background: #f8fafc;
       font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -35,14 +35,36 @@
       font-size: 0.9rem;
     }
 
-    /* 6-column grid */
+    /* Grid system */
     .subservices-grid {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 1rem;
     }
 
-    /* Card – just the image container, no extra padding */
+    /* Tablets: 3 columns */
+    @media (max-width: 992px) {
+      .subservices-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Mobile & small devices: always 3 columns */
+    @media (max-width: 768px) {
+      .subservices-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.7rem;
+      }
+    }
+
+    /* Very small phones: reduce gap & font sizes */
+    @media (max-width: 480px) {
+      .subservices-grid {
+        gap: 0.5rem;
+      }
+    }
+
+    /* Card */
     .subservice-card {
       background: transparent;
       border-radius: 12px;
@@ -53,11 +75,11 @@
       transform: translateY(-2px);
     }
 
-    /* Image container with overlay text (everything on image) */
+    /* Image container */
     .card-image {
       position: relative;
       width: 100%;
-      aspect-ratio: 1 / 1; /* square, adjust if needed */
+      aspect-ratio: 1 / 1;
       background: #f1f5f9;
       border-radius: 12px;
       overflow: hidden;
@@ -68,7 +90,8 @@
     .card-image img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
+      display: block;
     }
 
     .card-image .no-image {
@@ -82,23 +105,23 @@
       background: #f1f5f9;
     }
 
-    /* Overlay – shows name, price, description */
+    /* Overlay – only at bottom, no blur, gradient is semi‑transparent */
     .image-overlay {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.4) 60%, transparent);
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
       color: white;
-      padding: 0.6rem 0.5rem 0.5rem;
+      padding: 0.5rem 0.4rem 0.3rem;
       text-align: left;
-      backdrop-filter: blur(3px);
+      /* No backdrop-filter to keep image clear */
     }
 
     .overlay-name {
       font-weight: 700;
-      font-size: 0.85rem;
-      margin-bottom: 0.2rem;
+      font-size: 0.8rem;
+      margin-bottom: 0.1rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -106,22 +129,38 @@
 
     .overlay-price {
       font-weight: 600;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       opacity: 0.95;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.1rem;
     }
 
     .overlay-description {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       opacity: 0.85;
-      line-height: 1.3;
+      line-height: 1.2;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    /* No extra buttons or rows */
+    /* Reduce fonts further on very small screens */
+    @media (max-width: 480px) {
+      .overlay-name {
+        font-size: 0.7rem;
+      }
+      .overlay-price {
+        font-size: 0.6rem;
+      }
+      .overlay-description {
+        font-size: 0.5rem;
+        -webkit-line-clamp: 1; /* only one line on tiny phones */
+      }
+      .image-overlay {
+        padding: 0.3rem 0.3rem 0.2rem;
+      }
+    }
+
     .back-link {
       display: inline-block;
       margin-top: 2rem;
@@ -133,16 +172,6 @@
     .back-link:hover {
       text-decoration: underline;
       color: #0f172a;
-    }
-
-    @media (max-width: 1100px) {
-      .subservices-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 700px) {
-      .subservices-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 480px) {
-      .subservices-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -169,7 +198,6 @@
           <div class="image-overlay">
             <div class="overlay-name">{{ $sub->name }}</div>
             <div class="overlay-price">Rs. {{ number_format($sub->price) }}</div>
-            <div class="overlay-description">{{ Str::limit($sub->description, 60) }}</div>
           </div>
         </div>
       </div>
