@@ -3,12 +3,13 @@
 
 <head>
     @include('user.includes.general_style')
-    <!-- Leaflet CSS + JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- SweetAlert2 for pretty modal -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>{{ $subService->name }} | {{ $service->name }} - Map Booking</title>
     <style>
-        /* Your existing styles + map adjustments */
+        /* Your existing styles unchanged */
         .location-card {
             background: white;
             border-radius: 1rem;
@@ -28,9 +29,8 @@
             padding: 0.5rem 0;
             border-bottom: 1px dashed #f0ece8;
         }
-
-        .price-row span{
-color: black !important;
+        .price-row span {
+            color: black !important;
         }
         .price-row.total {
             border-top: 2px solid #FFE66D;
@@ -136,23 +136,19 @@ color: black !important;
                     <span class="text-sm font-semibold text-[#2C1810]">Pickup & Drop on Map</span>
                 </div>
                 
-                <!-- Mode toggle (Pickup / Drop) -->
                 <div class="mode-buttons">
                     <button id="pickupModeBtn" class="mode-btn active">📍 Set Pickup</button>
                     <button id="dropModeBtn" class="mode-btn">🏁 Set Drop</button>
                 </div>
 
-                <!-- Map container -->
                 <div id="map"></div>
-                
-                <!-- Live location feedback -->
                 <div class="location-info" id="locationFeedback">
                     Click on map to set pickup location first.
                 </div>
             </div>
         </div>
 
-        <!-- Price Breakdown (dynamic) -->
+        <!-- Price Breakdown -->
         <div class="px-4">
             <div class="price-breakdown">
                 <h3 class="text-sm font-bold text-[#2C1810] mb-2 flex items-center gap-2">
@@ -164,7 +160,7 @@ color: black !important;
                 </div>
                 <div class="price-row">
                     <span>Distance (per km)</span>
-                    <span>Rs. {{ number_format($subService->price, 0) }}/km</span>
+                    <span id="perKmRateDisplay">Rs. 35/km</span>
                 </div>
                 <div class="price-row">
                     <span>Distance Charge</span>
@@ -191,25 +187,20 @@ color: black !important;
 
     <script>
         // --- Map Configuration ---
-        // Default center (example: your city center, e.g., Kathmandu or any lat/lng)
-        const defaultCenter = [27.7172, 85.3240];  // Change to your city's coordinates
-        
-        // Initialize map
+        const defaultCenter = [27.7172, 85.3240];
         const map = L.map('map').setView(defaultCenter, 13);
         
-        // Load OpenStreetMap tiles
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
             subdomains: 'abcd',
             maxZoom: 19
         }).addTo(map);
         
-        // Markers
         let pickupMarker = null;
         let dropMarker = null;
-        let currentMode = 'pickup'; // 'pickup' or 'drop'
+        let currentMode = 'pickup';
         
-        // UI elements
+        // DOM elements
         const pickupModeBtn = document.getElementById('pickupModeBtn');
         const dropModeBtn = document.getElementById('dropModeBtn');
         const locationFeedback = document.getElementById('locationFeedback');
@@ -217,14 +208,14 @@ color: black !important;
         const totalPriceSpan = document.getElementById('totalPrice');
         const distanceKmSpan = document.getElementById('distanceKm');
         
-        // Price constants
+        // Price data
         const basePrice = {{ $subService->price }};
         const perKmRate = 35;
         const serviceFee = 30;
         
-        // Helper: calculate distance (Haversine formula) in km
+        // Helper distance
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // km
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -234,7 +225,6 @@ color: black !important;
             return R * c;
         }
         
-        // Update price based on current markers
         function updatePrice() {
             if (pickupMarker && dropMarker) {
                 const p = pickupMarker.getLatLng();
@@ -246,21 +236,24 @@ color: black !important;
                 distanceChargeSpan.innerText = 'Rs. ' + distanceCharge.toLocaleString();
                 totalPriceSpan.innerText = 'Rs. ' + total.toLocaleString();
                 distanceKmSpan.innerText = `Distance: ${distance.toFixed(2)} km`;
+                // Store current values for booking
+                window.currentDistance = distance;
+                window.currentDistanceCharge = distanceCharge;
+                window.currentTotal = total;
             } else {
                 distanceChargeSpan.innerText = 'Rs. 0';
                 totalPriceSpan.innerText = 'Rs. ' + (basePrice + serviceFee).toLocaleString();
                 distanceKmSpan.innerText = 'Distance: 0 km (set both locations)';
+                window.currentDistance = 0;
+                window.currentDistanceCharge = 0;
+                window.currentTotal = basePrice + serviceFee;
             }
         }
         
-        // Handle map click
         map.on('click', function(e) {
             const { lat, lng } = e.latlng;
-            
             if (currentMode === 'pickup') {
-                // Remove existing pickup marker
                 if (pickupMarker) map.removeLayer(pickupMarker);
-                // Add new pickup marker (green)
                 pickupMarker = L.marker([lat, lng], {
                     icon: L.divIcon({
                         className: 'custom-div-icon',
@@ -270,11 +263,7 @@ color: black !important;
                     })
                 }).addTo(map);
                 pickupMarker.bindPopup('Pickup').openPopup();
-                locationFeedback.innerHTML = '✅ Pickup set. Now click "Set Drop" or tap on map again to set drop location.';
-                // Optionally auto-switch mode to drop for convenience
-                // But we'll let user switch manually to avoid confusion. 
-                // Uncomment next line if you want auto-switch:
-                // document.getElementById('dropModeBtn').click();
+                locationFeedback.innerHTML = '✅ Pickup set. Now set drop location.';
             } 
             else if (currentMode === 'drop') {
                 if (dropMarker) map.removeLayer(dropMarker);
@@ -287,18 +276,16 @@ color: black !important;
                     })
                 }).addTo(map);
                 dropMarker.bindPopup('Drop').openPopup();
-                locationFeedback.innerHTML = '✅ Drop set. Both locations ready.';
+                locationFeedback.innerHTML = '✅ Drop set. Ready to book!';
             }
-            
             updatePrice();
         });
         
-        // Mode switching UI
         pickupModeBtn.addEventListener('click', () => {
             currentMode = 'pickup';
             pickupModeBtn.classList.add('active');
             dropModeBtn.classList.remove('active');
-            locationFeedback.innerHTML = '📍 Pickup mode active – click on map to set pickup location.';
+            locationFeedback.innerHTML = '📍 Pickup mode – click on map to set pickup.';
         });
         
         dropModeBtn.addEventListener('click', () => {
@@ -309,28 +296,75 @@ color: black !important;
             currentMode = 'drop';
             dropModeBtn.classList.add('active');
             pickupModeBtn.classList.remove('active');
-            locationFeedback.innerHTML = '🏁 Drop mode active – click on map to set drop location.';
+            locationFeedback.innerHTML = '🏁 Drop mode – click on map to set drop.';
         });
         
-        // Optional: Add a reset button? Not required but you can add a small "Reset" link.
-        // For better UX, we add a hidden reset feature: double-click map clears all? Not needed now.
-        
-        // Dummy booking button
-        document.getElementById('bookNowBtn').addEventListener('click', () => {
+        // BOOKING with AJAX + SweetAlert2
+        document.getElementById('bookNowBtn').addEventListener('click', async () => {
             if (!pickupMarker || !dropMarker) {
-                alert('Please set both pickup and drop locations on the map before booking.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Incomplete',
+                    text: 'Please set both pickup and drop locations on the map!',
+                    confirmButtonColor: '#FF6B6B'
+                });
                 return;
             }
+            
             const pickupLatLng = pickupMarker.getLatLng();
             const dropLatLng = dropMarker.getLatLng();
-            const totalText = totalPriceSpan.innerText;
-            alert(`✨ DEMO BOOKING ✨\n\nService: {{ $subService->name }}\nPickup: ${pickupLatLng.lat.toFixed(4)}, ${pickupLatLng.lng.toFixed(4)}\nDrop: ${dropLatLng.lat.toFixed(4)}, ${dropLatLng.lng.toFixed(4)}\nTotal: ${totalText}\n\nThis is a dummy demonstration. No actual booking is created.`);
+            
+            const bookingData = {
+                service_id: {{ $service->id }},
+                sub_service_id: {{ $subService->id }},
+                pickup_lat: pickupLatLng.lat,
+                pickup_lng: pickupLatLng.lng,
+                drop_lat: dropLatLng.lat,
+                drop_lng: dropLatLng.lng,
+                distance_km: window.currentDistance.toFixed(2),
+                base_price: basePrice,
+                per_km_rate: perKmRate,
+                distance_charge: window.currentDistanceCharge,
+                service_fee: serviceFee,
+                total_price: window.currentTotal,
+                _token: '{{ csrf_token() }}'
+            };
+            
+            try {
+                const response = await fetch('{{ route("user.subservice.book") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '🎉 Booking Confirmed!',
+                        html: `<strong>Booking ID:</strong> #${result.booking_id}<br>
+                               <strong>Service:</strong> {{ $subService->name }}<br>
+                               <strong>Total Paid:</strong> Rs. ${window.currentTotal.toLocaleString()}<br>
+                               <strong>Status:</strong> Confirmed`,
+                        confirmButtonText: 'Great!',
+                        confirmButtonColor: '#22c55e',
+                        background: '#fff',
+                        backdrop: true
+                    }).then(() => {
+                        // Optional: redirect to booking history
+                        // window.location.href = '/my-bookings';
+                    });
+                } else {
+                    Swal.fire('Error', result.message || 'Booking failed. Try again.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Network error. Please check your connection.', 'error');
+            }
         });
         
-        // Lucide icons & initial distance message
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            updatePrice(); // base price only
+            updatePrice();
         });
     </script>
 </body>

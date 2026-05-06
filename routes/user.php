@@ -21,13 +21,15 @@ Route::group(['middleware' => 'checkUserRole'], function () {
     Route::get('/explore', [MainUser::class, 'explore'])->name('user.explore');
     Route::get('/service/{slug}', [MainUser::class, 'sub_service'])->name('user.service');
     Route::get('/service/{slug}/{subslug}', [MainUser::class, 'sub_service_detail'])->name('user.sub.service');
+    Route::post('/book-sub-service', [MainUser::class, 'storeBooking'])->name('user.subservice.book');
 
     Route::get('/services', [MainUser::class, 'services'])->name('user.services');
     Route::get('/expert/{id}', [MainUser::class, 'expertDetail'])->name('user.expert_detail');
-    // Bookings (my service requests)
+
+
     Route::get('/bookings', [MainUser::class, 'bookings'])->name('user.bookings');
     Route::get('/bookings/{id}', [MainUser::class, 'booking_show'])->name('bookings.show');
-    Route::post('/bookings', [MainUser::class, 'booking_store'])->name('bookings.store');
+    Route::post('/bookings/{id}/cancel', [MainUser::class, 'cancelBooking'])->name('bookings.cancel');
 
     Route::get('/user-profile',   [MainUser::class, 'user_profile'])->name('user.profile');
     Route::post('/update-user-profile',   [MainUser::class, 'update_user_profile'])->name('user_profile.update');

@@ -19,6 +19,8 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
     Route::post('/jobs/{id}/decline', [ExpertMain::class, 'jobs_decline'])->name('expert.jobs.decline');
     Route::post('/jobs/{id}/complete', [ExpertMain::class, 'jobs_complete'])->name('expert.jobs.complete');
     Route::post('/jobs/{id}/status', [ExpertMain::class, 'updateStatus'])->name('expert.jobs.status');
+
+    
     Route::get('/earnings', [ExpertMain::class, 'earnings'])->name('expert.earnings');
 
     Route::get('/rates', [ExpertRateController::class, 'index'])->name('expert.rates');

@@ -1,9 +1,29 @@
 ALTER TABLE `expert_details` ADD `sub_service_id` INT(11) NOT NULL AFTER `service_id`;
 
 
+CREATE TABLE `bookings` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `service_id` BIGINT UNSIGNED NOT NULL,
+    `sub_service_id` BIGINT UNSIGNED NOT NULL,
+    `pickup_lat` DECIMAL(10, 7) NOT NULL,
+    `pickup_lng` DECIMAL(10, 7) NOT NULL,
+    `drop_lat` DECIMAL(10, 7) NOT NULL,
+    `drop_lng` DECIMAL(10, 7) NOT NULL,
+    `distance_km` DECIMAL(8, 2) NOT NULL,
+    `base_price` INT NOT NULL,
+    `per_km_rate` INT NOT NULL,
+    `distance_charge` INT NOT NULL,
+    `service_fee` INT NOT NULL,
+    `total_price` INT NOT NULL,
+    `status` ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
+ALTER TABLE `bookings` 
+ADD COLUMN `expert_id` INT UNSIGNED NULL AFTER `user_id`,
+ADD COLUMN `assigned_at` TIMESTAMP NULL AFTER `expert_id`;
 
 
 

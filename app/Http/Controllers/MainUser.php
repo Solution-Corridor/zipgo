@@ -14,6 +14,7 @@ use App\Models\City;
 use App\Models\Service;
 use App\Models\SubService;
 use App\Models\ExpertDetail;
+use App\Models\Booking;
 use App\Models\Blog;
 
 class MainUser extends Controller
@@ -483,6 +484,47 @@ class MainUser extends Controller
     return view('user.sub_service_detail', compact('service', 'subService'));
   }
 
+  public function storeBooking(Request $request)
+  {
+    $request->validate([
+      'service_id' => 'required|exists:services,id',
+      'sub_service_id' => 'required|exists:sub_services,id',
+      'pickup_lat' => 'required|numeric',
+      'pickup_lng' => 'required|numeric',
+      'drop_lat' => 'required|numeric',
+      'drop_lng' => 'required|numeric',
+      'distance_km' => 'required|numeric',
+      'base_price' => 'required|numeric',
+      'per_km_rate' => 'required|numeric',
+      'distance_charge' => 'required|numeric',
+      'service_fee' => 'required|numeric',
+      'total_price' => 'required|numeric',
+    ]);
+
+    $booking = Booking::create([
+      'user_id' => Auth::id(),
+      'service_id' => $request->service_id,
+      'sub_service_id' => $request->sub_service_id,
+      'pickup_lat' => $request->pickup_lat,
+      'pickup_lng' => $request->pickup_lng,
+      'drop_lat' => $request->drop_lat,
+      'drop_lng' => $request->drop_lng,
+      'distance_km' => $request->distance_km,
+      'base_price' => $request->base_price,
+      'per_km_rate' => $request->per_km_rate,
+      'distance_charge' => $request->distance_charge,
+      'service_fee' => $request->service_fee,
+      'total_price' => $request->total_price,
+      'status' => 'confirmed',
+    ]);
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Booking confirmed successfully!',
+      'booking_id' => $booking->id
+    ]);
+  }
+
 
   public function services()
   {
@@ -555,42 +597,38 @@ class MainUser extends Controller
     return view('user.expert_detail', compact('expert', 'displayName', 'price', 'rating', 'cityName', 'selfieImage', 'rates', 'service'));
   }
 
+
   public function bookings()
   {
-    // Dummy bookings (upcoming & past)
-    $upcoming = [
-      (object) ['id' => 101, 'professional' => 'Ramesh K.', 'service' => 'Plumbing', 'date' => '2025-05-05 10:00 AM', 'status' => 'Confirmed'],
-      (object) ['id' => 102, 'professional' => 'Sunil E.', 'service' => 'Electrical', 'date' => '2025-05-07 02:00 PM', 'status' => 'Pending'],
-    ];
+    $bookings = Booking::with(['service', 'subService'])
+      ->where('user_id', Auth::id())
+      ->orderBy('created_at', 'desc')
+      ->get();
 
-    $past = [
-      (object) ['id' => 99, 'professional' => 'Mohan C.', 'service' => 'Carpentry', 'date' => '2025-04-20', 'status' => 'Completed'],
-    ];
+    $upcoming = $bookings->whereIn('status', ['pending', 'confirmed']);
+    $past = $bookings->whereIn('status', ['completed', 'cancelled']);
 
     return view('user.bookings', compact('upcoming', 'past'));
   }
 
   public function booking_show($id)
   {
-    // Dummy single booking detail
-    $booking = (object) [
-      'id' => $id,
-      'professional' => 'Ramesh K.',
-      'service' => 'Plumbing',
-      'date' => '2025-05-05 10:00 AM',
-      'address' => '123 Main St, Bangalore',
-      'price' => 299,
-      'status' => 'Confirmed',
-      'description' => 'Fix leaking kitchen pipe',
-    ];
+    $booking = Booking::with(['service', 'subService'])
+      ->where('user_id', Auth::id())
+      ->findOrFail($id);
 
     return view('user.booking-detail', compact('booking'));
   }
 
-  public function booking_store(Request $request)
+  public function cancelBooking($id)
   {
-    // Dummy store – redirect back with success
-    return redirect()->route('customer.bookings')->with('success', 'Booking created (demo)!');
+    $booking = Booking::where('user_id', Auth::id())->findOrFail($id);
+    if (in_array($booking->status, ['pending', 'confirmed'])) {
+      $booking->status = 'cancelled';
+      $booking->save();
+      return response()->json(['success' => true]);
+    }
+    return response()->json(['success' => false, 'message' => 'Cannot cancel this booking'], 400);
   }
 
 

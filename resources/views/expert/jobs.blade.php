@@ -25,12 +25,17 @@
         <!-- Jobs list -->
         <div class="space-y-3">
             @forelse($jobs as $job)
+            @php
+                // For display, we extract customer name from the user relationship
+                $customerName = $job->user->name ?? 'Customer';
+                $serviceName = $job->subService->name ?? $job->service->name;
+            @endphp
             <div class="bg-[#1A2636] rounded-xl p-3 border border-[#2A3A5A] shadow-md">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="font-semibold text-white">{{ $job->customer }}</p>
-                        <p class="text-xs text-gray-400">{{ $job->service }} • {{ $job->date }} at {{ $job->time }}</p>
-                        <p class="text-xs text-gray-500 mt-1 truncate max-w-[200px]">{{ $job->address }}</p>
+                        <p class="font-semibold text-white">{{ $customerName }}</p>
+                        <p class="text-xs text-gray-400">{{ $serviceName }} • {{ $job->created_at->format('M d, Y') }}</p>
+                        <p class="text-xs text-gray-500 mt-1 truncate max-w-[200px]">Distance: {{ $job->distance_km }} km</p>
                     </div>
                     <div class="text-right">
                         <span class="text-xs px-2 py-1 rounded-full 
@@ -40,8 +45,8 @@
                             @else bg-red-900/40 text-red-400 @endif">
                             {{ ucfirst($job->status) }}
                         </span>
-                        @if($job->earnings)
-                            <p class="text-xs text-[#F4A261] mt-1">Rs. {{ number_format($job->earnings) }}</p>
+                        @if($job->status == 'completed')
+                            <p class="text-xs text-[#F4A261] mt-1">Rs. {{ number_format($job->total_price) }}</p>
                         @endif
                     </div>
                 </div>
@@ -52,7 +57,7 @@
             @empty
             <div class="bg-[#1A2636]/60 rounded-xl p-8 text-center border border-dashed border-[#2A3A5A]">
                 <i data-lucide="briefcase" class="w-12 h-12 text-gray-600 mx-auto mb-2"></i>
-                <p class="text-gray-400">No jobs found.</p>
+                <p class="text-gray-400">No jobs found matching your service.</p>
             </div>
             @endforelse
         </div>

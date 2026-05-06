@@ -15,7 +15,7 @@ use App\Models\City;
 use App\Models\Service;
 use App\Models\SubService;
 use App\Models\ExpertDetail;
-use App\Models\Blog;
+use App\Models\Booking;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -141,111 +141,123 @@ class ExpertMain extends Controller
 
   public function jobs(Request $request)
   {
-    // Dummy data for jobs listing
-    $jobs = [
-      (object) [
-        'id'       => 101,
-        'customer' => 'Rajesh Sharma',
-        'service'  => 'Plumbing',
-        'date'     => '2025-05-01',
-        'time'     => '10:00 AM',
-        'status'   => 'completed',
-        'earnings' => 499,
-        'address'  => '123 Main St, Bangalore'
-      ],
-      (object) [
-        'id'       => 102,
-        'customer' => 'Priya Singh',
-        'service'  => 'Electrical',
-        'date'     => '2025-05-02',
-        'time'     => '02:00 PM',
-        'status'   => 'completed',
-        'earnings' => 699,
-        'address'  => '45 Park Ave, Bangalore'
-      ],
-      (object) [
-        'id'       => 103,
-        'customer' => 'Amit Verma',
-        'service'  => 'AC Repair',
-        'date'     => '2025-05-03',
-        'time'     => '11:00 AM',
-        'status'   => 'cancelled',
-        'earnings' => 0,
-        'address'  => '78 Lake View, Bangalore'
-      ],
-      (object) [
-        'id'       => 104,
-        'customer' => 'Neha Gupta',
-        'service'  => 'Carpentry',
-        'date'     => '2025-05-05',
-        'time'     => '03:00 PM',
-        'status'   => 'pending',
-        'earnings' => null,
-        'address'  => '12 Garden Colony, Bangalore'
-      ],
-      (object) [
-        'id'       => 105,
-        'customer' => 'Suresh Kumar',
-        'service'  => 'Plumbing',
-        'date'     => '2025-05-06',
-        'time'     => '09:00 AM',
-        'status'   => 'confirmed',
-        'earnings' => 599,
-        'address'  => '67 Lake Road, Bangalore'
-      ],
-    ];
+    $expert = Auth::user();
 
-    // Optional: filter by status from request
+    // Get expert's service & sub-service from expert_details table
+    $expertDetail = ExpertDetail::where('user_id', $expert->id)->first();
+
+    if (!$expertDetail || !$expertDetail->service_id || !$expertDetail->sub_service_id) {
+      $jobs = collect();
+    } else {
+      // Get bookings that:
+      // - match expert's service & sub-service
+      // - are not assigned to any expert (pending) OR assigned to this expert (confirmed/ongoing)
+      $jobs = Booking::with(['service', 'subService', 'user'])
+        ->where('service_id', $expertDetail->service_id)
+        ->where('sub_service_id', $expertDetail->sub_service_id)
+        ->where(function ($q) use ($expert) {
+          $q->whereNull('expert_id')
+            ->orWhere('expert_id', $expert->id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+    }
+
+    // Filter by status if requested
     $statusFilter = $request->get('status');
     if ($statusFilter && in_array($statusFilter, ['pending', 'confirmed', 'completed', 'cancelled'])) {
-      $jobs = array_filter($jobs, fn($job) => $job->status === $statusFilter);
+      $jobs = $jobs->where('status', $statusFilter);
     }
 
     return view('expert.jobs', compact('jobs', 'statusFilter'));
   }
 
-  /**
-   * Show a single job details.
-   */
+  // Show single job details
   public function jobs_show($id)
   {
-    // Dummy data – in real app, fetch from DB
-    $job = (object) [
-      'id'          => (int) $id,
-      'customer'    => 'Rajesh Sharma',
-      'customer_phone' => '+91 98765 43210',
-      'service'     => 'Plumbing',
-      'date'        => '2025-05-01',
-      'time'        => '10:00 AM',
-      'address'     => '123 Main St, Bangalore',
-      'status'      => 'pending', // pending, confirmed, completed, cancelled
-      'earnings'    => 499,
-      'description' => 'Fix leaking kitchen pipe and replace faucet. Also check water pressure.',
-      'created_at'  => '2025-04-28',
-    ];
+    $expert = Auth::user();
+    $expertDetail = ExpertDetail::where('user_id', $expert->id)->first();
 
-    return view('expert.job-detail', compact('job'));
+    $booking = Booking::with(['service', 'subService', 'user'])
+      ->where('service_id', $expertDetail->service_id)
+      ->where('sub_service_id', $expertDetail->sub_service_id)
+      ->where(function ($q) use ($expert) {
+        $q->whereNull('expert_id')->orWhere('expert_id', $expert->id);
+      })
+      ->findOrFail($id);
+
+    return view('expert.job-detail', compact('booking'));
   }
 
+  // Accept a job (assign to this expert)
   public function jobs_accept($id)
   {
-    return back()->with('success', 'Job accepted.');
-  }
-  public function jobs_decline($id)
-  {
-    return back()->with('success', 'Job declined.');
-  }
-  public function jobs_complete($id)
-  {
-    return back()->with('success', 'Job marked completed.');
+    $expert = Auth::user();
+    $expertDetail = ExpertDetail::where('user_id', $expert->id)->first();
+
+    $booking = Booking::where('service_id', $expertDetail->service_id)
+      ->where('sub_service_id', $expertDetail->sub_service_id)
+      ->whereNull('expert_id')
+      ->where('status', 'pending')
+      ->findOrFail($id);
+
+    $booking->update([
+      'expert_id' => $expert->id,
+      'status' => 'confirmed',
+      'assigned_at' => now(),
+    ]);
+
+    return redirect()->route('expert.jobs.show', $booking->id)
+      ->with('success', 'Job accepted successfully!');
   }
 
+  // Decline a job (cancel it)
+  public function jobs_decline($id)
+  {
+    $expert = Auth::user();
+    $expertDetail = ExpertDetail::where('user_id', $expert->id)->first();
+
+    $booking = Booking::where('service_id', $expertDetail->service_id)
+      ->where('sub_service_id', $expertDetail->sub_service_id)
+      ->whereNull('expert_id')
+      ->where('status', 'pending')
+      ->findOrFail($id);
+
+    $booking->status = 'cancelled';
+    $booking->save();
+
+    return redirect()->route('expert.jobs')
+      ->with('success', 'Job declined and cancelled.');
+  }
+
+  // Mark job as completed
+  public function jobs_complete($id)
+  {
+    $expert = Auth::user();
+    $booking = Booking::where('expert_id', $expert->id)
+      ->where('status', 'confirmed')
+      ->findOrFail($id);
+
+    $booking->status = 'completed';
+    $booking->save();
+
+    return redirect()->route('expert.jobs.show', $booking->id)
+      ->with('success', 'Job marked as completed.');
+  }
+
+  // Update any status (optional)
   public function updateStatus(Request $request, $id)
   {
-    $status = $request->input('status'); // pending, confirmed, completed, cancelled
-    // Dummy update – in real app, update the job in DB
-    return back()->with('success', "Job #{$id} status updated to " . ucfirst($status));
+    $status = $request->input('status');
+    $expert = Auth::user();
+    $booking = Booking::where('expert_id', $expert->id)->findOrFail($id);
+    $booking->status = $status;
+    $booking->save();
+
+    return back()->with('success', "Status updated to " . ucfirst($status));
   }
+
+
 
   public function earnings()
   {
