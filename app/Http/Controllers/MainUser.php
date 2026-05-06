@@ -473,6 +473,17 @@ class MainUser extends Controller
   }
 
 
+  public function sub_service_detail($slug, $subslug)
+  {
+    $service = Service::where('slug', $slug)->firstOrFail();
+    $subService = SubService::where('slug', $subslug)
+      ->where('service_id', $service->id)
+      ->firstOrFail();
+
+    return view('user.sub_service_detail', compact('service', 'subService'));
+  }
+
+
   public function services()
   {
     $user = Auth::user();

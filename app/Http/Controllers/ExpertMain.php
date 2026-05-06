@@ -13,10 +13,11 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\City;
 use App\Models\Service;
+use App\Models\SubService;
 use App\Models\ExpertDetail;
 use App\Models\Blog;
 use Illuminate\Support\Facades\File;
-
+use Illuminate\Support\Facades\Log;
 
 class ExpertMain extends Controller
 {
@@ -292,7 +293,7 @@ class ExpertMain extends Controller
     return view('expert.profile', [
       'user'       => $user,
       'services'   => $services,
-      'expertData' => $expertData,   // now defined in view
+      'expertData' => $expertData,
     ]);
   }
 
@@ -302,6 +303,7 @@ class ExpertMain extends Controller
     // 1. Validate inputs – on failure, redirects back with old input automatically
     $validated = $request->validate([
       'service_id'     => 'required|exists:services,id',
+      'sub_service_id' => 'required|exists:sub_services,id',
       'full_name'      => 'required|string|max:255',
       'nic_number'     => 'required|string|max:50',
       'nic_expiry'     => 'required|date',
@@ -330,6 +332,7 @@ class ExpertMain extends Controller
     $data = [
       'user_id'        => $userId,
       'service_id'     => $request->service_id,
+      'sub_service_id' => $request->sub_service_id,
       'full_name'      => $request->full_name,
       'nic_number'     => $request->nic_number,
       'nic_expiry'     => $request->nic_expiry,
@@ -368,7 +371,14 @@ class ExpertMain extends Controller
   }
 
 
-
+  public function getSubServices($serviceId)
+  {
+    $subServices = SubService::where('service_id', $serviceId)
+      ->where('is_active', 1)
+      ->orderBy('name')
+      ->get(['id', 'name']);
+    return response()->json($subServices);
+  }
 
 
 

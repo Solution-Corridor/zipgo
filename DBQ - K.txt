@@ -1,3 +1,14 @@
+ALTER TABLE `expert_details` ADD `sub_service_id` INT(11) NOT NULL AFTER `service_id`;
+
+
+
+
+
+
+
+
+
+
 ALTER TABLE `expert_details` ADD `amount_paid` INT(11) NULL AFTER `payment_status`;
 
 

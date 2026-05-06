@@ -15,6 +15,7 @@ class ExpertDetail extends Model
   protected $fillable = [
     'user_id',
     'service_id',
+    'sub_service_id',
     'full_name',
     'nic_number',
     'nic_expiry',
@@ -47,5 +48,10 @@ class ExpertDetail extends Model
   public function rates()
   {
     return $this->hasMany(ExpertRate::class, 'expert_id');
+  }
+
+  public function subService()
+  {
+    return $this->belongsTo(SubService::class);
   }
 }

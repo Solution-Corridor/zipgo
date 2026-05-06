@@ -23,7 +23,7 @@ class CheckExpertRole
         }
 
         // 3. Exclude routes where expert profile creation/update is allowed
-        $excludedRoutes = ['expert.profile', 'expert.profile.update', 'expert.payment.page', 'expert.payment.process'];
+        $excludedRoutes = ['expert.profile', 'expert.profile.update', 'expert.payment.page', 'expert.payment.process', 'expert.sub-services'];
         if (in_array($request->route()->getName(), $excludedRoutes)) {
             return $next($request);
         }

@@ -6,7 +6,6 @@ use App\Http\Controllers\ExpertMain;
 use App\Http\Controllers\ExpertRateController;
 
 
-
 Route::group(['middleware' => 'checkExpertRole'], function () {
   Route::prefix('expert')->group(function () {
     Route::get('/dashboard', [ExpertMain::class, 'expert_dashboard'])->name('expert.dashboard');
@@ -29,6 +28,8 @@ Route::group(['middleware' => 'checkExpertRole'], function () {
 
     Route::get('/profile', [ExpertMain::class, 'expert_profile'])->name('expert.profile');
     Route::post('/update_profile', [ExpertMain::class, 'updateExpert'])->name('expert.profile.update');
+    Route::get('/sub-services/{serviceId}', [ExpertMain::class, 'getSubServices'])->name('expert.sub-services');
+
 
     Route::get('/expert-payment', [ExpertMain::class, 'showPaymentPage'])->name('expert.payment.page');
 
