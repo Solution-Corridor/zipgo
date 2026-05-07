@@ -1,3 +1,6 @@
+ALTER TABLE `services` ADD `type` VARCHAR(255) NOT NULL AFTER `slug`;
+
+
 ALTER TABLE `expert_details` ADD `sub_service_id` INT(11) NOT NULL AFTER `service_id`;
 
 

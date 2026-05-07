@@ -33,7 +33,7 @@ Edit Service
                     @csrf
                     @method('PUT')
                     <div class="row">
-                      <div class="col-md-5">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label>Service Name <code>*</code></label>
                           <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $service->name) }}" required>
@@ -41,7 +41,7 @@ Edit Service
                         @error('name')<p class="text-danger">{{ $message }}</p>@enderror
                       </div>
 
-                      <div class="col-md-5">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label>Slug <code>*</code></label>
                           <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug', $service->slug) }}" required>
@@ -49,12 +49,39 @@ Edit Service
                         @error('slug')<p class="text-danger">{{ $message }}</p>@enderror
                       </div>
 
-                      {{-- PRIORITY NUMBER FIELD (replaces toggle) --}}
+                      <div class="col-md-2">
+                        <div class="form-group">
+                          <label>Type <code>*</code></label>
+                          <select name="type" class="form-control" required>
+                            <option value="">Select Tag</option>
+
+                            <option value="easy_go"
+                              {{ old('type', $service->type) == 'easy_go' ? 'selected' : '' }}>
+                              Easy Go
+                            </option>
+
+                            <option value="buy_fast"
+                              {{ old('type', $service->type) == 'buy_fast' ? 'selected' : '' }}>
+                              Buy Fast
+                            </option>
+
+                            <option value="quick_service"
+                              {{ old('type', $service->tag_name) == 'quick_service' ? 'selected' : '' }}>
+                              Quick Service
+                            </option>
+                          </select>
+                        </div>
+
+                        @error('type')
+                        <p class="text-danger">{{ $message }}</p>
+                        @enderror
+                      </div>
+
                       <div class="col-md-2">
                         <div class="form-group">
                           <label>Priority Order</label>
                           <input type="number" name="is_priority" id="is_priority" class="form-control"
-                                 min="1" step="1" value="{{ old('is_priority', $service->is_priority) }}">
+                            min="1" step="1" value="{{ old('is_priority', $service->is_priority) }}">
                           <small class="text-muted">Lower number = higher position (1 = first). Leave empty to place after all prioritized services.</small>
                         </div>
                         @error('is_priority')<p class="text-danger">{{ $message }}</p>@enderror
@@ -71,11 +98,11 @@ Edit Service
                       <div class="col-md-6">
                         <div class="form-group">
                           <label>Current Image</label>
-                          <input type="file" name="picture" class="form-control" accept="image/*"><br> 
+                          <input type="file" name="picture" class="form-control" accept="image/*"><br>
                           @if($service->pic)
-                            <img src="/{{ $service->pic }}" width="80" height="80" style="object-fit: cover;">
+                          <img src="/{{ $service->pic }}" width="80" height="80" style="object-fit: cover;">
                           @else
-                            No image
+                          No image
                           @endif
                           <small>Leave empty to keep current image. Max 2MB.</small>
                         </div>
@@ -127,4 +154,5 @@ Edit Service
     });
   </script>
 </body>
+
 </html>

@@ -32,7 +32,7 @@ Add New Service
                   <form action="{{ route('services.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-                      <div class="col-md-5">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label>Service Name <code>*</code></label>
                           <input type="text" name="name" id="name" class="form-control" required value="{{ old('name') }}" placeholder="Service Name">
@@ -40,7 +40,7 @@ Add New Service
                         @error('name')<p class="text-danger">{{ $message }}</p>@enderror
                       </div>
 
-                      <div class="col-md-5">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label>Slug / URL <code>*</code></label>
                           <input type="text" name="slug" id="slug" class="form-control" required value="{{ old('slug') }}" placeholder="Leave Empty For Auto Slug">
@@ -49,12 +49,32 @@ Add New Service
                         @error('slug')<p class="text-danger">{{ $message }}</p>@enderror
                       </div>
 
-                      {{-- NEW PRIORITY FIELD --}}
+                      <div class="col-md-2">
+                        <div class="form-group">
+                          <label>Type <code>*</code></label>
+                          <select name="type" class="form-control" required>
+                            <option value="">Select Tag</option>
+                            <option value="easy_go" {{ old('type') == 'easy_go' ? 'selected' : '' }}>
+                              Easy Go
+                            </option>
+                            <option value="buy_fast" {{ old('type') == 'buy_fast' ? 'selected' : '' }}>
+                              Buy Fast
+                            </option>
+                            <option value="quick_service" {{ old('type') == 'quick_service' ? 'selected' : '' }}>
+                              Quick Service
+                            </option>
+                          </select>
+                        </div>
+                        @error('type')
+                        <p class="text-danger">{{ $message }}</p>
+                        @enderror
+                      </div>
+
                       <div class="col-md-2">
                         <div class="form-group">
                           <label>Priority Order</label>
                           <input type="number" name="is_priority" id="is_priority" class="form-control"
-                                 min="1" step="1" value="{{ old('is_priority') }}">
+                            min="1" step="1" value="{{ old('is_priority') }}">
                           <small class="text-muted">Lower number = higher position (1 = first). Leave empty to place after all prioritized services.</small>
                         </div>
                         @error('is_priority')<p class="text-danger">{{ $message }}</p>@enderror
@@ -127,4 +147,5 @@ Add New Service
     });
   </script>
 </body>
+
 </html>

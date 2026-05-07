@@ -419,10 +419,28 @@ class Welcome extends Controller
   // ----------------------------- QUICK SERVICES ---------------------------------
   public function homeMaintenance()
   {
-    $services = Service::where('is_active', true)->orderBy('is_priority', 'desc')->orderBy('name')->get();
+    $services = Service::where('is_active', 1)
+      ->orderByRaw('is_priority = 0')
+      ->orderBy('is_priority', 'asc')
+      ->orderBy('name', 'asc')
+      ->where('type', 'quick_service')
+      ->get();
     return view('website.home-maintenance', compact('services'));
   }
 
+  // --------------------------- QUICK SERVICES END -------------------------------
+
+  // ----------------------------- QUICK SERVICES ---------------------------------
+  public function delivery()
+  {
+    $deliveryServices = Service::where('is_active', true)
+      ->where('type', 'buy_fast')
+      ->orderBy('is_priority', 'desc')
+      ->orderBy('name')
+      ->get();
+
+    return view('website.delivery', compact('deliveryServices'));
+  }
   // --------------------------- QUICK SERVICES END -------------------------------
 
   public function home()

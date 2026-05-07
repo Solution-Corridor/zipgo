@@ -56,6 +56,11 @@ Route::get('/home-maintenance', [Welcome::class, 'homeMaintenance'])->name('home
 
 // --------------------------- QUICK SERVICES END -------------------------------
 
+// ----------------------------- FAST DELIVERY ---------------------------------
+Route::get('/delivery', [Welcome::class, 'delivery'])->name('delivery');
+
+// --------------------------- FAST DELIVERY END -------------------------------
+
 Route::get('/home', [Welcome::class, 'home'])->name('welcome');
 Route::get('/search', [Welcome::class, 'search'])->name('search');
 Route::get('/live-search', [Welcome::class, 'liveSearch'])->name('live.search');

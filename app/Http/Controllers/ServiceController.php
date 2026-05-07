@@ -29,6 +29,7 @@ class ServiceController extends Controller
     $request->validate([
       'name'     => 'required|string|max:255',
       'slug'     => 'required|string|unique:services,slug',
+      'type'     => 'required',
       'price'    => 'required|numeric|min:0',
       'detail'   => 'nullable|string',
       'picture'  => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
@@ -47,6 +48,7 @@ class ServiceController extends Controller
     Service::create([
       'name'     => $request->name,
       'slug'     => $request->slug,
+      'type'     => $request->type,
       'pic'      => $picPath,
       'price'    => $request->price,
       'detail'   => $request->detail,
@@ -72,6 +74,7 @@ class ServiceController extends Controller
     $request->validate([
       'name'     => 'required|string|max:255',
       'slug'     => 'required|string|unique:services,slug,' . $service->id,
+      'type'     => 'required',
       'price'    => 'required|numeric|min:0',
       'detail'   => 'nullable|string',
       'picture'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
@@ -81,6 +84,7 @@ class ServiceController extends Controller
     $data = [
       'name'     => $request->name,
       'slug'     => $request->slug,
+      'type'     => $request->type,
       'price'    => $request->price,
       'detail'   => $request->detail,
       'is_priority' => $request->is_priority,   // store null or integer
