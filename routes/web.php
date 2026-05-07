@@ -43,7 +43,15 @@ Route::get('/verify/{v_token}', [Welcome::class, 'verify_otp']);
 Route::post('/verify_email', [Welcome::class, 'verify_email']);
 Route::get('/send-email', [Welcome::class, 'sendEmail'])->name('send-email');
 
-Route::get('/', [Welcome::class, 'index'])->name('welcome');
+Route::get('/', [Welcome::class, 'index'])->name('index');
+
+
+// ----------------------------- EASY GO ---------------------------------
+Route::get('/ride-booking', [Welcome::class, 'ride_booking'])->name('ride.booking');
+
+// --------------------------- EASY GO END -------------------------------
+
+Route::get('/home', [Welcome::class, 'home'])->name('welcome');
 Route::get('/search', [Welcome::class, 'search'])->name('search');
 Route::get('/live-search', [Welcome::class, 'liveSearch'])->name('live.search');
 

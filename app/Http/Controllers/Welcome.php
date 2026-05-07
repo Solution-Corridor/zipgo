@@ -392,7 +392,6 @@ class Welcome extends Controller
   }
 
   // ================================== AUTH SYSTEM END ==========================
-
   public function index()
   {
     $priority_services = Service::where('is_active', 1)
@@ -407,6 +406,30 @@ class Welcome extends Controller
 
     $experts = ExpertDetail::with('user')->where('profile_status', 1)->limit(6)->get();
     return view('website.index', compact('priority_services', 'services', 'experts'));
+  }
+
+  // ----------------------------- EASY GO ---------------------------------
+  public function ride_booking()
+  {
+    return view('website.ride_booking');
+  }
+
+// --------------------------- EASY GO END -------------------------------
+
+  public function home()
+  {
+    $priority_services = Service::where('is_active', 1)
+      ->where('is_priority', '!=', 0)
+      ->orderBy('is_priority', 'asc')
+      ->get();
+
+    $services = Service::where('is_active', 1)
+      ->where('is_priority', 0)
+      ->orderBy('name')
+      ->get();
+
+    $experts = ExpertDetail::with('user')->where('profile_status', 1)->limit(6)->get();
+    return view('website.home', compact('priority_services', 'services', 'experts'));
   }
 
   public function search(Request $request)
