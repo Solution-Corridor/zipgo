@@ -317,7 +317,7 @@
           splash.style.display = 'none';
         }, 600);
       }, 800);
-    }, 1500); // 2 seconds delay
+    }, 800); // 2 seconds delay
 
     // --------------------------------------------------------------
     // Initialize Lucide Icons & Map functionality

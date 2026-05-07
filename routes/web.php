@@ -51,6 +51,11 @@ Route::get('/ride-booking', [Welcome::class, 'ride_booking'])->name('ride.bookin
 
 // --------------------------- EASY GO END -------------------------------
 
+// ----------------------------- QUICK SERVICES ---------------------------------
+Route::get('/home-maintenance', [Welcome::class, 'homeMaintenance'])->name('home.maintenance');
+
+// --------------------------- QUICK SERVICES END -------------------------------
+
 Route::get('/home', [Welcome::class, 'home'])->name('welcome');
 Route::get('/search', [Welcome::class, 'search'])->name('search');
 Route::get('/live-search', [Welcome::class, 'liveSearch'])->name('live.search');

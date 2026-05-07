@@ -414,7 +414,16 @@ class Welcome extends Controller
     return view('website.ride_booking');
   }
 
-// --------------------------- EASY GO END -------------------------------
+  // --------------------------- EASY GO END -------------------------------
+
+  // ----------------------------- QUICK SERVICES ---------------------------------
+  public function homeMaintenance()
+  {
+    $services = Service::where('is_active', true)->orderBy('is_priority', 'desc')->orderBy('name')->get();
+    return view('website.home-maintenance', compact('services'));
+  }
+
+  // --------------------------- QUICK SERVICES END -------------------------------
 
   public function home()
   {
